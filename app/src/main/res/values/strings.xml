@@ -1,5 +1,12 @@
 <resources>
-    <string name="app_name" translatable="false">Fake Traveler</string>
+    <string name="app_name">Fake Traveler</string>
+
+    <!-- Layout defaults (language-neutral; translatable=false) -->
+    <string name="ActivityMain_GearIcon" translatable="false">&#9881;</string>
+    <string name="Default_MockCount" translatable="false">1</string>
+    <string name="Default_MockFrequency" translatable="false">10</string>
+    <string name="Default_DMockValue" translatable="false">0</string>
+    <string name="Default_MapProvider" translatable="false">OpenStreetMap</string>
 
     <!--  Strings from activity_main.xml layout  -->
     <!-- Latitude abbreviation  -->
@@ -13,8 +20,6 @@
     <!--  Strings from MainActivity.java  -->
     <string name="MainActivity_NoLatLong">No latitude/longitude values. Long press in the map where you want to be located.</string>
     <string name="MainActivity_MockApplied">Mocked location applied.</string>
-    <string name="MainActivity_MockNotApplied">Mocked location not applied. You must enable mock location in developer settings!</string>
-    <string name="MainActivity_MockLocRunning">Mocking location service running.</string>
     <string name="MainActivity_MockStopped">Mocking stopped.</string>
 
     <!--  Strings from activity_more.xml layout  -->
@@ -31,4 +36,51 @@
     <string name="ActivityMore_MapProvider">Map Provider (e.g., \'OpenStreetMap\')</string>
     <string name="ActivityMore_MapProviderInfo">Requires restart - a list of possible values can be found here: https://leaflet-extras.github.io/leaflet-providers/preview/</string>
     <string name="ActivityMore_LeafletLicense"><![CDATA[Both <a href="https://github.com/Leaflet/Leaflet/blob/main/LICENSE">Leaflet</a> and <a href="https://github.com/leaflet-extras/leaflet-providers/blob/master/license.md">Leaflet-providers</a> are licensed under the BSD 2-Clause License.]]></string>
+
+    <!-- ===== v2.4.0 additions ===== -->
+
+    <!-- Notification (FIX-006) -->
+    <string name="Notification_Title">FakeTraveler</string>
+    <string name="Notification_ChannelName">Mock location service</string>
+    <string name="Notification_ChannelDesc">Persistent notification shown while FakeTraveler is mocking your location.</string>
+    <string name="Notification_BodyIdle">Preparing mock location…</string>
+    <string name="Notification_BodyMocking">Mocking: %1$s, %2$s</string>
+    <string name="Notification_Stop">Stop</string>
+    <string name="Notification_ErrorTitle">FakeTraveler — Error</string>
+    <string name="Notification_ErrorBody">Mock location is not enabled. Tap to fix.</string>
+
+    <!-- Permission pre-flight dialog (FIX-008, FIX-009) -->
+    <string name="PermissionChecker_DialogTitle">Mock location not enabled</string>
+    <string name="PermissionChecker_DialogMessage">FakeTraveler is not selected as the mock-location app.\n\nTo fix:\n1. Open Developer options.\n2. Find \"Select mock location app\".\n3. Choose FakeTraveler.\n\nIf Developer options are hidden: open About phone and tap Build number 7 times.</string>
+    <string name="PermissionChecker_OpenSettings">Open Developer Settings</string>
+
+    <!-- OEM battery optimization helper (FIX-011) -->
+    <string name="OemHelper_Title">Background restrictions</string>
+    <string name="OemHelper_OpenSettings">Open Settings</string>
+    <string name="OemHelper_Xiaomi">MIUI / HyperOS aggressively kills background apps. Open Security → Permissions → Autostart and enable FakeTraveler, then exclude it from battery saver.</string>
+    <string name="OemHelper_Samsung">One UI may put FakeTraveler to sleep after 3 days unused. Open Battery → Background usage limits and add FakeTraveler to \"Never sleeping apps\".</string>
+    <string name="OemHelper_OnePlus">ColorOS gates background work behind \"App Auto Launch\". Open Privacy permissions → Startup manager and enable FakeTraveler.</string>
+    <string name="OemHelper_Huawei">EMUI/HarmonyOS uses a \"Protected apps\" list. Open Battery → App launch and switch FakeTraveler to Manage manually with all three options enabled.</string>
+    <string name="OemHelper_Vivo">FunTouch OS background restrictions vary. Open Battery → Background power usage and set FakeTraveler to \"Allow background activity\".</string>
+    <string name="OemHelper_Generic">For mocking to survive screen-off and Doze, exempt FakeTraveler from battery optimization in system Settings.</string>
+
+    <!-- GPX import (FIX-012) -->
+    <string name="Gpx_OpenLabel">Open with FakeTraveler</string>
+    <string name="Gpx_ImportButton">Import GPX route</string>
+    <string name="Gpx_PlayRouteButton">Play imported route</string>
+    <plurals name="Gpx_ImportSuccess">
+        <item quantity="one">Imported %1$d point</item>
+        <item quantity="other">Imported %1$d points</item>
+    </plurals>
+    <string name="Gpx_ImportError">Could not read GPX file</string>
+    <plurals name="Gpx_TooLarge">
+        <item quantity="one">GPX too large — limit is %1$d point</item>
+        <item quantity="other">GPX too large — limit is %1$d points</item>
+    </plurals>
+    <string name="Gpx_NoRoute">No route imported yet. Tap \"Import GPX route\" first.</string>
+    <string name="Gpx_RouteHeader">Imported route</string>
+
+    <!-- MoreActivity additions (FIX-005 / FIX-011 / FIX-012) -->
+    <string name="More_RestoreAfterBoot">Restore mocking after reboot</string>
+    <string name="More_OemHelperButton">Battery / background settings</string>
 </resources>

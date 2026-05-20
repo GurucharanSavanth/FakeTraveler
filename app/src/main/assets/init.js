@@ -7,7 +7,7 @@ var urlParams = new URLSearchParams(window.location.search);
 var lat = (_urlParams$get = urlParams.get('lat')) !== null && _urlParams$get !== void 0 ? _urlParams$get : 12;
 var lng = (_urlParams$get2 = urlParams.get('lng')) !== null && _urlParams$get2 !== void 0 ? _urlParams$get2 : 15;
 var zoom = (_urlParams$get3 = urlParams.get('zoom')) !== null && _urlParams$get3 !== void 0 ? _urlParams$get3 : 12;
-var provider = (_urlParams$get4 = urlParams.get('provider')) !== null && _urlParams$get4 !== void 0 ? _urlParams$get4 : 'OpenStreetMap';
+var provider = (_urlParams$get4 = urlParams.get('provider')) !== null && _urlParams$get4 !== void 0 ? _urlParams$get4 : 'CartoDB.Positron';
 var map = L.map('map').setView([lat, lng], zoom);
 var popup = L.popup();
 var alreadyRunning = false;
@@ -94,3 +94,20 @@ map.on('zoomend', onZoomEnd);
 mapMarker = L.marker([lat, lng], {
   icon: icon
 }).addTo(map);
+
+// FIX-013: offline tile-error banner
+function _ft_showOfflineBanner() {
+  var ind = document.getElementById('offline_indicator');
+  if (ind) return;
+  ind = document.createElement('div');
+  ind.id = 'offline_indicator';
+  ind.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.7);color:#fff;padding:8px 16px;border-radius:4px;z-index:9999;font-size:14px;pointer-events:none;';
+  ind.textContent = 'Offline — tiles unavailable';
+  document.body.appendChild(ind);
+}
+function _ft_hideOfflineBanner() {
+  var ind = document.getElementById('offline_indicator');
+  if (ind) ind.remove();
+}
+map.on('tileerror', _ft_showOfflineBanner);
+map.on('tileload', _ft_hideOfflineBanner);

@@ -58,7 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="0"
-            android:text="&#9881;"
+            android:text="@string/ActivityMain_GearIcon"
             android:textSize="18sp" />
 
     </com.google.android.flexbox.FlexboxLayout>

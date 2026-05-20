@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">虚拟旅者</string>
+    <string name="app_name">虚拟旅者</string>
 
     <!--  Strings from activity_main.xml layout  -->
     <!-- Latitude abbreviation  -->
@@ -14,8 +14,6 @@
     <!--  Strings from MainActivity.java  -->
     <string name="MainActivity_NoLatLong">没有纬度/经度值。在地图上长按您想要定位的位置。</string>
     <string name="MainActivity_MockApplied">应用了模拟的位置。</string>
-    <string name="MainActivity_MockNotApplied">未应用模拟位置。您必须在开发人员设置中启用模拟位置！</string>
-    <string name="MainActivity_MockLocRunning">模拟位置服务运行中。</string>
     <string name="MainActivity_MockStopped">模拟已停止</string>
 
     <!--  Strings from activity_more.xml layout  -->

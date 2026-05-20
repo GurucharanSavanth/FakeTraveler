@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FIX-016: exclude shared prefs from cloud backup / device transfer (API 31+). -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="cl.coders.faketraveler.sharedprefs.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="cl.coders.faketraveler.sharedprefs.xml" />
+    </device-transfer>
+</data-extraction-rules>

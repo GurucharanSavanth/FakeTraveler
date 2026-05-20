@@ -62,3 +62,17 @@ fastlane/Preview.html
 fastlane/screenshots
 fastlane/test_output
 fastlane/readme.md
+
+# Pipeline artifacts (caveman orchestration outputs)
+output/
+
+# Gradle daemon JVM cache
+gradle/gradle-daemon-jvm.properties
+
+# Stale "do not commit" marker
+.codex
+.agents
+
+# Drill-sergeant + orchestration scratch docs
+FakeTraveler_Caveman_Orchestration_Engine.md
+

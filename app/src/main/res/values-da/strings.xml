@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">Fake Traveler</string>
+    <string name="app_name">Fake Traveler</string>
 
     <!--  Strings from activity_main.xml layout  -->
     <!-- Latitude abbreviation  -->
@@ -13,8 +13,6 @@
     <!--  Strings from MainActivity.java  -->
     <string name="MainActivity_NoLatLong">Ingen bredde- eller længdegrad indtastet. Anvend et langt tryk, der hvor du vil være placeret</string>
     <string name="MainActivity_MockApplied">Imiteret placering anvendt.</string>
-    <string name="MainActivity_MockNotApplied">Imiteret placering ikke anvendt. Aktivér imiter placering i udvikler indstillingerne!</string>
-    <string name="MainActivity_MockLocRunning">Imiteret placeringstjeneste kører.</string>
     <string name="MainActivity_MockStopped">Imitering stoppet.</string>
 
     <!--  Strings from activity_more.xml layout  -->

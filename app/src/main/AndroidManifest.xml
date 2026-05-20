@@ -1,17 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:installLocation="auto">
+    android:installLocation="internalOnly">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission
         android:name="android.permission.ACCESS_MOCK_LOCATION"
         tools:ignore="MockLocation,ProtectedPermissions" />
+    <!-- Required by Android 14+ when foregroundServiceType="location" — we mock, not read,
+         but the platform policy gates this permission on every foreground location service. -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!-- FIX-002 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- FIX-011: F-Droid friendly; Play submission may strip -->
+    <uses-permission
+        android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
+        tools:ignore="BatteryLife" />
+
+    <!-- FIX-021 (drill-sergeant V19): signature-protected broadcast for in-app STOP control.
+         Pre-33 registerReceiver gates on this permission; only our own PendingIntent (same signature)
+         can dispatch ACTION_STOP_MOCK. On API 33+ Context.RECEIVER_NOT_EXPORTED is used instead. -->
+    <permission
+        android:name="cl.coders.faketraveler.permission.STOP_MOCK"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="cl.coders.faketraveler.permission.STOP_MOCK" />
 
     <application
         android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:enableOnBackInvokedCallback="true"
+        tools:targetApi="tiramisu"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -44,14 +68,44 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
+
+            <!-- FIX-012: GPX file open. No android:host needed for content/file mime filters. -->
+            <intent-filter
+                android:label="@string/Gpx_OpenLabel"
+                tools:ignore="AppLinkUrlError">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="application/gpx+xml" />
+                <data android:mimeType="application/octet-stream" android:pathPattern=".*\\.gpx" />
+            </intent-filter>
         </activity>
         <activity
             android:name="cl.coders.faketraveler.MoreActivity"
             android:parentActivityName="cl.coders.faketraveler.MainActivity" />
 
+        <!-- FIX-001 / FIX-002 -->
         <service
             android:name=".MockedLocationService"
-            android:enabled="true" />
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="location" />
+
+        <!-- FIX-005 -->
+        <receiver
+            android:name=".BootCompletedReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:directBootAware="false"
+            tools:ignore="UnusedAttribute">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

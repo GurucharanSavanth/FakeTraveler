@@ -6,16 +6,17 @@ import java.util.Locale;
 
 public final class MapProviderUtil {
 
+    public static final String DEFAULT_PROVIDER = "CartoDB.Positron"; // FIX-007
+
     private MapProviderUtil() {
         throw new UnsupportedOperationException();
     }
 
     @NonNull
-    public static String getDefaultMapProvider(Locale locale) {
-        String lang = locale.getLanguage();
-        if (lang.equals("de")) return "OpenStreetMap.DE";
-        if (lang.equals("fr")) return "OpenStreetMap.France";
-        return "OpenStreetMap";
+    public static String getDefaultMapProvider(@NonNull Locale locale) {
+        final String lang = locale.getLanguage();
+        if ("de".equals(lang)) return "OpenStreetMap.DE";
+        if ("fr".equals(lang)) return "OpenStreetMap.France";
+        return DEFAULT_PROVIDER;
     }
-
 }

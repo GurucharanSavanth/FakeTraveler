@@ -58,7 +58,7 @@
                     android:layout_weight="0"
                     android:ems="10"
                     android:inputType="number"
-                    android:text="1" />
+                    android:text="@string/Default_MockCount" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/textView"
@@ -75,7 +75,7 @@
                     android:layout_weight="0"
                     android:ems="10"
                     android:inputType="number"
-                    android:text="10" />
+                    android:text="@string/Default_MockFrequency" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/et_DMockLatLon"
@@ -97,7 +97,7 @@
                         android:layout_weight="1"
                         android:ems="10"
                         android:inputType="numberSigned|numberDecimal"
-                        android:text="0" />
+                        android:text="@string/Default_DMockValue" />
 
                     <androidx.constraintlayout.widget.Guideline
                         android:id="@+id/guideline"
@@ -113,7 +113,7 @@
                         android:layout_weight="1"
                         android:ems="10"
                         android:inputType="numberSigned|numberDecimal"
-                        android:text="0" />
+                        android:text="@string/Default_DMockValue" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.AppCompatCheckBox
@@ -121,6 +121,41 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/ActivityMore_Speed" />
+
+                <!-- FIX-005: restore mock after reboot -->
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/cb_RestoreAfterBoot"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/More_RestoreAfterBoot" />
+
+                <!-- FIX-012: GPX route controls -->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="14dp"
+                    android:text="@string/Gpx_RouteHeader"
+                    android:textSize="18sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_ImportGpx"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Gpx_ImportButton" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_PlayRoute"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Gpx_PlayRouteButton" />
+
+                <!-- FIX-011: OEM battery optimization -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_OemHelper"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/More_OemHelperButton" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tv_MapProvider"
@@ -145,7 +180,7 @@
                     android:layout_weight="0"
                     android:ems="10"
                     android:inputType="text"
-                    android:text="OpenStreetMap" />
+                    android:text="@string/Default_MapProvider" />
 
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/guideline2"

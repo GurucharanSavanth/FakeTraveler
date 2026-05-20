@@ -1,0 +1,9 @@
+* Mocking now runs as a foreground service with a persistent notification (#108, #92)
+* Service survives swipe-from-recents and keeps mocking other apps (#95, #88, #55, #53)
+* Optional "Restore mocking after reboot" (#97)
+* New "Import GPX route" + "Play imported route" feature (#90)
+* Updated to Android 16 mock-location API (ProviderProperties, #56)
+* Permission errors now shown as full-text dialog with deep-link to Developer Settings (#101)
+* Map tile fetch fixes for picky tile servers; offline indicator on tile errors (#106, #105)
+* New "Battery / background settings" button with OEM-specific guidance (Xiaomi, Samsung, OnePlus, Huawei, Vivo) (#100, #93)
+* Internal refactor: MainActivity split into smaller, testable helpers
