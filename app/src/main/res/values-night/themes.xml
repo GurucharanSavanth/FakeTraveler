@@ -1,37 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- API 23+ overlay: enable dark icons on the transparent status bar.
-         Parent matches the base AppTheme (NoActionBar) so MainActivity can
-         host its own top app bar. M3 token bindings come from values/themes.xml
-         on API <23 only; on API >=23 this overlay replaces the whole theme,
-         so we duplicate the token bindings via theme overlays inherited from
-         the M3 parent and rely on @color/* resolving per night-mode. -->
+    <!--
+        AppTheme — Material 3 base theme, DARK variant.
+        Color token names match the light variant; the dark hex values
+        live in values-night/colors.xml and resolve automatically when
+        UI_MODE_NIGHT is YES. The OLED-black background lives there too.
+    -->
     <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+
+        <!-- Primary -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
         <item name="colorPrimaryContainer">@color/colorPrimaryContainer</item>
         <item name="colorOnPrimaryContainer">@color/colorOnPrimaryContainer</item>
+
+        <!-- Secondary -->
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="colorOnSecondary">@color/colorOnSecondary</item>
         <item name="colorSecondaryContainer">@color/colorSecondaryContainer</item>
         <item name="colorOnSecondaryContainer">@color/colorOnSecondaryContainer</item>
+
+        <!-- Surface -->
         <item name="colorSurface">@color/colorSurface</item>
         <item name="colorOnSurface">@color/colorOnSurface</item>
         <item name="colorSurfaceVariant">@color/colorSurfaceVariant</item>
         <item name="colorOnSurfaceVariant">@color/colorOnSurfaceVariant</item>
+
+        <!-- Background — pure OLED black in dark mode -->
         <item name="android:colorBackground">@color/colorBackground</item>
         <item name="colorOnBackground">@color/colorOnBackground</item>
+
+        <!-- Error -->
         <item name="colorError">@color/colorError</item>
         <item name="colorOnError">@color/colorOnError</item>
+
+        <!-- Outline -->
         <item name="colorOutline">@color/colorOutline</item>
+
+        <!-- Shape appearance overlays (shared with light) -->
         <item name="shapeAppearanceCornerSmall">@style/ShapeAppearance.FakeTraveler.CornerSmall</item>
         <item name="shapeAppearanceCornerMedium">@style/ShapeAppearance.FakeTraveler.CornerMedium</item>
         <item name="shapeAppearanceCornerLarge">@style/ShapeAppearance.FakeTraveler.CornerLarge</item>
+
+        <!-- System bars — preserved from previous AppTheme -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:windowLightStatusBar">true</item>
         <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
         <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
     </style>

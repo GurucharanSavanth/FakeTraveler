@@ -1,5 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Theme.Material3.DayNight provides a complete palette and DynamicColors picks it
-         up from the system wallpaper on Android 12+. No custom color tokens needed. -->
+    <!--
+        Material 3 design tokens — LIGHT palette.
+        See values-night/colors.xml for the dark counterpart.
+        Token names mirror the M3 attribute names so that theme bindings stay legible.
+    -->
+
+    <!-- Primary -->
+    <color name="colorPrimary">#0F67B1</color>
+    <color name="colorOnPrimary">#FFFFFF</color>
+    <color name="colorPrimaryContainer">#D6E3FF</color>
+    <color name="colorOnPrimaryContainer">#001D36</color>
+
+    <!-- Secondary -->
+    <color name="colorSecondary">#565F71</color>
+    <color name="colorOnSecondary">#FFFFFF</color>
+    <color name="colorSecondaryContainer">#DAE2F9</color>
+    <color name="colorOnSecondaryContainer">#131C2B</color>
+
+    <!-- Surface -->
+    <color name="colorSurface">#FDFDFD</color>
+    <color name="colorOnSurface">#1B1B1F</color>
+    <color name="colorSurfaceVariant">#E0E2EC</color>
+    <color name="colorOnSurfaceVariant">#44474F</color>
+
+    <!-- Background -->
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorOnBackground">#1B1B1F</color>
+
+    <!-- Error -->
+    <color name="colorError">#BA1A1A</color>
+    <color name="colorOnError">#FFFFFF</color>
+
+    <!-- Outline -->
+    <color name="colorOutline">#74777F</color>
+
+    <!-- Semantic — no M3 attr binding -->
+    <color name="colorSuccess">#2E7D32</color>
+
+    <!-- Map overlay panel: colorSurface @ 88% alpha (ARGB: 0xE0 = 224/255 ≈ 88%) -->
+    <color name="colorMapOverlay">#E0FDFDFD</color>
 </resources>

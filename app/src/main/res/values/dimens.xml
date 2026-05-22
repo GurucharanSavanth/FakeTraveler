@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Material 3 design tokens — DIMENSIONS.
+        Base spacing unit is 8dp. Component sizes follow M3 guidance.
+    -->
+
+    <!-- Spacing grid (8dp base unit) -->
+    <dimen name="spacing_xs">4dp</dimen>
+    <dimen name="spacing_sm">8dp</dimen>
+    <dimen name="spacing_md">16dp</dimen>
+    <dimen name="spacing_lg">24dp</dimen>
+    <dimen name="spacing_xl">32dp</dimen>
+
+    <!-- Semantic spacing aliases -->
+    <dimen name="screen_edge_padding">16dp</dimen>
+    <dimen name="card_internal_padding">16dp</dimen>
+    <dimen name="section_gap">24dp</dimen>
+    <dimen name="item_gap_related">8dp</dimen>
+    <dimen name="item_gap_unrelated">16dp</dimen>
+
+    <!-- Corner radii -->
+    <dimen name="corner_small">12dp</dimen>
+    <dimen name="corner_medium">16dp</dimen>
+    <dimen name="corner_large">24dp</dimen>
+
+    <!-- Component sizes -->
+    <dimen name="fab_size">56dp</dimen>
+    <dimen name="primary_action_button_width">200dp</dimen>
+    <dimen name="primary_action_button_height">56dp</dimen>
+    <dimen name="icon_size_small">24dp</dimen>
+    <dimen name="icon_size_medium">48dp</dimen>
+    <dimen name="icon_size_large">96dp</dimen>
+    <dimen name="touch_target_min">48dp</dimen>
+    <dimen name="top_app_bar_height">64dp</dimen>
+    <dimen name="drag_handle_width">36dp</dimen>
+    <dimen name="drag_handle_height">4dp</dimen>
+    <dimen name="text_input_height">56dp</dimen>
+
+    <!-- Text sizes (escape hatch for layouts that need to override M3 text appearances) -->
+    <dimen name="text_headline">28sp</dimen>
+    <dimen name="text_title">20sp</dimen>
+    <dimen name="text_body_large">16sp</dimen>
+    <dimen name="text_body_medium">14sp</dimen>
+    <dimen name="text_label_large">14sp</dimen>
+    <dimen name="text_label_small">11sp</dimen>
+
+    <!-- Line heights (for android:lineHeight on TextView API 28+) -->
+    <dimen name="line_height_headline">36sp</dimen>
+    <dimen name="line_height_title">28sp</dimen>
+    <dimen name="line_height_body_large">24sp</dimen>
+    <dimen name="line_height_body_medium">20sp</dimen>
+    <dimen name="line_height_label_large">20sp</dimen>
+    <dimen name="line_height_label_small">16sp</dimen>
+</resources>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Material 3 design tokens — DARK palette (OLED-black friendly).
+        Token names match the light variant in values/colors.xml.
+
+        Note: colorBackground is pure black (#000000) for OLED power savings
+        per user preference. colorSurface stays at #1B1B1F so cards visibly
+        float above the black root via tonal elevation.
+    -->
+
+    <!-- Primary -->
+    <color name="colorPrimary">#5FA8E8</color>
+    <color name="colorOnPrimary">#001D36</color>
+    <color name="colorPrimaryContainer">#0F67B1</color>
+    <color name="colorOnPrimaryContainer">#D6E3FF</color>
+
+    <!-- Secondary -->
+    <color name="colorSecondary">#BEC6DC</color>
+    <color name="colorOnSecondary">#28313F</color>
+    <color name="colorSecondaryContainer">#3E4759</color>
+    <color name="colorOnSecondaryContainer">#DAE2F9</color>
+
+    <!-- Surface -->
+    <color name="colorSurface">#1B1B1F</color>
+    <color name="colorOnSurface">#E3E2E6</color>
+    <color name="colorSurfaceVariant">#44474F</color>
+    <color name="colorOnSurfaceVariant">#C4C6D0</color>
+
+    <!-- Background — pure OLED black -->
+    <color name="colorBackground">#000000</color>
+    <color name="colorOnBackground">#E3E2E6</color>
+
+    <!-- Error -->
+    <color name="colorError">#FFB4AB</color>
+    <color name="colorOnError">#690005</color>
+
+    <!-- Outline -->
+    <color name="colorOutline">#8E9099</color>
+
+    <!-- Semantic — no M3 attr binding -->
+    <color name="colorSuccess">#81C784</color>
+
+    <!-- Map overlay panel: colorSurface @ 88% alpha (ARGB: 0xE0 = 224/255 ≈ 88%) -->
+    <color name="colorMapOverlay">#E01B1B1F</color>
+</resources>
