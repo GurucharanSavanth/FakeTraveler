@@ -128,8 +128,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
                 startActivity(new Intent(getBaseContext(), MoreActivity.class)));
 
         wireFavoriteButtons();
-        wireJoystickButton();
-        wireRouteImportButton();
         wireDetectionButton();
 
         detectAppVersion();
@@ -311,7 +309,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
                     cl.coders.faketraveler.cooldown.CooldownCalculator.compute(
                             last[0], last[1], newLat, newLng);
             if (!cd.isZero()) {
-                final double km = cl.coders.faketraveler.joystick.JoystickEngine
+                final double km = cl.coders.faketraveler.util.GeoUtils
                         .haversineKm(last[0], last[1], newLat, newLng);
                 cl.coders.faketraveler.cooldown.CooldownOverlayDialog dlg =
                         cl.coders.faketraveler.cooldown.CooldownOverlayDialog.newInstance(cd, km);
@@ -498,18 +496,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
             MockLogger.log("favorite_apply", fav.name);
         });
         sheet.show(getSupportFragmentManager(), "favorites");
-    }
-
-    private void wireJoystickButton() {
-        Inputs.<android.view.View>requireView(this, R.id.joystick_btn, "joystick_btn")
-                .setOnClickListener(v -> startActivity(new Intent(this,
-                        cl.coders.faketraveler.joystick.JoystickOverlayActivity.class)));
-    }
-
-    private void wireRouteImportButton() {
-        Inputs.<android.view.View>requireView(this, R.id.route_import_btn, "route_import_btn")
-                .setOnClickListener(v -> startActivity(new Intent(this,
-                        cl.coders.faketraveler.route.RouteImportActivity.class)));
     }
 
     private void wireDetectionButton() {

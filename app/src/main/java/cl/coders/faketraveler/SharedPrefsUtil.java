@@ -9,20 +9,17 @@ import android.location.Location;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
  * Originally from <a href="https://stackoverflow.com/a/18098090/5894824">StackOverflow</a>.
- * Extended in v2.4 with the v2 schema migration (FIX-014) and location/route serializers.
+ * Extended in v2.4 with the v2 schema migration (FIX-014) and location serializers.
  *
  * <p>Legacy backup half of the dual-write contract with {@link SettingsDataStore} (V42).
  * Setters mirror writes into SettingsDataStore; readers prefer DataStore and fall back here
- * only when the key is absent. New code should use {@link SettingsDataStore} directly;
- * this class is kept compiling so the existing service / boot path / route persistence
- * stay on one storage layer until v3.1 retires it.
+ * only when the key is absent. New code should use {@link SettingsDataStore} directly.
  */
 public final class SharedPrefsUtil {
 
@@ -33,7 +30,6 @@ public final class SharedPrefsUtil {
     public static final String KEY_SCHEMA_VERSION = "prefsSchemaVersion";
     public static final String KEY_RESTORE_AFTER_BOOT = "restoreAfterBoot";
     public static final String KEY_LAST_MOCKED_LOCATION = "lastMockedLocation";
-    public static final String KEY_ROUTE_DATA = "routeData";
 
     private SharedPrefsUtil() { throw new UnsupportedOperationException(); }
 
@@ -64,7 +60,7 @@ public final class SharedPrefsUtil {
         Log.i(TAG, "Migration done - deleted old config!");
     }
 
-    /** v1 → v2: introduce restoreAfterBoot, lastMockedLocation, routeData. Idempotent. FIX-014. */
+    /** v1 → v2: introduce restoreAfterBoot, lastMockedLocation. Idempotent. FIX-014. */
     public static void migrateToV2(@NonNull Context ctx) {
         final SharedPreferences p = ctx.getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE);
         final int schema = p.getInt(KEY_SCHEMA_VERSION, 0);
@@ -73,7 +69,6 @@ public final class SharedPrefsUtil {
         try {
             if (!p.contains(KEY_RESTORE_AFTER_BOOT)) e.putBoolean(KEY_RESTORE_AFTER_BOOT, false);
             if (!p.contains(KEY_LAST_MOCKED_LOCATION)) e.putString(KEY_LAST_MOCKED_LOCATION, "");
-            if (!p.contains(KEY_ROUTE_DATA)) e.putString(KEY_ROUTE_DATA, "");
             e.putInt(KEY_SCHEMA_VERSION, SCHEMA_V2);
             e.apply();
             Log.i(TAG, "Migrated SharedPreferences to schema v" + SCHEMA_V2);
@@ -95,24 +90,6 @@ public final class SharedPrefsUtil {
             SettingsDataStore.get(ctx).setStringBlocking(KEY_LAST_MOCKED_LOCATION, json);
         } catch (JSONException ignored) {
         }
-    }
-
-    public static void saveRouteJson(@NonNull Context ctx, @NonNull String json) {
-        ctx.getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE).edit()
-                .putString(KEY_ROUTE_DATA, json)
-                .apply();
-        SettingsDataStore.get(ctx).setStringBlocking(KEY_ROUTE_DATA, json);
-    }
-
-    @Nullable
-    public static String loadRouteJson(@NonNull Context ctx) {
-        // V42: DataStore is authoritative once written. Fall back to legacy prefs only when
-        // DataStore returns absent (first run after upgrade).
-        final String ds = SettingsDataStore.get(ctx).getStringBlocking(KEY_ROUTE_DATA);
-        if (ds != null && !ds.isEmpty()) return ds;
-        final String s = ctx.getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE)
-                .getString(KEY_ROUTE_DATA, "");
-        return s == null || s.isEmpty() ? null : s;
     }
 
     public static void setRestoreAfterBoot(@NonNull Context ctx, boolean restore) {

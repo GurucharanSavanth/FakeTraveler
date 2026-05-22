@@ -63,7 +63,7 @@
 
     </com.google.android.flexbox.FlexboxLayout>
 
-    <!-- v3.0 — feature buttons row (favorites, joystick, route, detection). -->
+    <!-- v3.0 — feature buttons row (favorites, detection). -->
     <com.google.android.flexbox.FlexboxLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -89,30 +89,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/MainActivity_FavList"
-            android:textSize="13sp" />
-
-        <Space
-            android:layout_width="8dp"
-            android:layout_height="wrap_content" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/joystick_btn"
-            style="?attr/materialButtonOutlinedStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/MainActivity_Joystick"
-            android:textSize="13sp" />
-
-        <Space
-            android:layout_width="8dp"
-            android:layout_height="wrap_content" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/route_import_btn"
-            style="?attr/materialButtonOutlinedStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/MainActivity_RouteImport"
             android:textSize="13sp" />
 
         <Space

@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 
 import java.time.Duration;
 
-import cl.coders.faketraveler.joystick.JoystickEngine;
+import cl.coders.faketraveler.util.GeoUtils;
 
 /**
  * Maps a teleport distance to the wait imposed before the user can apply the new mock.
@@ -20,7 +20,7 @@ public final class CooldownCalculator {
         if (Double.isNaN(lat1) || Double.isNaN(lng1) || Double.isNaN(lat2) || Double.isNaN(lng2)) {
             return Duration.ZERO;
         }
-        final double km = JoystickEngine.haversineKm(lat1, lng1, lat2, lng2);
+        final double km = GeoUtils.haversineKm(lat1, lng1, lat2, lng2);
         if (Double.isNaN(km) || Double.isInfinite(km)) return Duration.ZERO;
         if (km < 1)      return Duration.ZERO;
         if (km < 2)      return Duration.ofSeconds(30);

@@ -22,11 +22,6 @@
         android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
         tools:ignore="BatteryLife" />
 
-    <!-- v3.0 T2.2: joystick overlay -->
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <!-- v3.0 T3.1: Android 16 promoted notifications (no-op on lower APIs) -->
-    <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS" />
-
     <!-- FIX-021 (drill-sergeant V19): signature-protected broadcast for in-app STOP control.
          Pre-33 registerReceiver gates on this permission; only our own PendingIntent (same signature)
          can dispatch ACTION_STOP_MOCK. On API 33+ Context.RECEIVER_NOT_EXPORTED is used instead. -->
@@ -87,18 +82,6 @@
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
 
-            <!-- FIX-012: GPX file open. No android:host needed for content/file mime filters. -->
-            <intent-filter
-                android:label="@string/Gpx_OpenLabel"
-                tools:ignore="AppLinkUrlError">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="content" />
-                <data android:scheme="file" />
-                <data android:mimeType="application/gpx+xml" />
-                <data android:mimeType="application/octet-stream" android:pathPattern=".*\\.gpx" />
-            </intent-filter>
         </activity>
         <activity
             android:name="cl.coders.faketraveler.MoreActivity"
@@ -110,24 +93,6 @@
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="location" />
-
-        <!-- v3.0 T2.2: joystick overlay service + entry activity. -->
-        <service
-            android:name=".joystick.JoystickService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="location" />
-
-        <activity
-            android:name=".joystick.JoystickOverlayActivity"
-            android:exported="false"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-
-        <!-- v3.0 T2.3: route import. -->
-        <activity
-            android:name=".route.RouteImportActivity"
-            android:exported="false"
-            android:parentActivityName=".MainActivity" />
 
         <!-- v3.0 T4.2: detection test. -->
         <activity

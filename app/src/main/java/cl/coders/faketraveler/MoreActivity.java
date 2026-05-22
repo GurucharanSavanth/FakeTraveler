@@ -8,7 +8,6 @@ import static cl.coders.faketraveler.SharedPrefsUtil.putDouble;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
@@ -17,24 +16,18 @@ import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
-import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.snackbar.Snackbar;
 
-import java.io.InputStream;
 import java.util.Locale;
 
 import cl.coders.faketraveler.util.Inputs;
@@ -43,10 +36,6 @@ public class MoreActivity extends AppCompatActivity {
 
     @NonNull
     private static final String TAG = MoreActivity.class.getSimpleName();
-
-    @NonNull
-    private final ActivityResultLauncher<String[]> gpxPicker =                           // FIX-012
-            registerForActivityResult(new ActivityResultContracts.OpenDocument(), this::onGpxPicked);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +62,6 @@ public class MoreActivity extends AppCompatActivity {
         wireCheckBox(R.id.cb_MockSpeed, "mockSpeed", true);
         wireMapProvider(sharedPref);
         wireRestoreAfterBoot();                                                          // FIX-005
-        wireGpxButtons();                                                                // FIX-012
         wireOemHelper();                                                                 // FIX-011
         wireOemCard();
         wireDebugUnlock();
@@ -109,40 +97,6 @@ public class MoreActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         refreshOemCard();
-        renderPerAppApproaches();
-    }
-
-    /** Builds the list of per-app workaround buttons for the detected OEM (V44 — public
-     *  Intents only, no reflection or private APIs). */
-    private void renderPerAppApproaches() {
-        // perapp_list is androidx.appcompat.widget.LinearLayoutCompat in the layout; cast
-        // to ViewGroup so the code tolerates either LinearLayout or LinearLayoutCompat.
-        final android.view.ViewGroup host = findViewById(R.id.perapp_list);
-        if (host == null) return;
-        host.removeAllViews();
-        for (cl.coders.faketraveler.perapp.PerAppMockHelper.Approach a
-                : cl.coders.faketraveler.perapp.PerAppMockHelper.getApproachesFor(this)) {
-            final MaterialButton btn = new MaterialButton(this, null,
-                    com.google.android.material.R.attr.materialButtonOutlinedStyle);
-            btn.setText(a.title);
-            btn.setOnClickListener(v -> {
-                new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                        .setTitle(a.title)
-                        .setMessage(a.body)
-                        .setPositiveButton(android.R.string.ok, (d, w) -> {
-                            if (a.deepLink == null) return;
-                            try { startActivity(a.deepLink); }
-                            catch (Throwable t) {
-                                Snackbar.make(host,
-                                        R.string.Error_NoActivityForIntent,
-                                        Snackbar.LENGTH_LONG).show();
-                            }
-                        })
-                        .setNegativeButton(android.R.string.cancel, null)
-                        .show();
-            });
-            host.addView(btn);
-        }
     }
 
     /** Binds the static parts of the OEM whitelist card. Status text refreshes per
@@ -255,76 +209,9 @@ public class MoreActivity extends AppCompatActivity {
                 SharedPrefsUtil.setRestoreAfterBoot(getApplicationContext(), checked));
     }
 
-    private void wireGpxButtons() {                                                      // FIX-012
-        final MaterialButton btnImport = Inputs.requireView(this, R.id.btn_ImportGpx, "btn_ImportGpx");
-        btnImport.setOnClickListener(v -> {
-            try {
-                gpxPicker.launch(new String[]{"application/gpx+xml", "application/octet-stream", "text/xml"});
-            } catch (Throwable t) {
-                Log.e(TAG, "GPX picker launch failed", t);
-                snackbar(R.string.Gpx_ImportError);
-            }
-        });
-        final MaterialButton btnPlay = Inputs.requireView(this, R.id.btn_PlayRoute, "btn_PlayRoute");
-        btnPlay.setOnClickListener(v -> playRouteIfAvailable());
-    }
-
-    private void onGpxPicked(@androidx.annotation.Nullable Uri uri) {
-        if (uri == null) return;
-        try (InputStream in = getContentResolver().openInputStream(uri)) {
-            if (in == null) { snackbar(R.string.Gpx_ImportError); return; }
-            final GpxImporter.Route route = GpxImporter.parse(in);
-            SharedPrefsUtil.saveRouteJson(getApplicationContext(), GpxImporter.toJson(route));
-            final int n = route.points().size();
-            snackbar(getResources().getQuantityString(R.plurals.Gpx_ImportSuccess, n, n));
-        } catch (java.io.IOException ioe) {
-            Log.e(TAG, "GPX too large or unreadable", ioe);
-            snackbar(getResources().getQuantityString(R.plurals.Gpx_TooLarge,
-                    GpxImporter.MAX_POINTS, GpxImporter.MAX_POINTS));
-        } catch (Throwable t) {
-            Log.e(TAG, "GPX parse failed", t);
-            snackbar(R.string.Gpx_ImportError);
-        }
-    }
-
-    private void playRouteIfAvailable() {                                                // FIX-012
-        if (!PermissionChecker.isMockLocationEnabled(getApplicationContext())) {
-            PermissionChecker.showDevSettingsDialog(this);
-            return;
-        }
-        final String json = SharedPrefsUtil.loadRouteJson(getApplicationContext());
-        if (json == null) { snackbar(R.string.Gpx_NoRoute); return; }
-        final SharedPreferences sp = getApplicationContext().getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE);
-        int freq = sp.getInt("mockFrequency", 10);
-        if (freq <= 0) freq = 1;
-        final Intent svc = new Intent(this, MockedLocationService.class)
-                .setAction(MockedLocationService.ACTION_PLAY_ROUTE)
-                .putExtra(MockedLocationService.EXTRA_ROUTE_JSON, json)
-                .putExtra(MockedLocationService.EXTRA_FREQUENCY, (long) freq * 1000L);
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                ContextCompat.startForegroundService(this, svc);
-            } else {
-                startService(svc);
-            }
-        } catch (Throwable t) {
-            Log.e(TAG, "Failed to start route playback", t);
-        }
-    }
-
     private void wireOemHelper() {                                                       // FIX-011
         final MaterialButton btn = Inputs.requireView(this, R.id.btn_OemHelper, "btn_OemHelper");
         btn.setOnClickListener(v -> OemBatteryOptHelper.showDialog(this));
-    }
-
-    private void snackbar(@androidx.annotation.StringRes int res) {
-        final View root = Inputs.requireView(this, R.id.more_layout, "more_layout");
-        Snackbar.make(root, res, Snackbar.LENGTH_SHORT).show();
-    }
-
-    private void snackbar(@NonNull String s) {
-        final View root = Inputs.requireView(this, R.id.more_layout, "more_layout");
-        Snackbar.make(root, s, Snackbar.LENGTH_SHORT).show();
     }
 
     private static Spanned fromHtml(@NonNull String html) {

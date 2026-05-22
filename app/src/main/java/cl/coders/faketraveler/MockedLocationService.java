@@ -44,7 +44,6 @@ public class MockedLocationService extends Service {
     public static final String ACTION_START      = "cl.coders.faketraveler.action.START_MOCK";
     public static final String ACTION_STOP       = "cl.coders.faketraveler.action.STOP_MOCK";
     public static final String ACTION_RESUME     = "cl.coders.faketraveler.action.RESUME_MOCK";
-    public static final String ACTION_PLAY_ROUTE = "cl.coders.faketraveler.action.PLAY_ROUTE";
     public static final String EXTRA_LATITUDE   = "cl.coders.faketraveler.extra.LAT";
     public static final String EXTRA_LONGITUDE  = "cl.coders.faketraveler.extra.LNG";
     public static final String EXTRA_D_LAT      = "cl.coders.faketraveler.extra.D_LAT";
@@ -52,7 +51,6 @@ public class MockedLocationService extends Service {
     public static final String EXTRA_FREQUENCY  = "cl.coders.faketraveler.extra.FREQ_MILLIS";
     public static final String EXTRA_COUNT      = "cl.coders.faketraveler.extra.COUNT";
     public static final String EXTRA_SPEED      = "cl.coders.faketraveler.extra.SPEED";
-    public static final String EXTRA_ROUTE_JSON = "cl.coders.faketraveler.extra.ROUTE_JSON";
 
     @NonNull protected final MutableLiveData<MockState> mockState = new MutableLiveData<>(MockState.NOT_MOCKED);
     @NonNull protected final MutableLiveData<Location> mockedLocation = new MutableLiveData<>();
@@ -94,29 +92,7 @@ public class MockedLocationService extends Service {
         }
         if (ACTION_START.equals(action)) startFromIntent(intent);
         else if (ACTION_RESUME.equals(action)) resumeFromPrefsIfActive();
-        else if (ACTION_PLAY_ROUTE.equals(action)) startRouteFromIntent(intent);
         return START_STICKY;
-    }
-
-    private void startRouteFromIntent(@NonNull Intent in) {
-        final String json = in.getStringExtra(EXTRA_ROUTE_JSON);
-        final long freqMillis = in.getLongExtra(EXTRA_FREQUENCY, 10_000L);
-        final GpxImporter.Route route = json == null ? null : GpxImporter.fromJson(json);
-        if (route == null || route.points().isEmpty()) {
-            Log.w(TAG, "ACTION_PLAY_ROUTE missing or empty route");
-            return;
-        }
-        try {
-            stopMockNow();
-            attachAllProviders();
-            final TimerTask t = new RoutePlaybackTask(this, route.points());
-            timer.schedule(t, 0L, freqMillis);
-            tasks.add(t);
-            mockState.postValue(MockState.MOCKED);
-        } catch (SecurityException e) {
-            Log.e(TAG, "Route playback failed to register providers", e);
-            mockState.postValue(MockState.MOCK_ERROR);
-        }
     }
 
     private void attachAllProviders() {
