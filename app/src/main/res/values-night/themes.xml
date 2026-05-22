@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- windowLightStatusBar intentionally absent here: dark mode renders light icons,
+         and the night UI-mode qualifier wins over values-v23/values-v35 during resolution. -->
     <!--
         AppTheme — Material 3 base theme, DARK variant.
         Color token names match the light variant; the dark hex values

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- API 23+ overlay: enable dark icons on the transparent status bar.
-         Parent matches the base AppTheme (NoActionBar) so MainActivity can
-         host its own top app bar. M3 token bindings come from values/themes.xml
-         on API <23 only; on API >=23 this overlay replaces the whole theme,
-         so we duplicate the token bindings via theme overlays inherited from
-         the M3 parent and rely on @color/* resolving per night-mode. -->
+    <!-- API >=23 overlay. Android theme resolution replaces the entire AppTheme on API >=23,
+         so the full M3 token table is redeclared inline (any change to values/themes.xml must
+         be mirrored here). The only API-specific addition is windowLightStatusBar=true, which
+         lets dark icons render against the transparent status bar in light mode. -->
+    <!-- API 35+ note: this file also serves API 35+ via the vNN cascade; do not reintroduce
+         a values-v35/styles.xml unless a real v35-only divergence appears. -->
     <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
