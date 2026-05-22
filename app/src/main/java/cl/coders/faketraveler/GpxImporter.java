@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import cl.coders.faketraveler.util.Inputs;
+
 /**
  * Streaming GPX (&lt;trkpt&gt;) parser + JSON persister. FIX-012.
  * Safe by construction: {@link Xml#newPullParser()} does not process DTDs, so XXE attacks
@@ -51,10 +53,12 @@ public final class GpxImporter {
             final String lat = p.getAttributeValue(null, "lat");
             final String lon = p.getAttributeValue(null, "lon");
             if (lat == null || lon == null) continue;
-            try {
-                pts.add(new TrackPoint(Double.parseDouble(lat), Double.parseDouble(lon)));
-            } catch (NumberFormatException ignored) {
-                // skip malformed point
+            final double dLat = Inputs.parseDoubleSafe(lat, Double.NaN);
+            final double dLon = Inputs.parseDoubleSafe(lon, Double.NaN);
+            if (Inputs.validLat(dLat) && Inputs.validLng(dLon)) {
+                pts.add(new TrackPoint(dLat, dLon));
+            } else {
+                MockLogger.log("gpx_skip", "out-of-range trkpt lat=" + lat + " lon=" + lon);
             }
             if (pts.size() > MAX_POINTS) {
                 throw new IOException("GPX too large: > " + MAX_POINTS + " points");
@@ -71,7 +75,8 @@ public final class GpxImporter {
             try {
                 o.put("lat", t.lat());
                 o.put("lng", t.lon());
-            } catch (JSONException ignored) {
+            } catch (JSONException je) {
+                MockLogger.log("gpx_to_json", "skip point: " + je.getMessage());
                 continue;
             }
             arr.put(o);
@@ -96,7 +101,13 @@ public final class GpxImporter {
             final List<TrackPoint> pts = new ArrayList<>(arr.length());
             for (int i = 0; i < arr.length(); i++) {
                 final JSONObject o = arr.getJSONObject(i);
-                pts.add(new TrackPoint(o.getDouble("lat"), o.getDouble("lng")));
+                final double lat = o.optDouble("lat", Double.NaN);
+                final double lng = o.optDouble("lng", Double.NaN);
+                if (Inputs.validLat(lat) && Inputs.validLng(lng)) {
+                    pts.add(new TrackPoint(lat, lng));
+                } else {
+                    MockLogger.log("gpx_fromJson_skip", "lat=" + lat + " lng=" + lng);
+                }
             }
             return new Route(Collections.unmodifiableList(pts), root.optInt("version", 1));
         } catch (JSONException e) {

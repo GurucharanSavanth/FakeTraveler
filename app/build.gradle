@@ -6,6 +6,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
+        // R8 backports java.time + java.util.concurrent.Flow + NIO to the minSdk floor.
+        // Required for Duration usage in cooldown/health/boot workers on API 21–25.
+        coreLibraryDesugaringEnabled true
     }
     defaultConfig {
         applicationId = "cl.coders.faketraveler"
@@ -14,6 +17,16 @@ android {
         targetSdk = 36
         versionCode = 240
         versionName = "2.4.0"
+
+        // T2.1 favorites Room schema export (V34: schemas committed for future migrations).
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [
+                        "room.schemaLocation": "$projectDir/schemas".toString(),
+                        "room.incremental"   : "true"
+                ]
+            }
+        }
     }
     buildTypes {
         release {
@@ -36,10 +49,36 @@ android {
 }
 
 dependencies {
+    // material 1.14.x raises minSdk to 23; project pins minSdk 21 (SPEC §C4).
+    // Stay on 1.13.0 + Theme.Material3.DayNight (Expressive subtype is cosmetic).
     implementation 'com.google.android.material:material:1.13.0'
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
+
+    // v3.0 — approved per §C2 amendment in
+    // docs/superpowers/specs/2026-05-21-faketraveler-v3-design.md §3.
+    // All artifacts AndroidX / AOSP / F-Droid-friendly.
+    implementation 'androidx.work:work-runtime:2.10.0'
+    implementation 'androidx.room:room-runtime:2.7.0'
+    annotationProcessor 'androidx.room:room-compiler:2.7.0'
+    implementation 'androidx.datastore:datastore-preferences:1.1.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.8.7'
+    implementation 'androidx.lifecycle:lifecycle-livedata:2.8.7'
+    implementation 'androidx.activity:activity:1.10.0'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
+
+    // Desugars java.time (and friends) onto API 21+.
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
+
+    // Test-only — not shipped
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.14'
+    testImplementation 'androidx.test:core:1.6.1'
+    testImplementation 'androidx.test.ext:junit:1.2.1'
+    testImplementation 'androidx.work:work-testing:2.10.0'
+    testImplementation 'androidx.room:room-testing:2.7.0'
+    testImplementation 'androidx.arch.core:core-testing:2.2.0'
 }
 
 java {

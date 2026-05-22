@@ -18,8 +18,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/** Detects manufacturer and offers a deep-link to the right battery / autostart screen. FIX-011. */
+/**
+ * Detects the device manufacturer and routes the user to the right battery / autostart
+ * screen. Originally introduced as FIX-011; extended with the {@link Vendor} enum,
+ * eight-vendor detection, and per-vendor instruction strings to drive the OEM whitelist
+ * card in {@code MoreActivity} (V33).
+ */
 public final class OemBatteryOptHelper {
+
+    /** Supported vendors. {@code POCO} and {@code Redmi} resolve to {@code XIAOMI};
+     *  {@code iQOO} to {@code VIVO}; {@code HONOR} to {@code HUAWEI}. */
+    public enum Vendor {
+        XIAOMI, SAMSUNG, ONEPLUS, VIVO, OPPO, REALME, HUAWEI, UNKNOWN
+    }
 
     private OemBatteryOptHelper() { throw new UnsupportedOperationException(); }
 
@@ -27,6 +38,43 @@ public final class OemBatteryOptHelper {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return false;
         final PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
         return pm != null && !pm.isIgnoringBatteryOptimizations(ctx.getPackageName());
+    }
+
+    /** Inverse of {@link #shouldNag(Context)} — exposed so the OEM card can render a
+     *  positive status label without a double-negative. */
+    public static boolean isWhitelisted(@NonNull Context ctx) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return true;
+        final PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
+        return pm != null && pm.isIgnoringBatteryOptimizations(ctx.getPackageName());
+    }
+
+    /** Lower-cased substring match on {@link Build#MANUFACTURER} so model variants and
+     *  rebrands (POCO, Redmi, iQOO, HONOR) resolve to a single bucket. */
+    @NonNull
+    public static Vendor detect() {
+        final String m = manufacturer();
+        if (m.contains("xiaomi") || m.contains("poco") || m.contains("redmi")) return Vendor.XIAOMI;
+        if (m.contains("samsung")) return Vendor.SAMSUNG;
+        if (m.contains("oneplus")) return Vendor.ONEPLUS;
+        if (m.contains("vivo") || m.contains("iqoo")) return Vendor.VIVO;
+        if (m.contains("realme")) return Vendor.REALME;
+        if (m.contains("oppo")) return Vendor.OPPO;
+        if (m.contains("huawei") || m.contains("honor")) return Vendor.HUAWEI;
+        return Vendor.UNKNOWN;
+    }
+
+    @NonNull
+    public static String getInstructions(@NonNull Context ctx) {
+        return switch (detect()) {
+            case XIAOMI  -> ctx.getString(R.string.Oem_Xiaomi_Instructions);
+            case SAMSUNG -> ctx.getString(R.string.Oem_Samsung_Instructions);
+            case ONEPLUS -> ctx.getString(R.string.Oem_OnePlus_Instructions);
+            case VIVO    -> ctx.getString(R.string.Oem_Vivo_Instructions);
+            case OPPO    -> ctx.getString(R.string.Oem_Oppo_Instructions);
+            case REALME  -> ctx.getString(R.string.Oem_Realme_Instructions);
+            case HUAWEI  -> ctx.getString(R.string.Oem_Huawei_Instructions);
+            default      -> ctx.getString(R.string.Oem_Generic_Instructions);
+        };
     }
 
     public static void promptIfNeeded(@NonNull AppCompatActivity a) {

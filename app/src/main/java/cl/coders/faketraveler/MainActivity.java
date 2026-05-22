@@ -16,6 +16,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.text.InputType;
 import android.webkit.WebView;
 import android.widget.EditText;
 
@@ -33,6 +34,8 @@ import com.google.android.material.snackbar.Snackbar;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
+
+import cl.coders.faketraveler.util.Inputs;
 
 public class MainActivity extends AppCompatActivity implements ServiceConnector.Listener {
 
@@ -61,6 +64,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // EdgeToEdge.enable must run before setContentView; the platform uses the theme
+        // resolved at that point to decide light/dark system bars.
+        androidx.activity.EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_layout), (v, insets) -> {
             final Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars()
@@ -68,12 +74,33 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
             v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
             return WindowInsetsCompat.CONSUMED;
         });
+        // Predictive back: warn if the user is about to walk away from an active mock.
+        getOnBackPressedDispatcher().addCallback(this, new androidx.activity.OnBackPressedCallback(true) {
+            @Override public void handleOnBackPressed() {
+                if (endTime > System.currentTimeMillis()) {
+                    new com.google.android.material.dialog.MaterialAlertDialogBuilder(MainActivity.this)
+                            .setTitle(R.string.MainActivity_StopAndExitTitle)
+                            .setMessage(R.string.MainActivity_StopAndExitMsg)
+                            .setPositiveButton(R.string.Common_Yes, (d, w) -> {
+                                if (serviceConnector != null) serviceConnector.requestStop();
+                                finish();
+                            })
+                            .setNegativeButton(R.string.Common_No, null)
+                            .show();
+                } else {
+                    // Disable this callback and re-dispatch so the system default (finish())
+                    // runs instead of looping back into this handler.
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        });
         context = getApplicationContext();
-        webView = findViewById(R.id.webView0);
-        editTextLat = findViewById(R.id.editTextLat);
-        editTextLng = findViewById(R.id.editTextLng);
-        buttonApplyStop = findViewById(R.id.button_applyStop);
-        final MaterialButton buttonSettings = findViewById(R.id.button_settings);
+        webView = Inputs.requireView(this, R.id.webView0, "webView0");
+        editTextLat = Inputs.requireView(this, R.id.editTextLat, "editTextLat");
+        editTextLng = Inputs.requireView(this, R.id.editTextLng, "editTextLng");
+        buttonApplyStop = Inputs.requireView(this, R.id.button_applyStop, "button_applyStop");
+        final MaterialButton buttonSettings = Inputs.requireView(this, R.id.button_settings, "button_settings");
 
         final WebAppInterface bridge = new WebAppInterface(this);
         WebViewSetup.configure(webView, bridge);                                         // FIX-007
@@ -84,6 +111,11 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
         buttonApplyStop.setOnClickListener(view -> applyLocation());
         buttonSettings.setOnClickListener(view ->
                 startActivity(new Intent(getBaseContext(), MoreActivity.class)));
+
+        wireFavoriteButtons();
+        wireJoystickButton();
+        wireRouteImportButton();
+        wireDetectionButton();
 
         detectAppVersion();
         loadSharedPrefs();
@@ -234,42 +266,110 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
             return;
         }
         if (serviceConnector == null) return;
-        lat = LocationInputHandler.clampLat(Double.parseDouble(editTextLat.getText().toString()));
-        lng = LocationInputHandler.clampLng(Double.parseDouble(editTextLng.getText().toString()));
+        final double parsedLat = Inputs.parseDoubleSafe(editTextLat.getText().toString(), Double.NaN);
+        final double parsedLng = Inputs.parseDoubleSafe(editTextLng.getText().toString(), Double.NaN);
+        if (!Inputs.isFinite(parsedLat) || !Inputs.isFinite(parsedLng)) {
+            showError(R.string.MainActivity_NoLatLong);
+            return;
+        }
+        final double newLat = Inputs.clampLat(parsedLat);
+        final double newLng = Inputs.clampLng(parsedLng);
+
+        // Anti-detection cooldown: large jumps trigger rate-limiters in target apps. If a
+        // wait is required, gate Apply behind CooldownOverlayDialog and resume from its
+        // callback. See CooldownCalculator for the distance->wait table (V39).
+        final double[] last = readLastMockedLatLng();
+        if (last != null) {
+            final java.time.Duration cd =
+                    cl.coders.faketraveler.cooldown.CooldownCalculator.compute(
+                            last[0], last[1], newLat, newLng);
+            if (!cd.isZero()) {
+                final double km = cl.coders.faketraveler.joystick.JoystickEngine
+                        .haversineKm(last[0], last[1], newLat, newLng);
+                cl.coders.faketraveler.cooldown.CooldownOverlayDialog dlg =
+                        cl.coders.faketraveler.cooldown.CooldownOverlayDialog.newInstance(cd, km);
+                dlg.setOnOverride(dKm -> proceedWithApply(newLat, newLng));
+                dlg.show(getSupportFragmentManager(), "cooldown");
+                return;
+            }
+        }
+        proceedWithApply(newLat, newLng);
+    }
+
+    /** Apply path after the cooldown gate. Split out so the dialog can re-enter it via
+     *  its override callback. */
+    private void proceedWithApply(double newLat, double newLng) {
+        lat = newLat;
+        lng = newLng;
         final float[] speed = {0f};
         if (mockSpeed) {
             // FIX-023 (Phase 3.3): m/s = distance_per_tick(m) / interval(s).
-            // mockFrequency is already in seconds; prior code divided by *1000L = m/ms.
-            Location.distanceBetween(lat, lng, lat + dLat / 1_000_000d, lng + dLng / 1_000_000d, speed);
+            Location.distanceBetween(lat, lng,
+                    lat + dLat / 1_000_000d, lng + dLng / 1_000_000d, speed);
             speed[0] /= Math.max(1, mockFrequency);
         }
+        if (serviceConnector == null) return;
         serviceConnector.startAndBindForApply(new ServiceConnector.MockArgs(
                 lat, lng, dLat / 1_000_000d, dLng / 1_000_000d,
                 mockFrequency * 1000L, mockCount, speed[0]));
         // FIX-024 (Phase 3.2): mockCount==0 means infinite — sentinel endTime so UI
         // recognises "still running" instead of computing a past timestamp.
-        endTime = mockCount == 0
-                ? Long.MAX_VALUE
-                : System.currentTimeMillis() + (mockCount - 1L) * mockFrequency * 1000L;
+        // Saturate arithmetic so pathological mockCount/mockFrequency values (corrupt
+        // prefs, future schema bumps) can't overflow into a past timestamp.
+        if (mockCount == 0) {
+            endTime = Long.MAX_VALUE;
+        } else {
+            final long ticks = Math.max(0L, mockCount - 1L);
+            final long freqMs = Math.max(0L, (long) mockFrequency) * 1000L;
+            final long span = Inputs.saturatingMul(ticks, freqMs);
+            endTime = Inputs.saturatingAdd(System.currentTimeMillis(), span);
+        }
         saveSettings();
+        MockLogger.log("mock_start", "lat=" + lat + " lng=" + lng + " freq=" + mockFrequency + "s");
+        HealthCheckWorker.scheduleNext(this);
+    }
+
+    /** Parses {@code lastMockedLocation} JSON written by {@link SharedPrefsUtil}.
+     *  Returns {@code null} when absent or unparseable — callers treat that as "no prior
+     *  mock", which skips the cooldown gate. */
+    @Nullable
+    private double[] readLastMockedLatLng() {
+        try {
+            final String json = context.getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE)
+                    .getString(SharedPrefsUtil.KEY_LAST_MOCKED_LOCATION, "");
+            if (json == null || json.isEmpty()) return null;
+            org.json.JSONObject o = new org.json.JSONObject(json);
+            final double lat = o.optDouble("lat", Double.NaN);
+            final double lng = o.optDouble("lng", Double.NaN);
+            if (Double.isNaN(lat) || Double.isNaN(lng)) return null;
+            return new double[]{lat, lng};
+        } catch (Throwable t) {
+            return null;
+        }
     }
 
     void showSnackbar(@NonNull String s) {
-        Snackbar.make(findViewById(R.id.main_layout), s, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(Inputs.requireView(this, R.id.main_layout, "main_layout"),
+                s, Snackbar.LENGTH_SHORT).show();
     }
     void showSnackbar(@StringRes int strRes) {
-        Snackbar.make(findViewById(R.id.main_layout), strRes, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(Inputs.requireView(this, R.id.main_layout, "main_layout"),
+                strRes, Snackbar.LENGTH_SHORT).show();
     }
     /** FIX-025 (Phase 2.3): errors get LENGTH_LONG so users have time to read. */
     void showError(@StringRes int strRes) {
-        Snackbar.make(findViewById(R.id.main_layout), strRes, Snackbar.LENGTH_LONG).show();
+        Snackbar.make(Inputs.requireView(this, R.id.main_layout, "main_layout"),
+                strRes, Snackbar.LENGTH_LONG).show();
     }
     private static boolean isBlank(@NonNull EditText et) {
         return et.getText().toString().isBlank();
     }
     protected void setMapMarker(double lat, double lng) {
         if (webView == null || webView.getUrl() == null) return;
-        webView.loadUrl("javascript:setOnMap(" + lat + "," + lng + ");");
+        final double safeLat = Inputs.clampLat(lat);
+        final double safeLng = Inputs.clampLng(lng);
+        webView.loadUrl("javascript:setOnMap("
+                + Inputs.jsNumber(safeLat) + "," + Inputs.jsNumber(safeLng) + ");");
     }
     void changeButtonToApply() {
         buttonApplyStop.setText(context.getResources().getString(R.string.ActivityMain_Apply));
@@ -300,7 +400,16 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
     @Override
     public void onMockedStateChange(@NonNull MockState state) {
         switch (state) {
-            case NOT_MOCKED -> { showSnackbar(R.string.MainActivity_MockStopped); changeButtonToApply(); endTime = 0; saveSettings(); }
+            case NOT_MOCKED -> {
+                showSnackbar(R.string.MainActivity_MockStopped);
+                changeButtonToApply();
+                endTime = 0;
+                saveSettings();
+                MockLogger.log("mock_stop", "user or service");
+                // Tear down the heartbeat + any pending auto-recovery so the worker chain
+                // does not resurrect the mock after an explicit stop.
+                HealthCheckWorker.cancel(this);
+            }
             case SERVICE_BOUND -> { if (endTime > System.currentTimeMillis()) changeButtonToStop(); }
             case MOCKED -> { changeButtonToStop(); showSnackbar(R.string.MainActivity_MockApplied); }
             case MOCK_ERROR -> PermissionChecker.showDevSettingsDialog(this);            // FIX-008
@@ -313,4 +422,72 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
     }
 
     public enum SourceChange { NONE, LOAD, CHANGE_FROM_EDITTEXT, CHANGE_FROM_MAP }
+
+    private void wireFavoriteButtons() {
+        Inputs.<android.view.View>requireView(this, R.id.fav_save_btn, "fav_save_btn")
+                .setOnClickListener(v -> showSaveFavoriteDialog());
+        Inputs.<android.view.View>requireView(this, R.id.fav_list_btn, "fav_list_btn")
+                .setOnClickListener(v -> showFavoritesSheet());
+    }
+
+    private void showSaveFavoriteDialog() {
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setHint(R.string.Favorites_Save_Hint);
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.Favorites_Save_Title)
+                .setView(input)
+                .setPositiveButton(android.R.string.ok, (d, w) -> {
+                    final String name = input.getText().toString().trim();
+                    if (name.isEmpty()) return;
+                    final cl.coders.faketraveler.db.FavoriteEntity e =
+                            new cl.coders.faketraveler.db.FavoriteEntity();
+                    e.name = name;
+                    e.lat = lat;
+                    e.lng = lng;
+                    e.zoom = (int) zoom;
+                    e.createdAt = System.currentTimeMillis();
+                    final Context appCtx = getApplicationContext();
+                    final Thread io = new Thread(() ->
+                            cl.coders.faketraveler.db.AppDatabase.get(appCtx).favoriteDao().insert(e),
+                            "FavoritesIO");
+                    io.setDaemon(true);
+                    io.start();
+                    MockLogger.log("favorite_save", name);
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void showFavoritesSheet() {
+        cl.coders.faketraveler.ui.FavoritesBottomSheet sheet =
+                new cl.coders.faketraveler.ui.FavoritesBottomSheet();
+        sheet.setCallback(fav -> {
+            lat = fav.lat;
+            lng = fav.lng;
+            zoom = fav.zoom;
+            setLatLng(lat, lng, SourceChange.LOAD);
+            applyLocation();
+            MockLogger.log("favorite_apply", fav.name);
+        });
+        sheet.show(getSupportFragmentManager(), "favorites");
+    }
+
+    private void wireJoystickButton() {
+        Inputs.<android.view.View>requireView(this, R.id.joystick_btn, "joystick_btn")
+                .setOnClickListener(v -> startActivity(new Intent(this,
+                        cl.coders.faketraveler.joystick.JoystickOverlayActivity.class)));
+    }
+
+    private void wireRouteImportButton() {
+        Inputs.<android.view.View>requireView(this, R.id.route_import_btn, "route_import_btn")
+                .setOnClickListener(v -> startActivity(new Intent(this,
+                        cl.coders.faketraveler.route.RouteImportActivity.class)));
+    }
+
+    private void wireDetectionButton() {
+        Inputs.<android.view.View>requireView(this, R.id.detection_btn, "detection_btn")
+                .setOnClickListener(v -> startActivity(new Intent(this,
+                        cl.coders.faketraveler.detection.DetectionTestActivity.class)));
+    }
 }

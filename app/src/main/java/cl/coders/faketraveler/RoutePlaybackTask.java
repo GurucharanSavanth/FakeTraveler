@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import java.util.List;
 import java.util.TimerTask;
 
+import cl.coders.faketraveler.util.Inputs;
+
 /**
  * Replays an imported GPX route, one point per tick. Loops at the end-of-route by default.
  * FIX-012.
@@ -44,6 +46,11 @@ final class RoutePlaybackTask extends TimerTask {
             return;
         }
         final GpxImporter.TrackPoint p = points.get(index);
+        index++;
+        if (index >= points.size()) index = 0; // loop
+        if (!Inputs.validLat(p.lat()) || !Inputs.validLng(p.lon())) {
+            return; // skip corrupt point; next tick advances index
+        }
         final Location v = new Location(LocationManager.GPS_PROVIDER);
         v.setLatitude(p.lat());
         v.setLongitude(p.lon());
@@ -52,8 +59,9 @@ final class RoutePlaybackTask extends TimerTask {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             v.setSpeedAccuracyMetersPerSecond(0.01f);
         }
+        // Re-check cancel before publish so a stopMockNow() during this tick can't bump the
+        // next mock's progress counter via service.publishLocation.
+        if (cancelled) return;
         service.publishLocation(v, p.lat(), p.lon());
-        index++;
-        if (index >= points.size()) index = 0; // loop
     }
 }

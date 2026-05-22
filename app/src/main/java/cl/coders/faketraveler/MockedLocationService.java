@@ -28,6 +28,9 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import cl.coders.faketraveler.util.Inputs;
 
 /**
  * Foreground service that owns mock location providers and the periodic push timer.
@@ -61,6 +64,14 @@ public class MockedLocationService extends Service {
 
     @Nullable private StopReceiver stopReceiver;
     private boolean foregroundStarted = false;
+
+    /** Progress accounting for the ongoing notification.
+     *  {@code totalTicks == Integer.MAX_VALUE} renders an indeterminate spinner — this is
+     *  the sentinel for an infinite mock (V24 / V40). AtomicInteger so Timer thread can
+     *  increment {@code doneTicks} while UI thread reads it for the notification refresh
+     *  (V47): the prior {@code volatile + ++} pattern was a read-modify-write race. */
+    @NonNull private final AtomicInteger totalTicks = new AtomicInteger(Integer.MAX_VALUE);
+    @NonNull private final AtomicInteger doneTicks = new AtomicInteger(0);
 
     @Override
     public void onCreate() {
@@ -158,7 +169,7 @@ public class MockedLocationService extends Service {
             final NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             if (nm != null) {
                 nm.notify(NotificationFactory.NOTIFICATION_ID,
-                        NotificationFactory.buildOngoing(this, loc));
+                        NotificationFactory.buildProgress(this, loc, totalTicks.get(), doneTicks.get()));
             }
         } catch (Throwable t) {
             Log.w(TAG, "Notification refresh failed", t);
@@ -166,17 +177,19 @@ public class MockedLocationService extends Service {
     }
 
     private void startFromIntent(@NonNull Intent in) {
-        final double lat = in.getDoubleExtra(EXTRA_LATITUDE, Double.NaN);
-        final double lng = in.getDoubleExtra(EXTRA_LONGITUDE, Double.NaN);
-        if (Double.isNaN(lat) || Double.isNaN(lng)) {
-            Log.w(TAG, "ACTION_START missing lat/lng extras");
+        final double rawLat = in.getDoubleExtra(EXTRA_LATITUDE, Double.NaN);
+        final double rawLng = in.getDoubleExtra(EXTRA_LONGITUDE, Double.NaN);
+        if (!Inputs.validLat(rawLat) || !Inputs.validLng(rawLng)) {
+            Log.w(TAG, "ACTION_START rejected: lat/lng missing or out of range");
             return;
         }
-        final double dLat = in.getDoubleExtra(EXTRA_D_LAT, 0d);
-        final double dLng = in.getDoubleExtra(EXTRA_D_LNG, 0d);
-        final long freqMillis = in.getLongExtra(EXTRA_FREQUENCY, 10_000L);
-        final int count = in.getIntExtra(EXTRA_COUNT, 0);
-        final float speed = in.getFloatExtra(EXTRA_SPEED, 0f);
+        final double lat = Inputs.clampLat(rawLat);
+        final double lng = Inputs.clampLng(rawLng);
+        final double dLat = Inputs.sanitizeDelta(in.getDoubleExtra(EXTRA_D_LAT, 0d));
+        final double dLng = Inputs.sanitizeDelta(in.getDoubleExtra(EXTRA_D_LNG, 0d));
+        final long freqMillis = Inputs.clampFreqMs(in.getLongExtra(EXTRA_FREQUENCY, 10_000L));
+        final int count = Inputs.clampCount(in.getIntExtra(EXTRA_COUNT, 0));
+        final float speed = Inputs.sanitizeSpeed(in.getFloatExtra(EXTRA_SPEED, 0f));
         startMockedService(lng, lat, dLng, dLat, freqMillis, count, speed);
     }
 
@@ -185,15 +198,21 @@ public class MockedLocationService extends Service {
             final SharedPreferences p = getSharedPreferences(MainActivity.sharedPrefKey, Context.MODE_PRIVATE);
             final long endTime = p.getLong("endTime", 0L);
             if (endTime <= System.currentTimeMillis()) { stopSelf(); return; }
-            final double lat = SharedPrefsUtil.getDouble(p, "lat", Double.NaN);
-            final double lng = SharedPrefsUtil.getDouble(p, "lng", Double.NaN);
-            if (Double.isNaN(lat) || Double.isNaN(lng)) { stopSelf(); return; }
-            final double dLat = SharedPrefsUtil.getDouble(p, "dLat", 0d);
-            final double dLng = SharedPrefsUtil.getDouble(p, "dLng", 0d);
+            final double rawLat = SharedPrefsUtil.getDouble(p, "lat", Double.NaN);
+            final double rawLng = SharedPrefsUtil.getDouble(p, "lng", Double.NaN);
+            if (!Inputs.validLat(rawLat) || !Inputs.validLng(rawLng)) {
+                Log.w(TAG, "resume rejected: lat/lng missing or out of range");
+                stopSelf();
+                return;
+            }
+            final double lat = Inputs.clampLat(rawLat);
+            final double lng = Inputs.clampLng(rawLng);
+            final double dLat = Inputs.sanitizeDelta(SharedPrefsUtil.getDouble(p, "dLat", 0d));
+            final double dLng = Inputs.sanitizeDelta(SharedPrefsUtil.getDouble(p, "dLng", 0d));
             int freqSeconds = p.getInt("mockFrequency", 10);
             if (freqSeconds <= 0) freqSeconds = 1;
-            final long freqMillis = freqSeconds * 1000L;
-            final int count = p.getInt("mockCount", 0);
+            final long freqMillis = Inputs.clampFreqMs(freqSeconds * 1000L);
+            final int count = Inputs.clampCount(p.getInt("mockCount", 0));
             final float speed = p.getBoolean("mockSpeed", true) ? 0.01f : 0f;
             startMockedService(lng, lat, dLng / 1_000_000d, dLat / 1_000_000d, freqMillis, count, speed);
         } catch (Throwable t) {
@@ -209,6 +228,9 @@ public class MockedLocationService extends Service {
         try {
             stopMockNow();
             attachAllProviders();                                                        // FIX-004
+            // Reset progress counters. maxTime==0 means infinite — render indeterminate.
+            totalTicks.set(maxTime == 0 ? Integer.MAX_VALUE : maxTime);
+            doneTicks.set(0);
             final TimerTask t = new MockedLocationTask(this,
                     longitude, latitude, longitudeDistance, latitudeDistance, maxTime, mockSpeed);
             timer.schedule(t, 0L, mockMilli);
@@ -234,6 +256,7 @@ public class MockedLocationService extends Service {
 
     void publishLocation(@NonNull Location value, double lat, double lng) {
         mockedLocation.postValue(value);
+        if (totalTicks.get() != Integer.MAX_VALUE) doneTicks.incrementAndGet();
         refreshNotification(value);
         for (MockedLocationProvider prov : providers) prov.pushLocation(lat, lng);
     }

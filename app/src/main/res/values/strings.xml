@@ -83,4 +83,95 @@
     <!-- MoreActivity additions (FIX-005 / FIX-011 / FIX-012) -->
     <string name="More_RestoreAfterBoot">Restore mocking after reboot</string>
     <string name="More_OemHelperButton">Battery / background settings</string>
+
+    <!-- MoreActivity version footer (also doubles as the 7-tap debug-console gate) -->
+    <string name="More_VersionFooter">v%1$s (%2$d)</string>
+
+    <!-- Predictive-back dialog -->
+    <string name="MainActivity_StopAndExitTitle">Stop mocking?</string>
+    <string name="MainActivity_StopAndExitMsg">A mock is still running. Stop it and exit?</string>
+    <string name="Common_Yes">Yes</string>
+    <string name="Common_No">No</string>
+
+    <!-- T1.2 health monitor -->
+    <string name="Health_ChannelName">Mock health</string>
+    <string name="Health_ChannelDesc">Alerts when the mock-location loop stops unexpectedly</string>
+    <string name="Health_FailedTitle">Mock stopped</string>
+    <string name="Health_FailedMsg">Reason: %1$s. Tap to open Developer settings.</string>
+
+    <!-- T2.1 favorites -->
+    <string name="Favorites_Empty">No favorites yet. Tap ⭐ Save above to add one.</string>
+    <string name="Favorites_Rename_Title">Rename favorite</string>
+    <string name="Favorites_Save_Title">Save current location</string>
+    <string name="Favorites_Save_Hint">Name (e.g. Home, Office)</string>
+    <string name="MainActivity_FavSave">⭐ Save</string>
+    <string name="MainActivity_FavList">📍 Favorites</string>
+
+    <!-- T2.2 joystick + T2.3 route import + T4.2 detection (button labels) -->
+    <string name="MainActivity_Joystick">🎮 Joystick</string>
+    <string name="MainActivity_RouteImport">📁 Import GPX</string>
+    <string name="MainActivity_DetectionTest">🔍 Test detection</string>
+
+    <!-- T4.3 debug console -->
+    <string name="Debug_Title">Debug console</string>
+    <string name="Debug_Export">Export</string>
+    <string name="Debug_ExportTitle">Export debug log</string>
+    <string name="Debug_Clear">Clear</string>
+    <string name="Debug_Stress">Stress test</string>
+
+    <plurals name="Route_Imported">
+        <item quantity="one">Imported %1$d waypoint.</item>
+        <item quantity="other">Imported %1$d waypoints.</item>
+    </plurals>
+
+    <!-- T4.1 per-app mock doc -->
+    <string name="PerApp_Card_Title">Per-app mock (advanced)</string>
+    <string name="PerApp_Card_Disclaimer">Per-app mock without root is limited by Android security. These are documented workarounds — your mileage may vary.</string>
+    <string name="PerApp_Samsung_Title">Samsung Secure Folder</string>
+    <string name="PerApp_Samsung_Body">Clone the target app into Secure Folder. Mock location applies only to apps inside the folder.</string>
+    <string name="PerApp_Xiaomi_Title">Xiaomi/POCO Dual Apps</string>
+    <string name="PerApp_Xiaomi_Body">Enable Dual Apps for the target app. The cloned instance honours its own location settings.</string>
+    <string name="PerApp_OnePlus_Title">OnePlus Parallel Apps</string>
+    <string name="PerApp_OnePlus_Body">Use Parallel Apps to run a second copy of the target app.</string>
+    <string name="PerApp_WorkProfile_Title">Android Work Profile</string>
+    <string name="PerApp_WorkProfile_Body">Provision a Work Profile and install the target app there. The profile has its own mock-location setting.</string>
+    <string name="PerApp_Island_Title">Island (F-Droid)</string>
+    <string name="PerApp_Island_Body">Open-source app isolation. Free, no root.</string>
+    <string name="Error_NoActivityForIntent">No activity available for this action on your device.</string>
+
+    <!-- T4.2 detection test -->
+    <string name="Detection_Run">Run detection test</string>
+    <string name="Detection_Low">LOW risk — mock is well-hidden</string>
+    <string name="Detection_Medium">MEDIUM risk — some apps may detect</string>
+    <string name="Detection_High">HIGH risk — mock is easily detectable</string>
+    <string name="Detection_Low_Recommendation">Your mock is well-hidden. Enable all 3 providers for best results.</string>
+    <string name="Detection_Medium_Recommendation">Some apps may detect the mock. Use joystick mode + cooldown timer.</string>
+    <string name="Detection_High_Recommendation">Mock easily detectable. Enable all providers. Avoid teleporting.</string>
+
+    <!-- T2.4 cooldown -->
+    <string name="Cooldown_Title">Cooldown required</string>
+    <string name="Cooldown_Elapsed">You may now apply this location.</string>
+    <string name="Cooldown_Ack">I understand the detection risk</string>
+    <string name="Cooldown_Override">Override and apply now</string>
+
+    <!-- T2.3 route import body strings -->
+    <string name="Route_ImportTitle">Import GPX route</string>
+    <string name="Route_ImportHelp">Pick a .gpx file from your device. Files larger than 5 MB are rejected.</string>
+    <string name="Route_Pick">Pick a .gpx file</string>
+    <string name="Route_TooLarge">File is too large (5 MB max).</string>
+    <string name="Route_ParseFailed">Could not parse the GPX file.</string>
+
+    <!-- T1.3 OEM whitelist instructions -->
+    <string name="Oem_Xiaomi_Instructions">Open Settings → Battery → Battery saver → tap FakeTraveler → set to No restrictions. On MIUI 12+: Settings → Apps → FakeTraveler → Battery saver → No restrictions.</string>
+    <string name="Oem_Samsung_Instructions">Settings → Battery → Background usage limits → Never sleeping apps → add FakeTraveler.</string>
+    <string name="Oem_OnePlus_Instructions">Settings → Battery → Battery optimization → FakeTraveler → Don\'t optimize. Plus: Settings → Apps → FakeTraveler → Battery → Allow background activity.</string>
+    <string name="Oem_Vivo_Instructions">Settings → Battery → Background power consumption management → FakeTraveler → Allow.</string>
+    <string name="Oem_Oppo_Instructions">Settings → Battery → Allow apps to run in background → FakeTraveler → On.</string>
+    <string name="Oem_Realme_Instructions">Settings → Battery → App battery management → FakeTraveler → Allow background activity.</string>
+    <string name="Oem_Huawei_Instructions">Settings → Battery → App launch → FakeTraveler → Manage manually → enable all toggles.</string>
+    <string name="Oem_Generic_Instructions">Open Settings → Apps → FakeTraveler → Battery → Unrestricted.</string>
+    <string name="Oem_Card_Title">Battery whitelist</string>
+    <string name="Oem_Card_Fix_Button">Fix for my device</string>
+    <string name="Oem_Card_Status_OK">FakeTraveler is whitelisted on this device.</string>
+    <string name="Oem_Card_Status_Need">FakeTraveler is NOT whitelisted. Mocks may stop in the background.</string>
 </resources>

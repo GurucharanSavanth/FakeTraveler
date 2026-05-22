@@ -61,6 +61,10 @@ final class MockedLocationTask extends TimerTask {
             }
         }
 
+        // Re-check cancelled immediately before publishing — stopMockNow() on main thread
+        // can flip the flag after the initial L51 gate but before we touch the service.
+        // Without this gate, a stale tick bumps the *next* mock's progress counter.
+        if (cancelled) return;
         service.publishLocation(value, latitude, longitude);
         ++currentTimes;
         if (maxLocationTimes != 0 && maxLocationTimes == currentTimes) {

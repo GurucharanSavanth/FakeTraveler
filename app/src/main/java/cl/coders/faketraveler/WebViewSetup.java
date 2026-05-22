@@ -29,12 +29,23 @@ public final class WebViewSetup {
     }
 
     @SuppressLint("SetJavaScriptEnabled")
+    @SuppressWarnings("deprecation")
     public static void configure(@NonNull WebView v, @NonNull WebAppInterface bridge) {
         final WebSettings s = v.getSettings();
         s.setJavaScriptEnabled(true);
-        s.setJavaScriptCanOpenWindowsAutomatically(true);
-        // file-URL allow flags default to false on API 16+ and are deprecated on modern API levels;
-        // explicit no-op calls removed (no platform path enables them now).
+        // Map page never calls window.open(); turning this off shrinks the attack surface.
+        s.setJavaScriptCanOpenWindowsAutomatically(false);
+        // setAllowFileAccess(false) blocks regular file:// URLs but does NOT block
+        // file:///android_asset/ — the assets handler is special-cased in the framework
+        // on every supported API level (21+). map.html loaded from android_asset still
+        // resolves; the bundled tile fetcher uses HttpURLConnection, not WebView IO.
+        s.setAllowFileAccess(false);
+        s.setAllowContentAccess(false);
+        // Deprecated since API 30 (off by default) — still called explicitly so older OEM
+        // images that ignore the framework default cannot relax cross-origin from file://.
+        s.setAllowFileAccessFromFileURLs(false);
+        s.setAllowUniversalAccessFromFileURLs(false);
+        s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         v.setWebChromeClient(new WebChromeClient());
         v.setWebViewClient(new FakeTravelerWebViewClient());
         v.addJavascriptInterface(bridge, "Android");
@@ -76,6 +87,7 @@ public final class WebViewSetup {
             final String host = u.getHost();
             if (host == null || !TILE_HOSTS.contains(host)) return null;
             HttpURLConnection conn = null;
+            boolean handOff = false;
             try {
                 final URL url = new URL(u.toString());
                 conn = (HttpURLConnection) url.openConnection();
@@ -86,16 +98,25 @@ public final class WebViewSetup {
                 conn.setInstanceFollowRedirects(true);
                 final int code = conn.getResponseCode();
                 if (code < 200 || code >= 300) {
-                    return null; // let WebView retry on its own
+                    return null;
                 }
                 String mime = conn.getContentType();
                 if (mime == null) mime = "image/png";
                 final String encoding = conn.getContentEncoding();
-                return new WebResourceResponse(stripCharset(mime), encoding, conn.getInputStream());
+                final WebResourceResponse resp =
+                        new WebResourceResponse(stripCharset(mime), encoding, conn.getInputStream());
+                handOff = true;
+                return resp;
             } catch (IOException e) {
                 Log.w(TAG, "Tile interceptor falling back for " + u, e);
-                if (conn != null) conn.disconnect();
                 return null;
+            } catch (Throwable t) {
+                Log.e(TAG, "Tile interceptor unexpected error for " + u, t);
+                return null;
+            } finally {
+                if (!handOff && conn != null) {
+                    try { conn.disconnect(); } catch (Throwable ignored) {}
+                }
             }
         }
 

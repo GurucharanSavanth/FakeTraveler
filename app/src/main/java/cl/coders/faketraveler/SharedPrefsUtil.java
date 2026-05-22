@@ -17,6 +17,12 @@ import org.json.JSONObject;
 /**
  * Originally from <a href="https://stackoverflow.com/a/18098090/5894824">StackOverflow</a>.
  * Extended in v2.4 with the v2 schema migration (FIX-014) and location/route serializers.
+ *
+ * <p>Legacy backup half of the dual-write contract with {@link SettingsDataStore} (V42).
+ * Setters mirror writes into SettingsDataStore; readers prefer DataStore and fall back here
+ * only when the key is absent. New code should use {@link SettingsDataStore} directly;
+ * this class is kept compiling so the existing service / boot path / route persistence
+ * stay on one storage layer until v3.1 retires it.
  */
 public final class SharedPrefsUtil {
 
@@ -82,9 +88,11 @@ public final class SharedPrefsUtil {
                     .put("lat", loc.getLatitude())
                     .put("lng", loc.getLongitude())
                     .put("ts", System.currentTimeMillis());
+            final String json = o.toString();
             ctx.getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE).edit()
-                    .putString(KEY_LAST_MOCKED_LOCATION, o.toString())
+                    .putString(KEY_LAST_MOCKED_LOCATION, json)
                     .apply();
+            SettingsDataStore.get(ctx).setStringBlocking(KEY_LAST_MOCKED_LOCATION, json);
         } catch (JSONException ignored) {
         }
     }
@@ -93,10 +101,15 @@ public final class SharedPrefsUtil {
         ctx.getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE).edit()
                 .putString(KEY_ROUTE_DATA, json)
                 .apply();
+        SettingsDataStore.get(ctx).setStringBlocking(KEY_ROUTE_DATA, json);
     }
 
     @Nullable
     public static String loadRouteJson(@NonNull Context ctx) {
+        // V42: DataStore is authoritative once written. Fall back to legacy prefs only when
+        // DataStore returns absent (first run after upgrade).
+        final String ds = SettingsDataStore.get(ctx).getStringBlocking(KEY_ROUTE_DATA);
+        if (ds != null && !ds.isEmpty()) return ds;
         final String s = ctx.getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE)
                 .getString(KEY_ROUTE_DATA, "");
         return s == null || s.isEmpty() ? null : s;
@@ -106,9 +119,18 @@ public final class SharedPrefsUtil {
         ctx.getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE).edit()
                 .putBoolean(KEY_RESTORE_AFTER_BOOT, restore)
                 .apply();
+        SettingsDataStore.get(ctx).setBoolBlocking(KEY_RESTORE_AFTER_BOOT, restore);
     }
 
     public static boolean isRestoreAfterBoot(@NonNull Context ctx) {
+        // V42: DataStore wins once written. Read DS first; fall back to legacy prefs only
+        // when DS is absent.
+        final SettingsDataStore ds = SettingsDataStore.get(ctx);
+        final android.content.SharedPreferences spv3 = ctx.getApplicationContext()
+                .getSharedPreferences(SettingsDataStore.PREF_NAME, Context.MODE_PRIVATE);
+        if (spv3.contains(KEY_RESTORE_AFTER_BOOT)) {
+            return ds.getBoolBlocking(KEY_RESTORE_AFTER_BOOT, false);
+        }
         return ctx.getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE)
                 .getBoolean(KEY_RESTORE_AFTER_BOOT, false);
     }

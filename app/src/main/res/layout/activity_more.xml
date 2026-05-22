@@ -157,6 +157,93 @@
                     android:layout_marginTop="14dp"
                     android:text="@string/More_OemHelperButton" />
 
+                <!-- v3.0 T1.3: OEM whitelist status card with vendor-specific instructions. -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/oem_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="1dp"
+                    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/oem_card_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/Oem_Card_Title"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/oem_card_status"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/oem_card_instructions"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:textSize="13sp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/oem_card_fix_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/Oem_Card_Fix_Button" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- v3.0 T4.1: per-app mock doc card (doc-only; V8/V20/V44). -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/perapp_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="1dp"
+                    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/PerApp_Card_Title"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="@string/PerApp_Card_Disclaimer"
+                            android:textSize="13sp" />
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:id="@+id/perapp_list"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="vertical" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+                </com.google.android.material.card.MaterialCardView>
+
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tv_MapProvider"
                     android:layout_width="match_parent"
@@ -231,6 +318,17 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/ActivityMore_LeafletLicense" />
+
+                <!-- v3.0 T4.3: tap 7× to unlock debug console. -->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_AppVersion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="16dp"
+                    android:gravity="center"
+                    android:textSize="11sp"
+                    android:alpha="0.6" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
         </ScrollView>
