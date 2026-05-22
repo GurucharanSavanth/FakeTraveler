@@ -115,7 +115,9 @@ public class MoreActivity extends AppCompatActivity {
     /** Builds the list of per-app workaround buttons for the detected OEM (V44 — public
      *  Intents only, no reflection or private APIs). */
     private void renderPerAppApproaches() {
-        final android.widget.LinearLayout host = findViewById(R.id.perapp_list);
+        // perapp_list is androidx.appcompat.widget.LinearLayoutCompat in the layout; cast
+        // to ViewGroup so the code tolerates either LinearLayout or LinearLayoutCompat.
+        final android.view.ViewGroup host = findViewById(R.id.perapp_list);
         if (host == null) return;
         host.removeAllViews();
         for (cl.coders.faketraveler.perapp.PerAppMockHelper.Approach a

@@ -21,6 +21,13 @@
     <string name="MainActivity_NoLatLong">No latitude/longitude values. Long press in the map where you want to be located.</string>
     <string name="MainActivity_MockApplied">Mocked location applied.</string>
     <string name="MainActivity_MockStopped">Mocking stopped.</string>
+    <string name="MainActivity_LocationPermissionNeeded">Location permission is required to start the mock service on Android 14+.</string>
+    <string name="Joystick_Speed_Walk">Walk</string>
+    <string name="Joystick_Speed_Bike">Bike</string>
+    <string name="Joystick_Speed_Drive">Drive</string>
+    <string name="Joystick_Stop">Stop</string>
+    <string name="Joystick_NeedMockPermission">Enable Fake Traveler as the mock location app in Developer options first.</string>
+    <string name="Joystick_ProviderFailed">Could not register mock location providers.</string>
 
     <!--  Strings from activity_more.xml layout  -->
     <string name="ActivityMore_HowToTittle">How to use it?</string>

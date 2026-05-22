@@ -6,11 +6,13 @@ import static cl.coders.faketraveler.MainActivity.SourceChange.LOAD;
 import static cl.coders.faketraveler.SharedPrefsUtil.getDouble;
 import static cl.coders.faketraveler.SharedPrefsUtil.putDouble;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.location.Location;
 import android.net.Uri;
@@ -20,10 +22,13 @@ import android.text.InputType;
 import android.webkit.WebView;
 import android.widget.EditText;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -52,6 +57,16 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
     private int currentVersion;
     @Nullable private ServiceConnector serviceConnector;
     @Nullable private LocationInputHandler inputHandler;
+
+    /** API 34+ FGS type=location requires ACCESS_COARSE_LOCATION at runtime, otherwise
+     *  startForeground throws SecurityException and the mock service crashes. */
+    @NonNull
+    private final ActivityResultLauncher<String> locationPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
+                if (!granted) {
+                    showError(R.string.MainActivity_LocationPermissionNeeded);
+                }
+            });
 
     // Persisted config
     private int version;
@@ -120,6 +135,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
         detectAppVersion();
         loadSharedPrefs();
         applyIntentOrDefault(getIntent());
+        maybeRequestLocationPermission();
 
         if (endTime > System.currentTimeMillis()) {
             // FIX-028 (Phase 3.5): after process death, RESUME-start the foreground service
@@ -155,6 +171,17 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
             if (webState != null) {
                 try { webView.restoreState(webState); }
                 catch (Throwable t) { Log.w(TAG, "WebView restoreState failed", t); }
+            }
+        }
+    }
+
+    private void maybeRequestLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            try {
+                locationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION);
+            } catch (Throwable t) {
+                Log.w(TAG, "Could not request location permission", t);
             }
         }
     }

@@ -160,6 +160,11 @@ public class MockedLocationService extends Service {
             foregroundStarted = true;
         } catch (Throwable t) {
             Log.e(TAG, "startForeground failed", t);
+            // FGS type=location is gated on ACCESS_COARSE/FINE_LOCATION (API 34+). When the
+            // user hasn't granted it, the system kills any background mock anyway — exit
+            // cleanly instead of running as a ghost service with no notification.
+            mockState.postValue(MockState.MOCK_ERROR);
+            stopSelf();
         }
     }
 
