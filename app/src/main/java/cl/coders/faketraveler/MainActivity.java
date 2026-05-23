@@ -499,8 +499,12 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
 
     private void wireDetectionButton() {
         Inputs.<android.view.View>requireView(this, R.id.detection_btn, "detection_btn")
-                .setOnClickListener(v -> startActivity(new Intent(this,
-                        cl.coders.faketraveler.detection.DetectionTestActivity.class)));
+                .setOnClickListener(v -> showDetectionSheet());
+    }
+
+    private void showDetectionSheet() {
+        new cl.coders.faketraveler.ui.DetectionTestBottomSheet()
+                .show(getSupportFragmentManager(), "detection");
     }
 
     private void showSettingsSheet() {

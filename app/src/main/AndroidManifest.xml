@@ -91,19 +91,6 @@
             android:exported="false"
             android:foregroundServiceType="location" />
 
-        <!-- v3.0 T4.2: detection test. -->
-        <activity
-            android:name=".detection.DetectionTestActivity"
-            android:exported="false"
-            android:parentActivityName=".MainActivity" />
-
-        <!-- v3.0 T4.3: debug console. -->
-        <activity
-            android:name=".debug.DebugConsoleActivity"
-            android:exported="false"
-            android:label="@string/Debug_Title"
-            android:parentActivityName=".MainActivity" />
-
         <!-- FIX-005 -->
         <receiver
             android:name=".BootCompletedReceiver"
