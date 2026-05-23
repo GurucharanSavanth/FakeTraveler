@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Map pin drop bounce: 0.0 -> 1.0 scale with overshoot.
+    400ms. @android:interpolator/overshoot defaults to tension 2.0.
+    Pivot bottom-center: the pin's tip is the anchor point.
+-->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fillAfter="true"
+    android:interpolator="@android:interpolator/overshoot">
+    <scale
+        android:duration="400"
+        android:fromXScale="0.0"
+        android:fromYScale="0.0"
+        android:pivotX="50%"
+        android:pivotY="100%"
+        android:toXScale="1.0"
+        android:toYScale="1.0" />
+</set>

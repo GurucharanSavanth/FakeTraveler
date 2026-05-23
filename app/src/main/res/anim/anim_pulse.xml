@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Subtle pulse for the active mock action button.
+    1.0 -> 1.02 -> 1.0, 2000ms full cycle (1000ms each direction), looping forever.
+    Pivot center. accelerate_decelerate for smooth ease in/out.
+-->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fillAfter="true"
+    android:interpolator="@android:interpolator/accelerate_decelerate">
+    <scale
+        android:duration="1000"
+        android:fromXScale="1.0"
+        android:fromYScale="1.0"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:repeatCount="infinite"
+        android:repeatMode="reverse"
+        android:toXScale="1.02"
+        android:toYScale="1.02" />
+</set>

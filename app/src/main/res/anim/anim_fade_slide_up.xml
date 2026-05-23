@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Entry for bottom sheets + cards: slide up from below with fade-in.
+    350ms total. decelerate_interpolator (approximates easeOutCubic).
+    Per-element building block; apply via LayoutAnimationController for 50ms stagger.
+-->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="350"
+    android:fillAfter="true"
+    android:interpolator="@android:anim/decelerate_interpolator">
+    <translate
+        android:fromYDelta="20%p"
+        android:toYDelta="0%p" />
+    <alpha
+        android:fromAlpha="0.0"
+        android:toAlpha="1.0" />
+</set>
