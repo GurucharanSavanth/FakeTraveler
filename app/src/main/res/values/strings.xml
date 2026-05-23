@@ -129,4 +129,131 @@
     <string name="Oem_Card_Fix_Button">Fix for my device</string>
     <string name="Oem_Card_Status_OK">FakeTraveler is whitelisted on this device.</string>
     <string name="Oem_Card_Status_Need">FakeTraveler is NOT whitelisted. Mocks may stop in the background.</string>
+
+    <!-- ===== UI v2.0 additions ===== -->
+
+    <!-- Status / state announcements -->
+    <string name="Status_Idle">Idle</string>
+    <string name="Status_Active">Mocking active</string>
+    <string name="Status_PinDropped">Pin dropped</string>
+    <string name="A11y_MockActive">Mock location active at %1$s</string>
+    <string name="A11y_MockStopped">Mock location stopped</string>
+
+    <!-- Primary action button (3 states) -->
+    <string name="Action_SelectLocation">Select location</string>
+    <string name="Action_ApplyMock">Apply mock location</string>
+    <string name="Action_StopMock">Stop mocking</string>
+
+    <!-- Floating coordinate card -->
+    <string name="Coord_SearchHint">Search city, landmark, or paste coordinates…</string>
+    <string name="Coord_ManualEntryToggle">Manual entry</string>
+    <string name="Coord_LatLabel">Latitude</string>
+    <string name="Coord_LngLabel">Longitude</string>
+    <string name="Coord_MetadataUnknown">Unknown location</string>
+
+    <!-- Top app bar -->
+    <string name="TopAppBar_Wordmark">FakeTraveler</string>
+    <string name="TopAppBar_About">About</string>
+    <string name="TopAppBar_Help">Help</string>
+
+    <!-- FAB -->
+    <string name="Fab_MyLocation">My location</string>
+
+    <!-- Quick-settings chips -->
+    <string name="QuickSettings_Frequency">Every %1$ds</string>
+    <string name="QuickSettings_Count_Infinite">∞ times</string>
+    <string name="QuickSettings_Count_Finite">%1$d times</string>
+    <string name="QuickSettings_Accuracy">±%1$sm accuracy</string>
+
+    <!-- Settings bottom sheet -->
+    <string name="Settings_Title">Mock settings</string>
+    <string name="Settings_Section_Timing">Timing</string>
+    <string name="Settings_UpdateInterval_Label">Update interval</string>
+    <string name="Settings_UpdateInterval_Value">%1$ds</string>
+    <string name="Settings_RepeatCount_Label">Repeat count</string>
+    <string name="Settings_Section_AccuracyAltitude">Accuracy &amp; altitude</string>
+    <string name="Settings_Accuracy_Label">Accuracy (meters)</string>
+    <string name="Settings_Altitude_Label">Altitude (meters)</string>
+    <string name="Settings_Defaults_Helper">Leave blank to use defaults.</string>
+    <string name="Settings_Section_Movement">Movement</string>
+    <string name="Settings_Section_Map">Map provider</string>
+    <string name="Settings_Section_System">System</string>
+    <string name="Settings_Section_Diagnostics">Diagnostics</string>
+    <string name="Settings_OpenDetection">Test detection</string>
+    <string name="Settings_OpenDebug">Open debug console</string>
+    <string name="Settings_ResetDefaults">Reset to defaults</string>
+
+    <!-- Bookmarks (sheet + item + dialog) -->
+    <string name="Bookmark_SheetTitle">Saved locations</string>
+    <string name="Bookmark_AddCurrent">Add current</string>
+    <string name="Bookmark_Empty_Title">No bookmarks yet</string>
+    <string name="Bookmark_Empty_Body">Long-press the map to save a spot.</string>
+    <string name="Bookmark_Item_DateAdded">Added %1$s</string>
+    <string name="Bookmark_Item_CoordFormat">%1$s, %2$s</string>
+    <string name="Bookmark_Item_Overflow">More options</string>
+    <string name="Bookmark_Overflow_Edit">Edit</string>
+    <string name="Bookmark_Overflow_Share">Share</string>
+    <string name="Bookmark_Overflow_Delete">Delete</string>
+    <string name="Bookmark_Swipe_Delete">Delete</string>
+    <string name="Bookmark_Swipe_Undo">Undo</string>
+    <string name="Bookmark_Dialog_Title_Add">Save location</string>
+    <string name="Bookmark_Dialog_Title_Edit">Edit bookmark</string>
+    <string name="Bookmark_Dialog_Name_Hint">Name (e.g., Central Park, NYC)</string>
+    <string name="Bookmark_Dialog_Lat_Hint">Latitude</string>
+    <string name="Bookmark_Dialog_Lng_Hint">Longitude</string>
+    <string name="Bookmark_Dialog_Notes_Hint">Notes (optional)</string>
+    <string name="Bookmark_Dialog_Save">Save</string>
+    <string name="Bookmark_Dialog_Cancel">Cancel</string>
+
+    <!-- About activity -->
+    <string name="About_Title">About</string>
+    <string name="About_Version">v%1$s (%2$d)</string>
+    <string name="About_HowToTitle">How to use</string>
+    <string name="About_HowTo_Step1">Open FakeTraveler.</string>
+    <string name="About_HowTo_Step2">Long-press the map to drop a pin.</string>
+    <string name="About_HowTo_Step3">Tap %1$s.</string>
+    <string name="About_PermissionsTitle">Permissions</string>
+    <string name="About_Perm_Location">Location</string>
+    <string name="About_Perm_MockLocation">Mock location</string>
+    <string name="About_Perm_Background">Background activity</string>
+    <string name="About_Perm_StatusGranted">Granted</string>
+    <string name="About_Perm_StatusMissing">Missing</string>
+    <string name="About_LicensesTitle">Open-source licenses</string>
+    <string name="About_LicensesView">View licenses</string>
+    <string name="About_ReportIssue">Report an issue</string>
+    <string name="About_SourceCode">Source code</string>
+    <string name="About_IssueUrl" translatable="false">https://github.com/GurucharanSavanth/FakeTraveler/issues</string>
+    <string name="About_SourceUrl" translatable="false">https://github.com/GurucharanSavanth/FakeTraveler</string>
+
+    <!-- Permission rationale activity -->
+    <string name="Permission_Title">Enable mock locations</string>
+    <string name="Permission_Body">FakeTraveler needs to be set as your mock location app in Developer Options to simulate GPS coordinates globally.</string>
+    <string name="Permission_Step1_Title">Open Settings</string>
+    <string name="Permission_Step1_Body">Settings → System → Developer options.</string>
+    <string name="Permission_Step2_Title">Find the mock app picker</string>
+    <string name="Permission_Step2_Body">Tap \"Select mock location app\".</string>
+    <string name="Permission_Step3_Title">Choose FakeTraveler</string>
+    <string name="Permission_Step3_Body">Pick FakeTraveler from the list.</string>
+    <string name="Permission_CTA_OpenDevSettings">Open Developer options</string>
+    <string name="Permission_CTA_AlreadyDone">I\'ve already done this</string>
+
+    <!-- Content descriptions (a11y, icon-only buttons) -->
+    <string name="Cd_AppLogo">FakeTraveler logo</string>
+    <string name="Cd_Bookmarks">Saved locations</string>
+    <string name="Cd_Settings">Settings</string>
+    <string name="Cd_Overflow">More options</string>
+    <string name="Cd_Close">Close</string>
+    <string name="Cd_DragHandle">Drag handle</string>
+    <string name="Cd_Search">Search</string>
+    <string name="Cd_ClearSearch">Clear</string>
+    <string name="Cd_ManualEntryExpand">Toggle manual coordinate entry</string>
+    <string name="Cd_MyLocation">Center on my location</string>
+    <string name="Cd_PinActive">Active map pin</string>
+    <string name="Cd_PinInactive">Inactive map pin</string>
+    <string name="Cd_BookmarkOverflow">Bookmark options</string>
+
+    <!-- Bookmark add/edit error states -->
+    <string name="Bookmark_Error_NameRequired">Name is required</string>
+    <string name="Bookmark_Error_LatRange">Latitude must be between -90 and 90</string>
+    <string name="Bookmark_Error_LngRange">Longitude must be between -180 and 180</string>
 </resources>
