@@ -70,9 +70,9 @@ output/
 gradle/gradle-daemon-jvm.properties
 
 # Stale "do not commit" marker
-.codex
-.agents
+.claude/
 
 # Drill-sergeant + orchestration scratch docs
+docs/
 FakeTraveler_Caveman_Orchestration_Engine.md
 
