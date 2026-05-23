@@ -15,7 +15,7 @@
     <string name="MainActivity_MockApplied">Imiteret placering anvendt.</string>
     <string name="MainActivity_MockStopped">Imitering stoppet.</string>
 
-    <!--  Strings from activity_more.xml layout  -->
+    <!--  Strings from the settings sheet (ActivityMore_* keys preserved for compat) -->
     <string name="ActivityMore_HowToTittle">Hvordan bruger man det?</string>
     <string name="ActivityMore_HowManyTimes">Hvor mange gange vil du imitere placeringen? (0&#160;=&#160;uendelig)</string>
     <string name="ActivityMore_TimeInterval">Hvor mange sekunder mellem hver imitering?</string>

@@ -124,8 +124,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
         serviceConnector = new ServiceConnector(this, this);                             // FIX-015
 
         buttonApplyStop.setOnClickListener(view -> applyLocation());
-        buttonSettings.setOnClickListener(view ->
-                startActivity(new Intent(getBaseContext(), MoreActivity.class)));
+        buttonSettings.setOnClickListener(view -> showSettingsSheet());
 
         wireBookmarkButtons();
         wireDetectionButton();
@@ -502,5 +501,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
         Inputs.<android.view.View>requireView(this, R.id.detection_btn, "detection_btn")
                 .setOnClickListener(v -> startActivity(new Intent(this,
                         cl.coders.faketraveler.detection.DetectionTestActivity.class)));
+    }
+
+    private void showSettingsSheet() {
+        new cl.coders.faketraveler.ui.SettingsBottomSheet()
+                .show(getSupportFragmentManager(), "settings");
     }
 }

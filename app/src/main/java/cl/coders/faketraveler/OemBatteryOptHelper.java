@@ -22,7 +22,7 @@ import java.util.Locale;
  * Detects the device manufacturer and routes the user to the right battery / autostart
  * screen. Originally introduced as FIX-011; extended with the {@link Vendor} enum,
  * eight-vendor detection, and per-vendor instruction strings to drive the OEM whitelist
- * card in {@code MoreActivity} (V33).
+ * card in {@code SettingsBottomSheet} (V33).
  */
 public final class OemBatteryOptHelper {
 

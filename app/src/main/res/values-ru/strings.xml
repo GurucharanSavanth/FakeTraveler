@@ -14,7 +14,7 @@
     <string name="MainActivity_MockApplied">Изменённое местоположение применено.</string>
     <string name="MainActivity_MockStopped">Изменение остановлено.</string>
 
-    <!--  Strings from activity_more.xml layout  -->
+    <!--  Strings from the settings sheet (ActivityMore_* keys preserved for compat) -->
     <string name="ActivityMore_HowToTittle">Как это использовать?</string>
     <string name="ActivityMore_HowManyTimes">Сколько раз вы хотите изменять локацию? (0&#160;=&#160;бесконечно)</string>
     <string name="ActivityMore_TimeInterval">Сколько секунд между каждым изменением?</string>

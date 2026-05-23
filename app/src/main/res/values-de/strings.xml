@@ -15,7 +15,7 @@
     <string name="MainActivity_MockApplied">Simulierter Standort gesetzt.</string>
     <string name="MainActivity_MockStopped">Standort Simulation beendet.</string>
 
-    <!--  Strings from activity_more.xml layout  -->
+    <!--  Strings from the settings sheet (ActivityMore_* keys preserved for compat) -->
     <string name="ActivityMore_HowToTittle">Bedienungsanleitung</string>
     <string name="ActivityMore_HowManyTimes">Wie oft möchten Sie den Standort simulieren? (0&#160;=&#160;unbegrenzt)</string>
     <string name="ActivityMore_TimeInterval">Zeit zwischen jeder Simulation</string>

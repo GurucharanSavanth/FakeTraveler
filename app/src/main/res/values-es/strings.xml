@@ -13,7 +13,7 @@
     <string name="MainActivity_MockApplied">Posiciones ficticias aplicadas.</string>
     <string name="MainActivity_MockStopped">Falsificaciones detenidas.</string>
 
-    <!--  Strings from activity_more.xml layout  -->
+    <!--  Strings from the settings sheet (ActivityMore_* keys preserved for compat) -->
     <string name="ActivityMore_HowToTittle">¿Cómo se usa?</string>
     <string name="ActivityMore_HowManyTimes">¿Cuántas veces quieres falsificar la ubicación? (0&#160;=&#160;infinito)</string>
     <string name="ActivityMore_TimeInterval">¿Cuántos segundos entre cada falsificación?</string>

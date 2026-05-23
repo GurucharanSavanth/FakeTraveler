@@ -14,7 +14,7 @@
     <string name="MainActivity_MockStopped">Mudanças desativadas.</string>
 
 
-    <!--  Strings from activity_more.xml layout  -->
+    <!--  Strings from the settings sheet (ActivityMore_* keys preserved for compat) -->
     <string name="ActivityMore_HowToTittle">Como usar?</string>
     <string name="ActivityMore_HowManyTimes">Quantas vezes deseja mudar sua localização? (0&#160;=&#160;infinito)</string>
     <string name="ActivityMore_TimeInterval">Quantos segundos entre cada mudança?</string>

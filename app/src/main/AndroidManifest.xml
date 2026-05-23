@@ -83,9 +83,6 @@
             </intent-filter>
 
         </activity>
-        <activity
-            android:name="cl.coders.faketraveler.MoreActivity"
-            android:parentActivityName="cl.coders.faketraveler.MainActivity" />
 
         <!-- FIX-001 / FIX-002 -->
         <service
@@ -105,7 +102,7 @@
             android:name=".debug.DebugConsoleActivity"
             android:exported="false"
             android:label="@string/Debug_Title"
-            android:parentActivityName=".MoreActivity" />
+            android:parentActivityName=".MainActivity" />
 
         <!-- FIX-005 -->
         <receiver

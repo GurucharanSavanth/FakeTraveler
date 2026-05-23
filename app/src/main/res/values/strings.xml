@@ -22,7 +22,7 @@
     <string name="MainActivity_MockApplied">Mocked location applied.</string>
     <string name="MainActivity_MockStopped">Mocking stopped.</string>
     <string name="MainActivity_LocationPermissionNeeded">Location permission is required to start the mock service on Android 14+.</string>
-    <!--  Strings from activity_more.xml layout  -->
+    <!--  Strings from the settings sheet (ActivityMore_* keys preserved for compat) -->
     <string name="ActivityMore_HowToTittle">How to use it?</string>
     <string name="ActivityMore_HowManyTimes">How many times you want to mock the location? (0&#160;=&#160;infinite)</string>
     <string name="ActivityMore_TimeInterval">How many seconds between every mock?</string>
@@ -64,11 +64,11 @@
     <string name="OemHelper_Vivo">FunTouch OS background restrictions vary. Open Battery → Background power usage and set FakeTraveler to \"Allow background activity\".</string>
     <string name="OemHelper_Generic">For mocking to survive screen-off and Doze, exempt FakeTraveler from battery optimization in system Settings.</string>
 
-    <!-- MoreActivity additions (FIX-005 / FIX-011) -->
+    <!-- Settings sheet additions (FIX-005 / FIX-011) -->
     <string name="More_RestoreAfterBoot">Restore mocking after reboot</string>
     <string name="More_OemHelperButton">Battery / background settings</string>
 
-    <!-- MoreActivity version footer (also doubles as the 7-tap debug-console gate) -->
+    <!-- Settings sheet version footer (T10's AboutActivity will rehome the 7-tap debug gate) -->
     <string name="More_VersionFooter">v%1$s (%2$d)</string>
 
     <!-- Predictive-back dialog -->

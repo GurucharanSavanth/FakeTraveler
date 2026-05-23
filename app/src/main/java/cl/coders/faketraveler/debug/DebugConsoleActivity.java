@@ -15,9 +15,10 @@ import cl.coders.faketraveler.MockLogger;
 import cl.coders.faketraveler.R;
 
 /**
- * Live view of the {@link MockLogger} ring buffer. Unlocked via the 7-tap gesture on the
- * version footer in {@code MoreActivity}. Offers an export (text) and a stress-test action
- * useful for shaking out concurrency bugs in the log path itself.
+ * Live view of the {@link MockLogger} ring buffer. The 7-tap unlock gesture is being
+ * rehomed in T10's new AboutActivity; until then the console is reachable only via
+ * intent. Offers an export (text) and a stress-test action useful for shaking out
+ * concurrency bugs in the log path itself.
  */
 public class DebugConsoleActivity extends AppCompatActivity implements MockLogger.Listener {
 

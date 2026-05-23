@@ -16,7 +16,7 @@
     <string name="MainActivity_MockApplied">应用了模拟的位置。</string>
     <string name="MainActivity_MockStopped">模拟已停止</string>
 
-    <!--  Strings from activity_more.xml layout  -->
+    <!--  Strings from the settings sheet (ActivityMore_* keys preserved for compat) -->
     <string name="ActivityMore_HowToTittle">如何使用它？</string>
     <string name="ActivityMore_HowManyTimes">您想模拟该位置多少次？ （0 =无限）</string>
     <string name="ActivityMore_TimeInterval">每个模拟之间有几秒钟间隔？</string>
