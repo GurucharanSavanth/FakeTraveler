@@ -5,16 +5,16 @@
     android:padding="16dp">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/fav_list"
+        android:id="@+id/bookmark_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="120dp" />
 
     <TextView
-        android:id="@+id/fav_empty"
+        android:id="@+id/bookmark_empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="@string/Favorites_Empty"
+        android:text="@string/Bookmark_Empty_Title"
         android:visibility="gone" />
 </FrameLayout>

@@ -5,8 +5,8 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 /** Persisted record of a user-saved location. */
-@Entity(tableName = "favorites")
-public class FavoriteEntity {
+@Entity(tableName = "bookmarks")
+public class BookmarkEntity {
 
     @PrimaryKey(autoGenerate = true)
     public long id;

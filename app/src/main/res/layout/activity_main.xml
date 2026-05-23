@@ -63,7 +63,7 @@
 
     </com.google.android.flexbox.FlexboxLayout>
 
-    <!-- v3.0 — feature buttons row (favorites, detection). -->
+    <!-- v3.0 — feature buttons row (bookmarks, detection). -->
     <com.google.android.flexbox.FlexboxLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -72,11 +72,11 @@
         app:flexWrap="wrap">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/fav_save_btn"
+            android:id="@+id/bookmark_save_btn"
             style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/MainActivity_FavSave"
+            android:text="@string/Bookmark_AddCurrent"
             android:textSize="13sp" />
 
         <Space
@@ -84,11 +84,11 @@
             android:layout_height="wrap_content" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/fav_list_btn"
+            android:id="@+id/bookmark_list_btn"
             style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/MainActivity_FavList"
+            android:text="@string/Bookmark_SheetTitle"
             android:textSize="13sp" />
 
         <Space

@@ -13,36 +13,36 @@ import java.util.List;
 import java.util.Locale;
 
 import cl.coders.faketraveler.R;
-import cl.coders.faketraveler.db.FavoriteEntity;
+import cl.coders.faketraveler.db.BookmarkEntity;
 
 /**
- * RecyclerView adapter for the favorites bottom sheet.
+ * RecyclerView adapter for the bookmarks bottom sheet.
  *
  * <p>Holds a private list — it does NOT query the database. The hosting sheet observes
- * {@link cl.coders.faketraveler.db.FavoriteDao#getAll()} and pushes refreshed snapshots in
+ * {@link cl.coders.faketraveler.db.BookmarkDao#getAll()} and pushes refreshed snapshots in
  * (V35); this keeps the data layer out of the view layer.
  */
-public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.VH> {
+public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.VH> {
 
     public interface Listener {
-        void onTap(@NonNull FavoriteEntity fav);
-        void onLongPress(@NonNull FavoriteEntity fav);
+        void onTap(@NonNull BookmarkEntity fav);
+        void onLongPress(@NonNull BookmarkEntity fav);
     }
 
-    @NonNull private final List<FavoriteEntity> items = new ArrayList<>();
+    @NonNull private final List<BookmarkEntity> items = new ArrayList<>();
     @NonNull private final Listener listener;
 
-    public FavoriteAdapter(@NonNull Listener listener) { this.listener = listener; }
+    public BookmarkAdapter(@NonNull Listener listener) { this.listener = listener; }
 
     @android.annotation.SuppressLint("NotifyDataSetChanged")  // small list; full refresh is intentional
-    public void submit(@NonNull List<FavoriteEntity> next) {
+    public void submit(@NonNull List<BookmarkEntity> next) {
         items.clear();
         items.addAll(next);
         notifyDataSetChanged();
     }
 
     @androidx.annotation.Nullable
-    public FavoriteEntity itemAt(int pos) {
+    public BookmarkEntity itemAt(int pos) {
         if (pos < 0 || pos >= items.size()) return null;
         return items.get(pos);
     }
@@ -50,13 +50,13 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.VH> {
     @NonNull @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_favorite, parent, false);
+                .inflate(R.layout.item_bookmark, parent, false);
         return new VH(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull VH h, int pos) {
-        FavoriteEntity f = items.get(pos);
+        BookmarkEntity f = items.get(pos);
         h.name.setText(f.name);
         h.coords.setText(String.format(Locale.US, "%.5f, %.5f", f.lat, f.lng));
         h.itemView.setOnClickListener(v -> listener.onTap(f));
@@ -70,8 +70,8 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.VH> {
         final TextView coords;
         VH(@NonNull View v) {
             super(v);
-            name = v.findViewById(R.id.fav_name);
-            coords = v.findViewById(R.id.fav_coords);
+            name = v.findViewById(R.id.bookmark_name);
+            coords = v.findViewById(R.id.bookmark_coords);
         }
     }
 }

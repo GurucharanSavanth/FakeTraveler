@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
         buttonSettings.setOnClickListener(view ->
                 startActivity(new Intent(getBaseContext(), MoreActivity.class)));
 
-        wireFavoriteButtons();
+        wireBookmarkButtons();
         wireDetectionButton();
 
         detectAppVersion();
@@ -448,25 +448,25 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
 
     public enum SourceChange { NONE, LOAD, CHANGE_FROM_EDITTEXT, CHANGE_FROM_MAP }
 
-    private void wireFavoriteButtons() {
-        Inputs.<android.view.View>requireView(this, R.id.fav_save_btn, "fav_save_btn")
-                .setOnClickListener(v -> showSaveFavoriteDialog());
-        Inputs.<android.view.View>requireView(this, R.id.fav_list_btn, "fav_list_btn")
-                .setOnClickListener(v -> showFavoritesSheet());
+    private void wireBookmarkButtons() {
+        Inputs.<android.view.View>requireView(this, R.id.bookmark_save_btn, "bookmark_save_btn")
+                .setOnClickListener(v -> showSaveBookmarkDialog());
+        Inputs.<android.view.View>requireView(this, R.id.bookmark_list_btn, "bookmark_list_btn")
+                .setOnClickListener(v -> showBookmarksSheet());
     }
 
-    private void showSaveFavoriteDialog() {
+    private void showSaveBookmarkDialog() {
         final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
-        input.setHint(R.string.Favorites_Save_Hint);
+        input.setHint(R.string.Bookmark_Dialog_Name_Hint);
         new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.Favorites_Save_Title)
+                .setTitle(R.string.Bookmark_Dialog_Title_Add)
                 .setView(input)
                 .setPositiveButton(android.R.string.ok, (d, w) -> {
                     final String name = input.getText().toString().trim();
                     if (name.isEmpty()) return;
-                    final cl.coders.faketraveler.db.FavoriteEntity e =
-                            new cl.coders.faketraveler.db.FavoriteEntity();
+                    final cl.coders.faketraveler.db.BookmarkEntity e =
+                            new cl.coders.faketraveler.db.BookmarkEntity();
                     e.name = name;
                     e.lat = lat;
                     e.lng = lng;
@@ -474,28 +474,28 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
                     e.createdAt = System.currentTimeMillis();
                     final Context appCtx = getApplicationContext();
                     final Thread io = new Thread(() ->
-                            cl.coders.faketraveler.db.AppDatabase.get(appCtx).favoriteDao().insert(e),
-                            "FavoritesIO");
+                            cl.coders.faketraveler.db.AppDatabase.get(appCtx).bookmarkDao().insert(e),
+                            "BookmarksIO");
                     io.setDaemon(true);
                     io.start();
-                    MockLogger.log("favorite_save", name);
+                    MockLogger.log("bookmark_save", name);
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
     }
 
-    private void showFavoritesSheet() {
-        cl.coders.faketraveler.ui.FavoritesBottomSheet sheet =
-                new cl.coders.faketraveler.ui.FavoritesBottomSheet();
+    private void showBookmarksSheet() {
+        cl.coders.faketraveler.ui.BookmarksBottomSheet sheet =
+                new cl.coders.faketraveler.ui.BookmarksBottomSheet();
         sheet.setCallback(fav -> {
             lat = fav.lat;
             lng = fav.lng;
             zoom = fav.zoom;
             setLatLng(lat, lng, SourceChange.LOAD);
             applyLocation();
-            MockLogger.log("favorite_apply", fav.name);
+            MockLogger.log("bookmark_apply", fav.name);
         });
-        sheet.show(getSupportFragmentManager(), "favorites");
+        sheet.show(getSupportFragmentManager(), "bookmarks");
     }
 
     private void wireDetectionButton() {

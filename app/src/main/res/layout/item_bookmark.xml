@@ -12,14 +12,14 @@
     tools:ignore="UnusedAttribute">
 
     <TextView
-        android:id="@+id/fav_name"
+        android:id="@+id/bookmark_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16sp"
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/fav_coords"
+        android:id="@+id/bookmark_coords"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="13sp" />

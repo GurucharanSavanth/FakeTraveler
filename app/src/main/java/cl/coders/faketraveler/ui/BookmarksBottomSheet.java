@@ -20,44 +20,44 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import cl.coders.faketraveler.R;
 import cl.coders.faketraveler.db.AppDatabase;
-import cl.coders.faketraveler.db.FavoriteEntity;
+import cl.coders.faketraveler.db.BookmarkEntity;
 
 /**
- * Bottom sheet that lists saved favorites and exposes swipe-to-delete + long-press-to-rename.
- * Tap on a row picks the favorite and notifies the host via {@link OnFavoritePicked}.
+ * Bottom sheet that lists saved bookmarks and exposes swipe-to-delete + long-press-to-rename.
+ * Tap on a row picks the bookmark and notifies the host via {@link OnBookmarkPicked}.
  *
  * <p>Database writes happen on a short-lived background thread — Room throws on the main
  * thread. Reads are observed through the DAO's {@link androidx.lifecycle.LiveData}.
  */
-public class FavoritesBottomSheet extends BottomSheetDialogFragment implements FavoriteAdapter.Listener {
+public class BookmarksBottomSheet extends BottomSheetDialogFragment implements BookmarkAdapter.Listener {
 
-    public interface OnFavoritePicked {
-        void onPicked(@NonNull FavoriteEntity fav);
+    public interface OnBookmarkPicked {
+        void onPicked(@NonNull BookmarkEntity fav);
     }
 
-    @Nullable private OnFavoritePicked callback;
-    @Nullable private FavoriteAdapter adapter;
+    @Nullable private OnBookmarkPicked callback;
+    @Nullable private BookmarkAdapter adapter;
 
-    public void setCallback(@Nullable OnFavoritePicked cb) { this.callback = cb; }
+    public void setCallback(@Nullable OnBookmarkPicked cb) { this.callback = cb; }
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.bottom_sheet_favorites, container, false);
+        return inflater.inflate(R.layout.bottom_sheet_bookmarks, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        final TextView empty = view.findViewById(R.id.fav_empty);
-        final RecyclerView list = view.findViewById(R.id.fav_list);
+        final TextView empty = view.findViewById(R.id.bookmark_empty);
+        final RecyclerView list = view.findViewById(R.id.bookmark_list);
 
-        adapter = new FavoriteAdapter(this);
+        adapter = new BookmarkAdapter(this);
         list.setLayoutManager(new LinearLayoutManager(requireContext()));
         list.setAdapter(adapter);
 
-        AppDatabase.get(requireContext()).favoriteDao().getAll().observe(
+        AppDatabase.get(requireContext()).bookmarkDao().getAll().observe(
                 getViewLifecycleOwner(),
                 favs -> {
                     adapter.submit(favs);
@@ -79,32 +79,32 @@ public class FavoritesBottomSheet extends BottomSheetDialogFragment implements F
                 if (adapter == null) return;
                 final int pos = vh.getBindingAdapterPosition();
                 if (pos == RecyclerView.NO_POSITION) return;
-                final FavoriteEntity fav = adapter.itemAt(pos);
+                final BookmarkEntity fav = adapter.itemAt(pos);
                 if (fav == null) return;
                 final Context appCtx = requireContext().getApplicationContext();
-                runDb(() -> AppDatabase.get(appCtx).favoriteDao().delete(fav));
+                runDb(() -> AppDatabase.get(appCtx).bookmarkDao().delete(fav));
             }
         }).attachToRecyclerView(list);
     }
 
-    @Override public void onTap(@NonNull FavoriteEntity fav) {
+    @Override public void onTap(@NonNull BookmarkEntity fav) {
         if (callback != null) callback.onPicked(fav);
         dismiss();
     }
 
-    @Override public void onLongPress(@NonNull FavoriteEntity fav) {
+    @Override public void onLongPress(@NonNull BookmarkEntity fav) {
         final EditText input = new EditText(requireContext());
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         input.setText(fav.name);
         final Context appCtx = requireContext().getApplicationContext();
         new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.Favorites_Rename_Title)
+                .setTitle(R.string.Bookmark_Rename_Title)
                 .setView(input)
                 .setPositiveButton(android.R.string.ok, (d, w) -> {
                     String newName = input.getText().toString().trim();
                     if (newName.isEmpty()) return;
                     fav.name = newName;
-                    runDb(() -> AppDatabase.get(appCtx).favoriteDao().update(fav));
+                    runDb(() -> AppDatabase.get(appCtx).bookmarkDao().update(fav));
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
@@ -114,7 +114,7 @@ public class FavoritesBottomSheet extends BottomSheetDialogFragment implements F
      *  Bg thread holds only application context (captured by caller) so it cannot leak the
      *  fragment past destruction. */
     private static void runDb(@NonNull Runnable r) {
-        final Thread t = new Thread(r, "FavoritesIO");
+        final Thread t = new Thread(r, "BookmarksIO");
         t.setDaemon(true);
         t.start();
     }

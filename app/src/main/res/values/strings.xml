@@ -83,14 +83,6 @@
     <string name="Health_FailedTitle">Mock stopped</string>
     <string name="Health_FailedMsg">Reason: %1$s. Tap to open Developer settings.</string>
 
-    <!-- T2.1 favorites -->
-    <string name="Favorites_Empty">No favorites yet. Tap ⭐ Save above to add one.</string>
-    <string name="Favorites_Rename_Title">Rename favorite</string>
-    <string name="Favorites_Save_Title">Save current location</string>
-    <string name="Favorites_Save_Hint">Name (e.g. Home, Office)</string>
-    <string name="MainActivity_FavSave">⭐ Save</string>
-    <string name="MainActivity_FavList">📍 Favorites</string>
-
     <!-- T4.2 detection (button label) -->
     <string name="MainActivity_DetectionTest">🔍 Test detection</string>
 
@@ -198,6 +190,7 @@
     <string name="Bookmark_Swipe_Undo">Undo</string>
     <string name="Bookmark_Dialog_Title_Add">Save location</string>
     <string name="Bookmark_Dialog_Title_Edit">Edit bookmark</string>
+    <string name="Bookmark_Rename_Title">Rename bookmark</string>
     <string name="Bookmark_Dialog_Name_Hint">Name (e.g., Central Park, NYC)</string>
     <string name="Bookmark_Dialog_Lat_Hint">Latitude</string>
     <string name="Bookmark_Dialog_Lng_Hint">Longitude</string>
