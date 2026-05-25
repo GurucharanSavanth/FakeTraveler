@@ -8,7 +8,8 @@ var lat = (_urlParams$get = urlParams.get('lat')) !== null && _urlParams$get !==
 var lng = (_urlParams$get2 = urlParams.get('lng')) !== null && _urlParams$get2 !== void 0 ? _urlParams$get2 : 15;
 var zoom = (_urlParams$get3 = urlParams.get('zoom')) !== null && _urlParams$get3 !== void 0 ? _urlParams$get3 : 12;
 var provider = (_urlParams$get4 = urlParams.get('provider')) !== null && _urlParams$get4 !== void 0 ? _urlParams$get4 : 'CartoDB.Positron';
-var map = L.map('map').setView([lat, lng], zoom);
+var map = L.map('map', {zoomControl: false}).setView([lat, lng], zoom);
+L.control.zoom({position: 'bottomright'}).addTo(map);
 var popup = L.popup();
 var alreadyRunning = false;
 var searchInput = document.getElementById("address_input");

@@ -23,23 +23,41 @@ import cl.coders.faketraveler.db.BookmarkEntity;
 
 /**
  * Bottom sheet that lists saved bookmarks and exposes swipe-to-delete + long-press-to-rename.
- * Tap on a row picks the bookmark and notifies the host via {@link OnBookmarkPicked}.
+ * Tap on a row picks the bookmark and notifies the host via {@link Host}.
  *
  * <p>Database writes happen on a short-lived background thread — Room throws on the main
  * thread. Reads are observed through the DAO's {@link androidx.lifecycle.LiveData}.
  */
 public class BookmarksBottomSheet extends BottomSheetDialogFragment implements BookmarkAdapter.Listener {
 
-    public interface OnBookmarkPicked {
-        void onPicked(@NonNull BookmarkEntity fav);
+    /**
+     * Lifecycle-safe host interface. Resolved from the Activity in {@link #onAttach}.
+     * Survives configuration changes (FragmentManager re-creation) without leaking callbacks.
+     */
+    public interface Host {
+        void onBookmarkSelected(@NonNull BookmarkEntity fav);
+        void onAddCurrentRequested();
     }
 
-    @Nullable private OnBookmarkPicked callback;
-    @Nullable private Runnable onAddCurrent;
+    @Nullable private Host host;
     @Nullable private BookmarkAdapter adapter;
 
-    public void setCallback(@Nullable OnBookmarkPicked cb) { this.callback = cb; }
-    public void setOnAddCurrent(@Nullable Runnable action) { this.onAddCurrent = action; }
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof Host) {
+            host = (Host) context;
+        } else {
+            throw new IllegalStateException(context.getClass().getSimpleName()
+                    + " must implement BookmarksBottomSheet.Host");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        host = null;
+    }
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -56,7 +74,7 @@ public class BookmarksBottomSheet extends BottomSheetDialogFragment implements B
         final View addCurrent = view.findViewById(R.id.bookmark_add_current_btn);
         if (addCurrent != null) {
             addCurrent.setOnClickListener(v -> {
-                if (onAddCurrent != null) onAddCurrent.run();
+                if (host != null) host.onAddCurrentRequested();
             });
         }
 
@@ -95,7 +113,7 @@ public class BookmarksBottomSheet extends BottomSheetDialogFragment implements B
     }
 
     @Override public void onTap(@NonNull BookmarkEntity fav) {
-        if (callback != null) callback.onPicked(fav);
+        if (host != null) host.onBookmarkSelected(fav);
         dismiss();
     }
 

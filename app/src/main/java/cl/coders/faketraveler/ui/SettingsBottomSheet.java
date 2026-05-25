@@ -81,8 +81,8 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
         wireLeafletLicense(view);
         wireDoubleField(view, R.id.et_DMockLat, "dLat", sharedPref);
         wireDoubleField(view, R.id.et_DMockLon, "dLng", sharedPref);
-        wireIntField(view, R.id.et_MockCount, "mockCount", 0, sharedPref, /*minClamp*/ 0);
-        wireIntField(view, R.id.et_MockFrequency, "mockFrequency", 10, sharedPref, /*minClamp*/ 1);
+        wireIntField(view, R.id.et_MockCount, "mockCount", 0, sharedPref, /*minClamp*/ 0, /*maxClamp*/ 100);
+        wireIntField(view, R.id.et_MockFrequency, "mockFrequency", 10, sharedPref, /*minClamp*/ 1, /*maxClamp*/ 60);
         wireTimingSliders(view, sharedPref);
         wireCheckBox(view, R.id.cb_MockSpeed, "mockSpeed", true);
         wireMapProvider(view, sharedPref);
@@ -164,7 +164,7 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
     }
 
     private void wireIntField(@NonNull View view, int id, @NonNull String key, int dflt,
-                              @NonNull SharedPreferences sp, int minClamp) {
+                              @NonNull SharedPreferences sp, int minClamp, int maxClamp) {
         final EditText et = Inputs.requireView(view, id, "wireIntField:" + key);
         et.setText(String.format(Locale.ROOT, "%d", sp.getInt(key, dflt)));
         et.addTextChangedListener(new TextWatcher() {
@@ -182,7 +182,8 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
                         Log.e(TAG, "Could not parse " + key + "!", t);
                     }
                 }
-                if (value < minClamp) value = minClamp;                                  // FIX-014
+                if (value < minClamp) value = minClamp;
+                if (value > maxClamp) value = maxClamp;
                 e.putInt(key, value).apply();
             }
         });
@@ -195,6 +196,9 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
                 R.id.et_MockCount, sp.getInt("mockCount", 0), 0, 100, true);
     }
 
+    /** Guard flag to prevent recursive slider↔EditText updates. */
+    private boolean sliderEditSyncing;
+
     private void wireSlider(@NonNull View view, int sliderId, int labelId, int editId,
                             int current, int min, int max, boolean infiniteZero) {
         final Slider slider = view.findViewById(sliderId);
@@ -205,14 +209,44 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
         slider.setValue(clamped);
         label.setText(formatSliderValue(clamped, infiniteZero));
         slider.addOnChangeListener((s, value, fromUser) -> {
-            final int rounded = Math.round(value);
-            label.setText(formatSliderValue(rounded, infiniteZero));
-            if (fromUser) edit.setText(String.format(Locale.ROOT, "%d", rounded));
+            if (sliderEditSyncing) return;
+            sliderEditSyncing = true;
+            try {
+                final int rounded = Math.round(value);
+                label.setText(formatSliderValue(rounded, infiniteZero));
+                if (fromUser) edit.setText(String.format(Locale.ROOT, "%d", rounded));
+            } finally {
+                sliderEditSyncing = false;
+            }
+        });
+        edit.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
+            @Override public void onTextChanged(CharSequence s, int a, int b, int c) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (sliderEditSyncing) return;
+                sliderEditSyncing = true;
+                try {
+                    if (s.toString().isBlank()) return;
+                    int value;
+                    try {
+                        value = Integer.parseInt(s.toString());
+                    } catch (NumberFormatException e) {
+                        return;
+                    }
+                    final int clampedValue = Math.max(min, Math.min(max, value));
+                    slider.setValue(clampedValue);
+                    label.setText(formatSliderValue(clampedValue, infiniteZero));
+                } finally {
+                    sliderEditSyncing = false;
+                }
+            }
         });
     }
 
     @NonNull
     private String formatSliderValue(int value, boolean infiniteZero) {
+        if (getContext() == null) return String.valueOf(value);
         if (infiniteZero && value == 0) return getString(R.string.QuickSettings_Count_Infinite);
         return infiniteZero
                 ? getString(R.string.QuickSettings_Count_Finite, value)
@@ -271,6 +305,7 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
             e.putString("mapProvider",
                     MapProviderUtil.getDefaultMapProvider(Locale.getDefault()));
             e.apply();
+            SharedPrefsUtil.setRestoreAfterBoot(ctx, false);
             dismiss();
         });
     }

@@ -4,7 +4,8 @@ var lng = urlParams.get('lng') ?? 15;
 var zoom = urlParams.get('zoom') ?? 12;
 var provider = urlParams.get('provider') ?? 'OpenStreetMap';
 
-var map = L.map('map').setView([lat, lng], zoom);
+var map = L.map('map', {zoomControl: false}).setView([lat, lng], zoom);
+L.control.zoom({position: 'bottomright'}).addTo(map);
 var popup = L.popup();
 var alreadyRunning = false;
 

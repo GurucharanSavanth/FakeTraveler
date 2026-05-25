@@ -30,8 +30,8 @@
 
     <!-- Component sizes -->
     <dimen name="fab_size">56dp</dimen>
-    <dimen name="primary_action_button_width">200dp</dimen>
-    <dimen name="primary_action_button_height">56dp</dimen>
+    <dimen name="primary_action_button_width">160dp</dimen>
+    <dimen name="primary_action_button_height">48dp</dimen>
     <dimen name="icon_size_small">24dp</dimen>
     <dimen name="icon_size_medium">48dp</dimen>
     <dimen name="icon_size_large">96dp</dimen>
@@ -45,7 +45,7 @@
     <dimen name="main_control_panel_max_width">560dp</dimen>
     <dimen name="main_control_panel_side_width">384dp</dimen>
     <dimen name="main_control_panel_bottom_margin">88dp</dimen>
-    <dimen name="primary_action_overlap">28dp</dimen>
+    <dimen name="primary_action_overlap">20dp</dimen>
     <dimen name="quick_chip_height">36dp</dimen>
     <dimen name="bookmark_thumbnail_size">72dp</dimen>
     <dimen name="bottom_sheet_min_height">320dp</dimen>

@@ -48,7 +48,8 @@ import java.util.Locale;
 
 import cl.coders.faketraveler.util.Inputs;
 
-public class MainActivity extends AppCompatActivity implements ServiceConnector.Listener {
+public class MainActivity extends AppCompatActivity implements ServiceConnector.Listener,
+        cl.coders.faketraveler.ui.BookmarksBottomSheet.Host {
 
     @NonNull private static final String TAG = MainActivity.class.getSimpleName();
     @NonNull public static final String sharedPrefKey = "cl.coders.faketraveler.sharedprefs";
@@ -83,6 +84,24 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
     private boolean mockSpeed;
     private long endTime;
     private String mapProvider;
+
+    /** Strong reference prevents GC; registered in onStart, unregistered in onStop. */
+    @NonNull
+    private final SharedPreferences.OnSharedPreferenceChangeListener prefListener =
+            (sp, key) -> {
+                if (key == null) return;
+                switch (key) {
+                    case "mockFrequency":
+                    case "mockCount":
+                    case "dLat":
+                    case "dLng":
+                    case "mockSpeed":
+                    case "mapProvider":
+                    case "restoreAfterBoot":
+                        loadSharedPrefs();
+                        break;
+                }
+            };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -205,6 +224,20 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
         } catch (NameNotFoundException e) {
             Log.e(TAG, "Could not read version info!", e);
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        context.getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE)
+                .registerOnSharedPreferenceChangeListener(prefListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        context.getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE)
+                .unregisterOnSharedPreferenceChangeListener(prefListener);
     }
 
     @Override
@@ -525,18 +558,25 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
     }
 
     private void showBookmarksSheet() {
-        cl.coders.faketraveler.ui.BookmarksBottomSheet sheet =
-                new cl.coders.faketraveler.ui.BookmarksBottomSheet();
-        sheet.setOnAddCurrent(this::showSaveBookmarkDialog);
-        sheet.setCallback(fav -> {
-            lat = fav.lat;
-            lng = fav.lng;
-            zoom = fav.zoom;
-            setLatLng(lat, lng, SourceChange.LOAD);
-            applyLocation();
-            MockLogger.log("bookmark_apply", fav.name);
-        });
-        sheet.show(getSupportFragmentManager(), "bookmarks");
+        new cl.coders.faketraveler.ui.BookmarksBottomSheet()
+                .show(getSupportFragmentManager(), "bookmarks");
+    }
+
+    // --- BookmarksBottomSheet.Host ---
+
+    @Override
+    public void onBookmarkSelected(@NonNull cl.coders.faketraveler.db.BookmarkEntity fav) {
+        lat = fav.lat;
+        lng = fav.lng;
+        zoom = fav.zoom;
+        setLatLng(lat, lng, SourceChange.LOAD);
+        applyLocation();
+        MockLogger.log("bookmark_apply", fav.name);
+    }
+
+    @Override
+    public void onAddCurrentRequested() {
+        showSaveBookmarkDialog();
     }
 
     private void wireDetectionButton() {
