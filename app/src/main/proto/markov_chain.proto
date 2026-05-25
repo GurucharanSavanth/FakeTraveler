@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option java_package = "cl.coders.faketraveler.aether.data.proto";
+option java_multiple_files = true;
+
+message MarkovChain {
+    repeated Transition transitions = 1;
+
+    message Transition {
+        string from_app = 1;
+        string to_app = 2;
+        float probability = 3;
+        int32 hour = 4;
+        int32 day_of_week = 5;
+    }
+}

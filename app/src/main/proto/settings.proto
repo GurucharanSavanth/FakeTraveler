@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option java_package = "cl.coders.faketraveler.aether.data.proto";
+option java_multiple_files = true;
+
+message Settings {
+    bool chameleon_enabled = 1;
+    string last_profile_id = 2;
+    bool oem_warned = 3;
+    string active_theme = 4;
+}
