@@ -7,7 +7,7 @@
          lets dark icons render against the transparent status bar in light mode. -->
     <!-- API 35+ note: this file also serves API 35+ via the vNN cascade; do not reintroduce
          a values-v35/styles.xml unless a real v35-only divergence appears. -->
-    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="AppTheme" parent="Theme.Material3.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
         <item name="colorPrimaryContainer">@color/colorPrimaryContainer</item>
@@ -28,9 +28,13 @@
         <item name="shapeAppearanceCornerSmall">@style/ShapeAppearance.FakeTraveler.CornerSmall</item>
         <item name="shapeAppearanceCornerMedium">@style/ShapeAppearance.FakeTraveler.CornerMedium</item>
         <item name="shapeAppearanceCornerLarge">@style/ShapeAppearance.FakeTraveler.CornerLarge</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.FakeTraveler.CornerSmall</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.FakeTraveler.CornerMedium</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.FakeTraveler.CornerLarge</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:fontFamily">sans</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
         <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>

@@ -1,28 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--
-        Material 3 design tokens — DIMENSIONS.
-        Base spacing unit is 8dp. Component sizes follow M3 guidance.
+        Material 3 design tokens — DIMENSIONS (refreshed).
+        Base spacing unit is 8dp. Corners softer for modern feel.
     -->
 
-    <!-- Spacing grid (8dp base unit) -->
+    <!-- Spacing grid (8dp base) -->
     <dimen name="spacing_xs">4dp</dimen>
     <dimen name="spacing_sm">8dp</dimen>
     <dimen name="spacing_md">16dp</dimen>
     <dimen name="spacing_lg">24dp</dimen>
     <dimen name="spacing_xl">32dp</dimen>
+    <dimen name="spacing_xxl">40dp</dimen>
+    <dimen name="size_zero">0dp</dimen>
+    <dimen name="divider_size">1dp</dimen>
 
-    <!-- Semantic spacing aliases -->
+    <!-- Semantic spacing -->
     <dimen name="screen_edge_padding">16dp</dimen>
     <dimen name="card_internal_padding">16dp</dimen>
-    <dimen name="section_gap">24dp</dimen>
+    <dimen name="section_gap">28dp</dimen>
     <dimen name="item_gap_related">8dp</dimen>
     <dimen name="item_gap_unrelated">16dp</dimen>
 
-    <!-- Corner radii -->
-    <dimen name="corner_small">12dp</dimen>
-    <dimen name="corner_medium">16dp</dimen>
-    <dimen name="corner_large">24dp</dimen>
+    <!-- Corner radii — softer, more modern -->
+    <dimen name="corner_small">14dp</dimen>
+    <dimen name="corner_medium">20dp</dimen>
+    <dimen name="corner_large">28dp</dimen>
+    <dimen name="corner_pill">999dp</dimen>
 
     <!-- Component sizes -->
     <dimen name="fab_size">56dp</dimen>
@@ -33,11 +37,31 @@
     <dimen name="icon_size_large">96dp</dimen>
     <dimen name="touch_target_min">48dp</dimen>
     <dimen name="top_app_bar_height">64dp</dimen>
-    <dimen name="drag_handle_width">36dp</dimen>
+    <dimen name="top_app_bar_scrim_height">72dp</dimen>
+    <dimen name="drag_handle_width">40dp</dimen>
     <dimen name="drag_handle_height">4dp</dimen>
     <dimen name="text_input_height">56dp</dimen>
+    <dimen name="toolbar_icon_button_size">48dp</dimen>
+    <dimen name="main_control_panel_max_width">560dp</dimen>
+    <dimen name="main_control_panel_side_width">384dp</dimen>
+    <dimen name="main_control_panel_bottom_margin">88dp</dimen>
+    <dimen name="primary_action_overlap">28dp</dimen>
+    <dimen name="quick_chip_height">36dp</dimen>
+    <dimen name="bookmark_thumbnail_size">72dp</dimen>
+    <dimen name="bottom_sheet_min_height">320dp</dimen>
+    <dimen name="bottom_sheet_land_width">480dp</dimen>
+    <dimen name="about_icon_size">80dp</dimen>
+    <dimen name="step_number_size">32dp</dimen>
+    <dimen name="permission_illustration_size">96dp</dimen>
+    <dimen name="dialog_content_max_width">560dp</dimen>
+    <dimen name="hidden_compat_size">0dp</dimen>
 
-    <!-- Text sizes (escape hatch for layouts that need to override M3 text appearances) -->
+    <!-- Elevation -->
+    <dimen name="elevation_none">0dp</dimen>
+    <dimen name="elevation_low">1dp</dimen>
+    <dimen name="elevation_medium">3dp</dimen>
+
+    <!-- Text sizes -->
     <dimen name="text_headline">28sp</dimen>
     <dimen name="text_title">20sp</dimen>
     <dimen name="text_body_large">16sp</dimen>
@@ -45,7 +69,7 @@
     <dimen name="text_label_large">14sp</dimen>
     <dimen name="text_label_small">11sp</dimen>
 
-    <!-- Line heights (for android:lineHeight on TextView API 28+) -->
+    <!-- Line heights -->
     <dimen name="line_height_headline">36sp</dimen>
     <dimen name="line_height_title">28sp</dimen>
     <dimen name="line_height_body_large">24sp</dimen>

@@ -1,43 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--
-        Material 3 design tokens — LIGHT palette.
-        See values-night/colors.xml for the dark counterpart.
-        Token names mirror the M3 attribute names so that theme bindings stay legible.
+        Material 3 design tokens — LIGHT palette (refreshed).
+        More vibrant primary, warmer surfaces, crisper accents.
+        See values-night/colors.xml for dark counterpart.
     -->
 
-    <!-- Primary -->
-    <color name="colorPrimary">#0F67B1</color>
+    <!-- Primary — vibrant blue with punch -->
+    <color name="colorPrimary">#1565C0</color>
     <color name="colorOnPrimary">#FFFFFF</color>
-    <color name="colorPrimaryContainer">#D6E3FF</color>
+    <color name="colorPrimaryContainer">#D1E4FF</color>
     <color name="colorOnPrimaryContainer">#001D36</color>
 
-    <!-- Secondary -->
-    <color name="colorSecondary">#565F71</color>
+    <!-- Secondary — muted slate-blue -->
+    <color name="colorSecondary">#525F7A</color>
     <color name="colorOnSecondary">#FFFFFF</color>
-    <color name="colorSecondaryContainer">#DAE2F9</color>
-    <color name="colorOnSecondaryContainer">#131C2B</color>
+    <color name="colorSecondaryContainer">#D8E2F8</color>
+    <color name="colorOnSecondaryContainer">#0F1B2D</color>
 
-    <!-- Surface -->
-    <color name="colorSurface">#FDFDFD</color>
-    <color name="colorOnSurface">#1B1B1F</color>
-    <color name="colorSurfaceVariant">#E0E2EC</color>
-    <color name="colorOnSurfaceVariant">#44474F</color>
+    <!-- Tertiary — warm coral accent for active states -->
+    <color name="colorTertiary">#8B5000</color>
+    <color name="colorOnTertiary">#FFFFFF</color>
+    <color name="colorTertiaryContainer">#FFDCBE</color>
+    <color name="colorOnTertiaryContainer">#2C1600</color>
+
+    <!-- Surface — warmer, less clinical -->
+    <color name="colorSurface">#FAFAFA</color>
+    <color name="colorOnSurface">#1A1C1E</color>
+    <color name="colorSurfaceVariant">#DFE2EB</color>
+    <color name="colorOnSurfaceVariant">#43474E</color>
+    <color name="colorSurfaceContainerLowest">#FFFFFF</color>
+    <color name="colorSurfaceContainerLow">#F3F3F3</color>
+    <color name="colorSurfaceContainer">#EDEDED</color>
+    <color name="colorSurfaceContainerHigh">#E7E7E7</color>
+    <color name="colorSurfaceContainerHighest">#E1E1E1</color>
 
     <!-- Background -->
-    <color name="colorBackground">#FFFFFF</color>
-    <color name="colorOnBackground">#1B1B1F</color>
+    <color name="colorBackground">#FAFAFA</color>
+    <color name="colorOnBackground">#1A1C1E</color>
 
     <!-- Error -->
     <color name="colorError">#BA1A1A</color>
     <color name="colorOnError">#FFFFFF</color>
+    <color name="colorErrorContainer">#FFDAD6</color>
+    <color name="colorOnErrorContainer">#410002</color>
 
     <!-- Outline -->
-    <color name="colorOutline">#74777F</color>
+    <color name="colorOutline">#73777F</color>
+    <color name="colorOutlineVariant">#C3C6CF</color>
 
-    <!-- Semantic — no M3 attr binding -->
-    <color name="colorSuccess">#2E7D32</color>
+    <!-- Semantic — custom tokens -->
+    <color name="colorSuccess">#1B7D2C</color>
+    <color name="colorSuccessContainer">#CEEFD1</color>
+    <color name="colorOnSuccessContainer">#00390A</color>
+    <color name="colorWarning">#8B6B00</color>
+    <color name="colorWarningContainer">#FFEEA4</color>
+    <color name="colorOnWarningContainer">#291D00</color>
+    <color name="colorDragHandle">#50525F7A</color>
 
-    <!-- Map overlay panel: colorSurface @ 88% alpha (ARGB: 0xE0 = 224/255 ≈ 88%) -->
-    <color name="colorMapOverlay">#E0FDFDFD</color>
+    <!-- Map overlay panel: colorSurface @ 92% alpha -->
+    <color name="colorMapOverlay">#EBFAFAFA</color>
+    <color name="colorTopAppBarOverlay">#F0FAFAFA</color>
+
+    <!-- Scrim -->
+    <color name="colorScrim">#1A000000</color>
 </resources>

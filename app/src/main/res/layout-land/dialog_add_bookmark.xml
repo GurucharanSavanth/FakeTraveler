@@ -4,7 +4,8 @@
     android:layout_height="wrap_content">
 
     <include
-        layout="@layout/bottom_sheet_bookmarks_content"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        layout="@layout/dialog_add_bookmark_content"
+        android:layout_width="@dimen/dialog_content_max_width"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal" />
 </FrameLayout>

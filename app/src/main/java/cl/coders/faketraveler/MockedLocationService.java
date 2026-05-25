@@ -63,6 +63,9 @@ public class MockedLocationService extends Service {
     @Nullable private StopReceiver stopReceiver;
     private boolean foregroundStarted = false;
 
+    private long lastNotificationRefresh = 0;
+    private static final long NOTIFICATION_THROTTLE_MS = 5_000L;
+
     /** Progress accounting for the ongoing notification.
      *  {@code totalTicks == Integer.MAX_VALUE} renders an indeterminate spinner — this is
      *  the sentinel for an infinite mock (V24 / V40). AtomicInteger so Timer thread can
@@ -113,6 +116,7 @@ public class MockedLocationService extends Service {
     public void onDestroy() {
         unregisterStopReceiver();
         stopMockNow();
+        timer.cancel();
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) stopForeground(STOP_FOREGROUND_REMOVE);
             else stopForegroundLegacy();
@@ -238,7 +242,11 @@ public class MockedLocationService extends Service {
     void publishLocation(@NonNull Location value, double lat, double lng) {
         mockedLocation.postValue(value);
         if (totalTicks.get() != Integer.MAX_VALUE) doneTicks.incrementAndGet();
-        refreshNotification(value);
+        final long now = System.currentTimeMillis();
+        if (now - lastNotificationRefresh >= NOTIFICATION_THROTTLE_MS) {
+            lastNotificationRefresh = now;
+            refreshNotification(value);
+        }
         for (MockedLocationProvider prov : providers) prov.pushLocation(lat, lng);
     }
 

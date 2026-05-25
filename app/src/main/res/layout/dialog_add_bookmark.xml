@@ -4,7 +4,7 @@
     android:layout_height="wrap_content">
 
     <include
-        layout="@layout/bottom_sheet_bookmarks_content"
+        layout="@layout/dialog_add_bookmark_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 </FrameLayout>

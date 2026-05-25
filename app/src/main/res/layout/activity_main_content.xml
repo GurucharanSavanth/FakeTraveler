@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    tools:context=".MainActivity">
+
+    <WebView
+        android:id="@+id/webView0"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no" />
+
+    <LinearLayout
+        android:id="@+id/top_app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/top_app_bar_height"
+        android:layout_gravity="top"
+        android:background="@drawable/bg_top_app_bar"
+        android:elevation="@dimen/elevation_low"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/screen_edge_padding"
+        android:paddingEnd="@dimen/screen_edge_padding">
+
+        <ImageView
+            android:layout_width="@dimen/icon_size_small"
+            android:layout_height="@dimen/icon_size_small"
+            android:contentDescription="@string/Cd_AppLogo"
+            android:src="@drawable/ic_logo"
+            app:tint="?attr/colorPrimary" />
+
+        <TextView
+            android:layout_width="@dimen/size_zero"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_sm"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/TopAppBar_Wordmark"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textColor="?attr/colorOnSurface" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/bookmark_list_btn"
+            style="?attr/materialIconButtonStyle"
+            android:layout_width="@dimen/toolbar_icon_button_size"
+            android:layout_height="@dimen/toolbar_icon_button_size"
+            android:contentDescription="@string/Cd_Bookmarks"
+            android:text="@null"
+            app:icon="@drawable/ic_bookmark"
+            app:iconTint="?attr/colorOnSurface" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_settings"
+            style="?attr/materialIconButtonStyle"
+            android:layout_width="@dimen/toolbar_icon_button_size"
+            android:layout_height="@dimen/toolbar_icon_button_size"
+            android:contentDescription="@string/Cd_Settings"
+            android:text="@null"
+            app:icon="@drawable/ic_settings"
+            app:iconTint="?attr/colorOnSurface" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/more_btn"
+            style="?attr/materialIconButtonStyle"
+            android:layout_width="@dimen/toolbar_icon_button_size"
+            android:layout_height="@dimen/toolbar_icon_button_size"
+            android:contentDescription="@string/Cd_Overflow"
+            android:text="@null"
+            app:icon="@drawable/ic_more_vert"
+            app:iconTint="?attr/colorOnSurface" />
+    </LinearLayout>
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/status_chip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="@dimen/screen_edge_padding"
+        android:layout_marginTop="@dimen/top_app_bar_scrim_height"
+        android:contentDescription="@string/Cd_StatusChip"
+        android:elevation="@dimen/elevation_low"
+        android:minHeight="@dimen/touch_target_min"
+        android:text="@string/Status_Idle"
+        android:textAppearance="?attr/textAppearanceLabelLarge"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        app:chipBackgroundColor="?attr/colorSurfaceVariant"
+        app:chipIcon="@drawable/ic_location_off"
+        app:chipIconTint="?attr/colorOnSurfaceVariant"
+        app:chipMinHeight="@dimen/quick_chip_height"
+        app:ensureMinTouchTargetSize="true" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/my_location_fab"
+        android:layout_width="@dimen/fab_size"
+        android:layout_height="@dimen/fab_size"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="@dimen/top_app_bar_scrim_height"
+        android:layout_marginEnd="@dimen/screen_edge_padding"
+        android:contentDescription="@string/Fab_MyLocation"
+        app:backgroundTint="?attr/colorSurface"
+        app:elevation="@dimen/elevation_low"
+        app:srcCompat="@drawable/ic_my_location"
+        app:tint="?attr/colorPrimary" />
+
+    <FrameLayout
+        android:id="@+id/main_control_stack"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginStart="@dimen/screen_edge_padding"
+        android:layout_marginEnd="@dimen/screen_edge_padding"
+        android:layout_marginBottom="@dimen/screen_edge_padding">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/coordinate_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="@dimen/primary_action_overlap"
+            android:animateLayoutChanges="true"
+            app:cardBackgroundColor="@color/colorMapOverlay"
+            app:cardCornerRadius="@dimen/corner_large"
+            app:cardElevation="@dimen/elevation_low"
+            app:strokeWidth="@dimen/size_zero">
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/card_internal_padding"
+                    android:paddingBottom="@dimen/primary_action_button_height">
+
+                    <include layout="@layout/view_drag_handle" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/search_input_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_md"
+                    android:hint="@string/Coord_SearchHint"
+                    android:visibility="gone"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="@dimen/corner_small"
+                    app:boxCornerRadiusBottomStart="@dimen/corner_small"
+                    app:boxCornerRadiusTopEnd="@dimen/corner_small"
+                    app:boxCornerRadiusTopStart="@dimen/corner_small"
+                    app:endIconDrawable="@drawable/ic_clear"
+                    app:endIconMode="clear_text"
+                    app:startIconDrawable="@drawable/ic_search">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/search_edit_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/text_input_height"
+                        android:imeOptions="actionSearch"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:textAppearance="?attr/textAppearanceBodyLarge" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <LinearLayout
+                    android:id="@+id/manual_coordinate_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_md"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="@dimen/size_zero"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="@string/Coord_LatLabel"
+                        app:boxBackgroundMode="outline"
+                        app:boxCornerRadiusBottomEnd="@dimen/corner_small"
+                        app:boxCornerRadiusBottomStart="@dimen/corner_small"
+                        app:boxCornerRadiusTopEnd="@dimen/corner_small"
+                        app:boxCornerRadiusTopStart="@dimen/corner_small">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/editTextLat"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/text_input_height"
+                            android:inputType="numberSigned|numberDecimal"
+                            android:maxLines="1"
+                            android:textAppearance="?attr/textAppearanceBodyMedium" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <Space
+                        android:layout_width="@dimen/spacing_sm"
+                        android:layout_height="@dimen/size_zero" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="@dimen/size_zero"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="@string/Coord_LngLabel"
+                        app:boxBackgroundMode="outline"
+                        app:boxCornerRadiusBottomEnd="@dimen/corner_small"
+                        app:boxCornerRadiusBottomStart="@dimen/corner_small"
+                        app:boxCornerRadiusTopEnd="@dimen/corner_small"
+                        app:boxCornerRadiusTopStart="@dimen/corner_small">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/editTextLng"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/text_input_height"
+                            android:inputType="numberSigned|numberDecimal"
+                            android:maxLines="1"
+                            android:textAppearance="?attr/textAppearanceBodyMedium" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/location_metadata"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_sm"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:text="@string/Coord_MetadataUnknown"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurface" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/quick_settings_strip"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_sm"
+                    app:singleLine="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/quick_frequency_chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minHeight="@dimen/quick_chip_height"
+                        android:text="@string/Default_MockFrequency"
+                        app:chipBackgroundColor="?attr/colorSurfaceVariant"
+                        app:chipMinHeight="@dimen/quick_chip_height" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/quick_count_chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minHeight="@dimen/quick_chip_height"
+                        android:text="@string/QuickSettings_Count_Infinite"
+                        app:chipBackgroundColor="?attr/colorSurfaceVariant"
+                        app:chipMinHeight="@dimen/quick_chip_height" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/quick_accuracy_chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minHeight="@dimen/quick_chip_height"
+                        android:text="@string/QuickSettings_Accuracy_Default"
+                        app:chipBackgroundColor="?attr/colorSurfaceVariant"
+                        app:chipMinHeight="@dimen/quick_chip_height" />
+                </com.google.android.material.chip.ChipGroup>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/bookmark_save_btn"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_sm"
+                    android:contentDescription="@string/Cd_SaveCurrent"
+                    android:text="@string/Bookmark_AddCurrent"
+                    app:icon="@drawable/ic_bookmark_filled" />
+                </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_applyStop"
+            android:layout_width="@dimen/primary_action_button_width"
+            android:layout_height="@dimen/primary_action_button_height"
+            android:layout_gravity="bottom|center_horizontal"
+            android:text="@string/ActivityMain_Apply"
+            app:cornerRadius="@dimen/corner_medium"
+            app:icon="@drawable/ic_location_on"
+            app:iconGravity="textStart" />
+    </FrameLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/detection_btn"
+        android:layout_width="@dimen/hidden_compat_size"
+        android:layout_height="@dimen/hidden_compat_size"
+        android:visibility="gone"
+        android:text="@string/MainActivity_DetectionTest" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

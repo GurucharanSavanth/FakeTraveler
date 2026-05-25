@@ -1,29 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="@dimen/spacing_lg">
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <TextView
         android:id="@+id/cooldown_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textSize="40sp" />
+        android:textAppearance="?attr/textAppearanceHeadlineLarge"
+        android:textColor="?attr/colorOnSurface" />
 
-    <androidx.appcompat.widget.AppCompatCheckBox
+    <com.google.android.material.materialswitch.MaterialSwitch
         android:id="@+id/cooldown_ack"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/Cooldown_Ack" />
+        android:layout_marginTop="@dimen/spacing_md"
+        android:minHeight="@dimen/touch_target_min"
+        android:text="@string/Cooldown_Ack"
+        android:textAppearance="?attr/textAppearanceBodyLarge" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/cooldown_override"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="@dimen/spacing_sm"
         android:text="@string/Cooldown_Override" />
-</androidx.appcompat.widget.LinearLayoutCompat>
+</LinearLayout>

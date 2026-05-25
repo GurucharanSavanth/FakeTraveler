@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_sheet"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:id="@+id/settings_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_lg">
+
+        <include layout="@layout/view_drag_handle" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_lg"
+            android:text="@string/Settings_Title"
+            android:textAppearance="?attr/textAppearanceHeadlineSmall"
+            android:textColor="?attr/colorOnSurface" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:text="@string/Settings_GlobalOnly_Helper"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
+        <!-- ═══ Timing Section ═══ -->
+
+        <TextView
+            style="?attr/textAppearanceLabelLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/section_gap"
+            android:text="@string/Settings_Section_Timing"
+            android:textAllCaps="true"
+            android:textColor="?attr/colorPrimary" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="@dimen/size_zero"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/Settings_UpdateInterval_Label"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                android:textColor="?attr/colorOnSurface" />
+
+            <TextView
+                android:id="@+id/mock_frequency_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/Default_MockFrequency"
+                android:textAppearance="?attr/textAppearanceLabelLarge"
+                android:textColor="?attr/colorPrimary" />
+        </LinearLayout>
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/slider_MockFrequency"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:valueFrom="1"
+            android:valueTo="60"
+            android:stepSize="1" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/Settings_UpdateInterval_Label"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusBottomEnd="@dimen/corner_small"
+            app:boxCornerRadiusBottomStart="@dimen/corner_small"
+            app:boxCornerRadiusTopEnd="@dimen/corner_small"
+            app:boxCornerRadiusTopStart="@dimen/corner_small">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_MockFrequency"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/text_input_height"
+                android:inputType="number"
+                android:maxLines="1"
+                android:text="@string/Default_MockFrequency" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_lg"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="@dimen/size_zero"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/Settings_RepeatCount_Label"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                android:textColor="?attr/colorOnSurface" />
+
+            <TextView
+                android:id="@+id/mock_count_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/QuickSettings_Count_Infinite"
+                android:textAppearance="?attr/textAppearanceLabelLarge"
+                android:textColor="?attr/colorPrimary" />
+        </LinearLayout>
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/slider_MockCount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:valueFrom="0"
+            android:valueTo="100"
+            android:stepSize="1" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/Settings_RepeatCount_Label"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusBottomEnd="@dimen/corner_small"
+            app:boxCornerRadiusBottomStart="@dimen/corner_small"
+            app:boxCornerRadiusTopEnd="@dimen/corner_small"
+            app:boxCornerRadiusTopStart="@dimen/corner_small">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_MockCount"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/text_input_height"
+                android:inputType="number"
+                android:maxLines="1"
+                android:text="@string/Default_MockCount" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- ═══ Accuracy & Altitude Section ═══ -->
+
+        <TextView
+            style="?attr/textAppearanceLabelLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/section_gap"
+            android:text="@string/Settings_Section_AccuracyAltitude"
+            android:textAllCaps="true"
+            android:textColor="?attr/colorPrimary" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:orientation="horizontal">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="@dimen/size_zero"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/Settings_Accuracy_Label"
+                app:boxBackgroundMode="outline"
+                app:boxCornerRadiusBottomEnd="@dimen/corner_small"
+                app:boxCornerRadiusBottomStart="@dimen/corner_small"
+                app:boxCornerRadiusTopEnd="@dimen/corner_small"
+                app:boxCornerRadiusTopStart="@dimen/corner_small"
+                app:helperText="@string/Settings_Defaults_Helper">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_Accuracy"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/text_input_height"
+                    android:inputType="numberDecimal"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Space
+                android:layout_width="@dimen/spacing_sm"
+                android:layout_height="@dimen/size_zero" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="@dimen/size_zero"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/Settings_Altitude_Label"
+                app:boxBackgroundMode="outline"
+                app:boxCornerRadiusBottomEnd="@dimen/corner_small"
+                app:boxCornerRadiusBottomStart="@dimen/corner_small"
+                app:boxCornerRadiusTopEnd="@dimen/corner_small"
+                app:boxCornerRadiusTopStart="@dimen/corner_small"
+                app:helperText="@string/Settings_Defaults_Helper">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_Altitude"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/text_input_height"
+                    android:inputType="numberSigned|numberDecimal"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
+        <!-- ═══ Map Section ═══ -->
+
+        <TextView
+            style="?attr/textAppearanceLabelLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/section_gap"
+            android:text="@string/Settings_Section_Map"
+            android:textAllCaps="true"
+            android:textColor="?attr/colorPrimary" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:hint="@string/ActivityMore_MapProvider"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusBottomEnd="@dimen/corner_small"
+            app:boxCornerRadiusBottomStart="@dimen/corner_small"
+            app:boxCornerRadiusTopEnd="@dimen/corner_small"
+            app:boxCornerRadiusTopStart="@dimen/corner_small"
+            app:helperText="@string/Settings_MapProvider_Helper">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_MapProvider"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/text_input_height"
+                android:inputType="text"
+                android:maxLines="1"
+                android:text="@string/Default_MapProvider" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- ═══ System Section ═══ -->
+
+        <TextView
+            style="?attr/textAppearanceLabelLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/section_gap"
+            android:text="@string/Settings_Section_System"
+            android:textAllCaps="true"
+            android:textColor="?attr/colorPrimary" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/cb_RestoreAfterBoot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:minHeight="@dimen/touch_target_min"
+            android:text="@string/More_RestoreAfterBoot"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_OemHelper"
+            style="@style/Widget.FakeTraveler.Button.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:text="@string/More_OemHelperButton" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/oem_card"
+            style="@style/Widget.FakeTraveler.Card.Filled"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            app:cardBackgroundColor="?attr/colorSurfaceVariant">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/card_internal_padding">
+
+                <TextView
+                    android:id="@+id/oem_card_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Oem_Card_Title"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:textColor="?attr/colorOnSurface" />
+
+                <TextView
+                    android:id="@+id/oem_card_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xs"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+
+                <TextView
+                    android:id="@+id/oem_card_instructions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xs"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/oem_card_fix_button"
+                    style="@style/Widget.FakeTraveler.Button.Outlined"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_sm"
+                    android:text="@string/Oem_Card_Fix_Button" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ═══ Footer ═══ -->
+
+        <TextView
+            android:id="@+id/tv_LeafletLicense"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/section_gap"
+            android:text="@string/ActivityMore_LeafletLicense"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
+        <TextView
+            android:id="@+id/tv_AppVersion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_lg"
+            android:gravity="center"
+            android:textAppearance="?attr/textAppearanceLabelSmall"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/settings_reset_defaults"
+            style="@style/Widget.FakeTraveler.Button.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:text="@string/Settings_ResetDefaults"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
+        <!-- Hidden compat values — referenced by SettingsBottomSheet.java for backward compat -->
+        <LinearLayout
+            android:id="@+id/settings_compatibility_values"
+            android:layout_width="@dimen/hidden_compat_size"
+            android:layout_height="@dimen/hidden_compat_size"
+            android:visibility="gone"
+            android:orientation="vertical">
+
+            <TextView android:id="@+id/textView"  android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ActivityMore_HowToTittle" />
+            <TextView android:id="@+id/textView2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ActivityMore_HowToInstructions" />
+            <TextView android:id="@+id/textView3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ActivityMore_IconLicense" />
+            <TextView android:id="@+id/et_DMockLatLon" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ActivityMore_DMockLatLon" />
+            <EditText android:id="@+id/et_DMockLat"  android:layout_width="wrap_content" android:layout_height="wrap_content" android:inputType="numberSigned|numberDecimal" android:text="@string/Default_DMockValue" />
+            <EditText android:id="@+id/et_DMockLon"  android:layout_width="wrap_content" android:layout_height="wrap_content" android:inputType="numberSigned|numberDecimal" android:text="@string/Default_DMockValue" />
+            <CheckBox android:id="@+id/cb_MockSpeed" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ActivityMore_Speed" />
+            <TextView android:id="@+id/textView4" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ActivityMore_HowManyTimes" />
+            <TextView android:id="@+id/textView5" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ActivityMore_TimeInterval" />
+            <TextView android:id="@+id/tv_MapProvider" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ActivityMore_MapProvider" />
+            <TextView android:id="@+id/textView6" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ActivityMore_MapProviderInfo" />
+            <TextView android:id="@+id/textView7" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ActivityMore_Copyright" />
+            <TextView android:id="@+id/textView8" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ActivityMore_SourceCode" />
+            <TextView android:id="@+id/textView9" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ActivityMore_Bugs" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

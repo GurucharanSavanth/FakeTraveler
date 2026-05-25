@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,9 +35,11 @@ public class BookmarksBottomSheet extends BottomSheetDialogFragment implements B
     }
 
     @Nullable private OnBookmarkPicked callback;
+    @Nullable private Runnable onAddCurrent;
     @Nullable private BookmarkAdapter adapter;
 
     public void setCallback(@Nullable OnBookmarkPicked cb) { this.callback = cb; }
+    public void setOnAddCurrent(@Nullable Runnable action) { this.onAddCurrent = action; }
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -50,8 +51,14 @@ public class BookmarksBottomSheet extends BottomSheetDialogFragment implements B
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        final TextView empty = view.findViewById(R.id.bookmark_empty);
+        final View empty = view.findViewById(R.id.bookmark_empty);
         final RecyclerView list = view.findViewById(R.id.bookmark_list);
+        final View addCurrent = view.findViewById(R.id.bookmark_add_current_btn);
+        if (addCurrent != null) {
+            addCurrent.setOnClickListener(v -> {
+                if (onAddCurrent != null) onAddCurrent.run();
+            });
+        }
 
         adapter = new BookmarkAdapter(this);
         list.setLayoutManager(new LinearLayoutManager(requireContext()));

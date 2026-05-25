@@ -14,13 +14,18 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.ColorStateList;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.text.InputType;
+import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.webkit.WebView;
 import android.widget.EditText;
+import android.widget.PopupMenu;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -34,6 +39,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.chip.Chip;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.text.DecimalFormat;
@@ -50,6 +56,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
             new DecimalFormat("0.######", DecimalFormatSymbols.getInstance(Locale.ROOT));
 
     private MaterialButton buttonApplyStop;
+    @Nullable private Chip statusChip;
+    @Nullable private TextView locationMetadata;
     private WebView webView;
     private EditText editTextLat;
     private EditText editTextLng;
@@ -116,6 +124,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
         editTextLng = Inputs.requireView(this, R.id.editTextLng, "editTextLng");
         buttonApplyStop = Inputs.requireView(this, R.id.button_applyStop, "button_applyStop");
         final MaterialButton buttonSettings = Inputs.requireView(this, R.id.button_settings, "button_settings");
+        statusChip = findViewById(R.id.status_chip);
+        locationMetadata = findViewById(R.id.location_metadata);
 
         final WebAppInterface bridge = new WebAppInterface(this);
         WebViewSetup.configure(webView, bridge);                                         // FIX-007
@@ -125,9 +135,14 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
 
         buttonApplyStop.setOnClickListener(view -> applyLocation());
         buttonSettings.setOnClickListener(view -> showSettingsSheet());
+        final View moreButton = findViewById(R.id.more_btn);
+        if (moreButton != null) moreButton.setOnClickListener(this::showOverflowMenu);
+        final View myLocationButton = findViewById(R.id.my_location_fab);
+        if (myLocationButton != null) myLocationButton.setOnClickListener(v -> setLatLng(lat, lng, LOAD));
 
         wireBookmarkButtons();
         wireDetectionButton();
+        wireQuickSettingsChips();
 
         detectAppVersion();
         loadSharedPrefs();
@@ -234,6 +249,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
             version = currentVersion;
             saveSettings();
         }
+        updateQuickSettingsChips();
     }
 
     private void saveSettings() {
@@ -397,10 +413,20 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
     }
     void changeButtonToApply() {
         buttonApplyStop.setText(context.getResources().getString(R.string.ActivityMain_Apply));
+        buttonApplyStop.setIconResource(R.drawable.ic_location_on);
+        buttonApplyStop.clearAnimation();
+        tintButton(buttonApplyStop, R.color.colorPrimary, R.color.colorOnPrimary);
+        updateStatusChip(false);
         buttonApplyStop.setOnClickListener(view -> applyLocation());
     }
     void changeButtonToStop() {
         buttonApplyStop.setText(context.getResources().getString(R.string.ActivityMain_Stop));
+        buttonApplyStop.setIconResource(R.drawable.ic_stop_circle);
+        tintButton(buttonApplyStop, R.color.colorError, R.color.colorOnError);
+        buttonApplyStop.startAnimation(AnimationUtils.loadAnimation(this, R.anim.anim_pulse));
+        updateStatusChip(true);
+        buttonApplyStop.announceForAccessibility(getString(R.string.A11y_MockActive,
+                DECIMAL_FORMAT.format(lat) + ", " + DECIMAL_FORMAT.format(lng)));
         buttonApplyStop.setOnClickListener(view -> {
             if (serviceConnector != null) serviceConnector.requestStop();
         });
@@ -418,6 +444,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
         if ((srcChange == CHANGE_FROM_MAP || srcChange == LOAD) && inputHandler != null) {
             inputHandler.setProgrammatic(lat, lng);
         }
+        updateLocationMetadata();
         saveSettings();
     }
 
@@ -436,7 +463,11 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
             }
             case SERVICE_BOUND -> { if (endTime > System.currentTimeMillis()) changeButtonToStop(); }
             case MOCKED -> { changeButtonToStop(); showSnackbar(R.string.MainActivity_MockApplied); }
-            case MOCK_ERROR -> PermissionChecker.showDevSettingsDialog(this);            // FIX-008
+            case MOCK_ERROR -> {
+                endTime = 0;
+                saveSettings();
+                PermissionChecker.showDevSettingsDialog(this);                            // FIX-008
+            }
         }
     }
 
@@ -455,20 +486,30 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
     }
 
     private void showSaveBookmarkDialog() {
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        input.setHint(R.string.Bookmark_Dialog_Name_Hint);
+        final View content = getLayoutInflater().inflate(R.layout.dialog_add_bookmark, null, false);
+        final EditText input = content.findViewById(R.id.bookmark_name_input);
+        final EditText latInput = content.findViewById(R.id.bookmark_lat_input);
+        final EditText lngInput = content.findViewById(R.id.bookmark_lng_input);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+        latInput.setText(DECIMAL_FORMAT.format(lat));
+        lngInput.setText(DECIMAL_FORMAT.format(lng));
         new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.Bookmark_Dialog_Title_Add)
-                .setView(input)
-                .setPositiveButton(android.R.string.ok, (d, w) -> {
+                .setView(content)
+                .setPositiveButton(R.string.Bookmark_Dialog_Save, (d, w) -> {
                     final String name = input.getText().toString().trim();
                     if (name.isEmpty()) return;
+                    final double bookmarkLat = Inputs.parseDoubleSafe(latInput.getText().toString(), Double.NaN);
+                    final double bookmarkLng = Inputs.parseDoubleSafe(lngInput.getText().toString(), Double.NaN);
+                    if (!Inputs.isFinite(bookmarkLat) || !Inputs.isFinite(bookmarkLng)) {
+                        showError(R.string.MainActivity_NoLatLong);
+                        return;
+                    }
                     final cl.coders.faketraveler.db.BookmarkEntity e =
                             new cl.coders.faketraveler.db.BookmarkEntity();
                     e.name = name;
-                    e.lat = lat;
-                    e.lng = lng;
+                    e.lat = Inputs.clampLat(bookmarkLat);
+                    e.lng = Inputs.clampLng(bookmarkLng);
                     e.zoom = (int) zoom;
                     e.createdAt = System.currentTimeMillis();
                     final Context appCtx = getApplicationContext();
@@ -479,13 +520,14 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
                     io.start();
                     MockLogger.log("bookmark_save", name);
                 })
-                .setNegativeButton(android.R.string.cancel, null)
+                .setNegativeButton(R.string.Bookmark_Dialog_Cancel, null)
                 .show();
     }
 
     private void showBookmarksSheet() {
         cl.coders.faketraveler.ui.BookmarksBottomSheet sheet =
                 new cl.coders.faketraveler.ui.BookmarksBottomSheet();
+        sheet.setOnAddCurrent(this::showSaveBookmarkDialog);
         sheet.setCallback(fav -> {
             lat = fav.lat;
             lng = fav.lng;
@@ -510,5 +552,76 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
     private void showSettingsSheet() {
         new cl.coders.faketraveler.ui.SettingsBottomSheet()
                 .show(getSupportFragmentManager(), "settings");
+    }
+
+    private void wireQuickSettingsChips() {
+        final int[] chipIds = {
+                R.id.quick_frequency_chip, R.id.quick_count_chip, R.id.quick_accuracy_chip
+        };
+        for (int id : chipIds) {
+            final View chip = findViewById(id);
+            if (chip != null) chip.setOnClickListener(v -> showSettingsSheet());
+        }
+        updateQuickSettingsChips();
+    }
+
+    private void updateQuickSettingsChips() {
+        final TextView frequency = findViewById(R.id.quick_frequency_chip);
+        final TextView count = findViewById(R.id.quick_count_chip);
+        if (frequency != null) {
+            frequency.setText(getString(R.string.QuickSettings_Frequency, mockFrequency));
+        }
+        if (count != null) {
+            count.setText(mockCount == 0
+                    ? getString(R.string.QuickSettings_Count_Infinite)
+                    : getString(R.string.QuickSettings_Count_Finite, mockCount));
+        }
+    }
+
+    private void updateLocationMetadata() {
+        if (locationMetadata == null) return;
+        locationMetadata.setText(DECIMAL_FORMAT.format(lat) + ", " + DECIMAL_FORMAT.format(lng));
+    }
+
+    private void updateStatusChip(boolean active) {
+        if (statusChip == null) return;
+        final int bgColor = active ? R.color.colorPrimaryContainer : R.color.colorSurfaceVariant;
+        final int fgColor = active ? R.color.colorPrimary : R.color.colorSecondary;
+        final int fg = ContextCompat.getColor(this, fgColor);
+        statusChip.setText(active ? R.string.Status_Active : R.string.Status_Idle);
+        statusChip.setChipIconResource(active ? R.drawable.ic_location_on : R.drawable.ic_location_off);
+        statusChip.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(this, bgColor)));
+        statusChip.setTextColor(fg);
+        statusChip.setChipIconTint(ColorStateList.valueOf(fg));
+    }
+
+    private static void tintButton(@NonNull MaterialButton button, int bgColor, int fgColor) {
+        final int bg = ContextCompat.getColor(button.getContext(), bgColor);
+        final int fg = ContextCompat.getColor(button.getContext(), fgColor);
+        button.setBackgroundTintList(ColorStateList.valueOf(bg));
+        button.setTextColor(fg);
+        button.setIconTint(ColorStateList.valueOf(fg));
+    }
+
+    private void showOverflowMenu(@NonNull View anchor) {
+        final PopupMenu menu = new PopupMenu(this, anchor);
+        menu.inflate(R.menu.menu_main);
+        menu.setOnMenuItemClickListener(item -> {
+            final int itemId = item.getItemId();
+            if (itemId == R.id.action_bookmarks) {
+                showBookmarksSheet();
+                return true;
+            }
+            if (itemId == R.id.action_settings) {
+                showSettingsSheet();
+                return true;
+            }
+            if (itemId == R.id.action_about || itemId == R.id.action_help) {
+                startActivity(new Intent(this, AboutActivity.class));
+                return true;
+            }
+            return false;
+        });
+        menu.show();
     }
 }

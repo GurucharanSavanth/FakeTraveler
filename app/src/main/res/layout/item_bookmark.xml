@@ -1,26 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Widget.FakeTraveler.Card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:foreground="?attr/selectableItemBackground"
+    android:layout_marginBottom="@dimen/spacing_sm"
     android:clickable="true"
     android:focusable="true"
-    android:orientation="vertical"
-    android:padding="12dp"
-    tools:targetApi="m"
-    tools:ignore="UnusedAttribute">
+    android:foreground="?attr/selectableItemBackground"
+    tools:targetApi="m">
 
-    <TextView
-        android:id="@+id/bookmark_name"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/card_internal_padding">
 
-    <TextView
-        android:id="@+id/bookmark_coords"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="13sp" />
-</LinearLayout>
+        <FrameLayout
+            android:layout_width="@dimen/bookmark_thumbnail_size"
+            android:layout_height="@dimen/bookmark_thumbnail_size"
+            android:background="@drawable/bg_bookmark_thumbnail">
+
+            <ImageView
+                android:layout_width="@dimen/icon_size_small"
+                android:layout_height="@dimen/icon_size_small"
+                android:layout_gravity="center"
+                android:contentDescription="@string/Cd_PinActive"
+                android:src="@drawable/ic_pin_active" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="@dimen/size_zero"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_md"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/bookmark_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textAppearance="?attr/textAppearanceTitleSmall"
+                android:textColor="?attr/colorOnSurface"
+                tools:text="Central Park" />
+
+            <TextView
+                android:id="@+id/bookmark_coords"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                tools:text="40.78120, -73.96650" />
+
+            <TextView
+                android:id="@+id/bookmark_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="@string/Bookmark_Item_DateAdded_Default"
+                android:textAppearance="?attr/textAppearanceLabelSmall"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/bookmark_overflow"
+            style="?attr/materialIconButtonStyle"
+            android:layout_width="@dimen/touch_target_min"
+            android:layout_height="@dimen/touch_target_min"
+            android:contentDescription="@string/Bookmark_Item_Overflow"
+            app:icon="@drawable/ic_more_vert"
+            app:iconTint="?attr/colorOnSurfaceVariant" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

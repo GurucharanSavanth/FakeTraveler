@@ -10,12 +10,15 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Process;
 import android.provider.Settings;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 /**
  * Centralised permission / dev-settings checks. FIX-008, FIX-009.
@@ -71,13 +74,19 @@ public final class PermissionChecker {
      * Developer settings. Replaces the previous short snackbar (FIX-008).
      */
     public static void showDevSettingsDialog(@NonNull AppCompatActivity activity) {
-        new AlertDialog.Builder(activity)
-                .setTitle(R.string.PermissionChecker_DialogTitle)
-                .setMessage(R.string.PermissionChecker_DialogMessage)
-                .setPositiveButton(R.string.PermissionChecker_OpenSettings,
-                        (d, w) -> openDevSettings(activity))
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
+        final View content = activity.getLayoutInflater()
+                .inflate(R.layout.activity_permission_rationale, null, false);
+        final AlertDialog dialog = new MaterialAlertDialogBuilder(activity)
+                .setView(content)
+                .create();
+        content.findViewById(R.id.permission_open_settings)
+                .setOnClickListener(v -> {
+                    dialog.dismiss();
+                    openDevSettings(activity);
+                });
+        content.findViewById(R.id.permission_already_done)
+                .setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
     }
 
     private static void openDevSettings(@NonNull Activity a) {

@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!--
-        AppTheme — Material 3 base theme. Resolved by AndroidManifest.xml.
-        Light values live here; dark values live in values-night/themes.xml.
-        The "NoActionBar" parent is required because MainActivity renders its
-        own top app bar inside a CoordinatorLayout.
-    -->
-    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="AppTheme" parent="Theme.Material3.Light.NoActionBar">
 
         <!-- Primary -->
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -20,6 +14,12 @@
         <item name="colorOnSecondary">@color/colorOnSecondary</item>
         <item name="colorSecondaryContainer">@color/colorSecondaryContainer</item>
         <item name="colorOnSecondaryContainer">@color/colorOnSecondaryContainer</item>
+
+        <!-- Tertiary -->
+        <item name="colorTertiary">@color/colorTertiary</item>
+        <item name="colorOnTertiary">@color/colorOnTertiary</item>
+        <item name="colorTertiaryContainer">@color/colorTertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/colorOnTertiaryContainer</item>
 
         <!-- Surface -->
         <item name="colorSurface">@color/colorSurface</item>
@@ -34,24 +34,39 @@
         <!-- Error -->
         <item name="colorError">@color/colorError</item>
         <item name="colorOnError">@color/colorOnError</item>
+        <item name="colorErrorContainer">@color/colorErrorContainer</item>
+        <item name="colorOnErrorContainer">@color/colorOnErrorContainer</item>
 
         <!-- Outline -->
         <item name="colorOutline">@color/colorOutline</item>
+        <item name="colorOutlineVariant">@color/colorOutlineVariant</item>
 
-        <!-- Shape appearance overlays (light + dark share these) -->
+        <!-- Shape -->
         <item name="shapeAppearanceCornerSmall">@style/ShapeAppearance.FakeTraveler.CornerSmall</item>
         <item name="shapeAppearanceCornerMedium">@style/ShapeAppearance.FakeTraveler.CornerMedium</item>
         <item name="shapeAppearanceCornerLarge">@style/ShapeAppearance.FakeTraveler.CornerLarge</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.FakeTraveler.CornerSmall</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.FakeTraveler.CornerMedium</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.FakeTraveler.CornerLarge</item>
 
-        <!-- System bars — preserved from previous AppTheme -->
+        <!-- System bars -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
         <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+
+        <!-- Typography — system default, clean -->
+        <item name="android:fontFamily">sans-serif</item>
+
+        <!-- Component defaults -->
+        <item name="materialButtonStyle">@style/Widget.FakeTraveler.Button</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.FakeTraveler.Button.Outlined</item>
+        <item name="chipStyle">@style/Widget.FakeTraveler.Chip</item>
+        <item name="textInputStyle">@style/Widget.FakeTraveler.TextInputLayout</item>
     </style>
 
-    <!-- Shape appearance overlays -->
+    <!-- Shape appearance -->
     <style name="ShapeAppearance.FakeTraveler.CornerSmall" parent="ShapeAppearance.Material3.Corner.Small">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/corner_small</item>
@@ -65,5 +80,48 @@
     <style name="ShapeAppearance.FakeTraveler.CornerLarge" parent="ShapeAppearance.Material3.Corner.Large">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/corner_large</item>
+    </style>
+
+    <!-- Button defaults -->
+    <style name="Widget.FakeTraveler.Button" parent="Widget.Material3.Button">
+        <item name="cornerRadius">@dimen/corner_medium</item>
+        <item name="android:minHeight">@dimen/touch_target_min</item>
+    </style>
+
+    <style name="Widget.FakeTraveler.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="cornerRadius">@dimen/corner_medium</item>
+        <item name="android:minHeight">@dimen/touch_target_min</item>
+    </style>
+
+    <!-- Chip default -->
+    <style name="Widget.FakeTraveler.Chip" parent="Widget.Material3.Chip.Assist">
+        <item name="chipMinHeight">@dimen/quick_chip_height</item>
+        <item name="chipCornerRadius">@dimen/corner_small</item>
+    </style>
+
+    <!-- TextInputLayout default -->
+    <style name="Widget.FakeTraveler.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">@dimen/corner_small</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/corner_small</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/corner_small</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/corner_small</item>
+    </style>
+
+    <!-- Bottom sheet style -->
+    <style name="Widget.FakeTraveler.BottomSheet" parent="Widget.Material3.BottomSheet">
+        <item name="shapeAppearance">@style/ShapeAppearance.FakeTraveler.CornerLarge</item>
+    </style>
+
+    <!-- Card styles -->
+    <style name="Widget.FakeTraveler.Card" parent="Widget.Material3.CardView.Outlined">
+        <item name="cardCornerRadius">@dimen/corner_medium</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeWidth">@dimen/divider_size</item>
+        <item name="strokeColor">?attr/colorOutlineVariant</item>
+    </style>
+
+    <style name="Widget.FakeTraveler.Card.Filled" parent="Widget.Material3.CardView.Filled">
+        <item name="cardCornerRadius">@dimen/corner_medium</item>
+        <item name="cardElevation">0dp</item>
     </style>
 </resources>

@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- windowLightStatusBar intentionally absent here: dark mode renders light icons,
-         and the night UI-mode qualifier wins over values-v23/values-v35 during resolution. -->
-    <!--
-        AppTheme — Material 3 base theme, DARK variant.
-        Color token names match the light variant; the dark hex values
-        live in values-night/colors.xml and resolve automatically when
-        UI_MODE_NIGHT is YES. The OLED-black background lives there too.
-    -->
-    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="AppTheme" parent="Theme.Material3.Dark.NoActionBar">
 
         <!-- Primary -->
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -23,33 +15,54 @@
         <item name="colorSecondaryContainer">@color/colorSecondaryContainer</item>
         <item name="colorOnSecondaryContainer">@color/colorOnSecondaryContainer</item>
 
+        <!-- Tertiary -->
+        <item name="colorTertiary">@color/colorTertiary</item>
+        <item name="colorOnTertiary">@color/colorOnTertiary</item>
+        <item name="colorTertiaryContainer">@color/colorTertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/colorOnTertiaryContainer</item>
+
         <!-- Surface -->
         <item name="colorSurface">@color/colorSurface</item>
         <item name="colorOnSurface">@color/colorOnSurface</item>
         <item name="colorSurfaceVariant">@color/colorSurfaceVariant</item>
         <item name="colorOnSurfaceVariant">@color/colorOnSurfaceVariant</item>
 
-        <!-- Background — pure OLED black in dark mode -->
+        <!-- Background — OLED black -->
         <item name="android:colorBackground">@color/colorBackground</item>
         <item name="colorOnBackground">@color/colorOnBackground</item>
 
         <!-- Error -->
         <item name="colorError">@color/colorError</item>
         <item name="colorOnError">@color/colorOnError</item>
+        <item name="colorErrorContainer">@color/colorErrorContainer</item>
+        <item name="colorOnErrorContainer">@color/colorOnErrorContainer</item>
 
         <!-- Outline -->
         <item name="colorOutline">@color/colorOutline</item>
+        <item name="colorOutlineVariant">@color/colorOutlineVariant</item>
 
-        <!-- Shape appearance overlays (shared with light) -->
+        <!-- Shape -->
         <item name="shapeAppearanceCornerSmall">@style/ShapeAppearance.FakeTraveler.CornerSmall</item>
         <item name="shapeAppearanceCornerMedium">@style/ShapeAppearance.FakeTraveler.CornerMedium</item>
         <item name="shapeAppearanceCornerLarge">@style/ShapeAppearance.FakeTraveler.CornerLarge</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.FakeTraveler.CornerSmall</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.FakeTraveler.CornerMedium</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.FakeTraveler.CornerLarge</item>
 
-        <!-- System bars — preserved from previous AppTheme -->
+        <!-- System bars -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
         <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+
+        <!-- Typography -->
+        <item name="android:fontFamily">sans-serif</item>
+
+        <!-- Component defaults (shared with light) -->
+        <item name="materialButtonStyle">@style/Widget.FakeTraveler.Button</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.FakeTraveler.Button.Outlined</item>
+        <item name="chipStyle">@style/Widget.FakeTraveler.Chip</item>
+        <item name="textInputStyle">@style/Widget.FakeTraveler.TextInputLayout</item>
     </style>
 </resources>

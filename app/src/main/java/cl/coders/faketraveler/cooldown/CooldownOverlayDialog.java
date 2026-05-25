@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -56,7 +56,7 @@ public class CooldownOverlayDialog extends DialogFragment {
         // Use the fragment-scoped inflater so the dialog content inherits the host theme.
         View content = getLayoutInflater().inflate(R.layout.dialog_cooldown, null, false);
         TextView countdown = content.findViewById(R.id.cooldown_text);
-        CheckBox ack = content.findViewById(R.id.cooldown_ack);
+        CompoundButton ack = content.findViewById(R.id.cooldown_ack);
         MaterialButton override = content.findViewById(R.id.cooldown_override);
         override.setEnabled(false);
         ack.setOnCheckedChangeListener((b, isChecked) -> override.setEnabled(isChecked));

@@ -146,6 +146,9 @@ public final class ServiceConnector implements ServiceConnection {
 
     /** Send STOP intent (foreground service already running). */
     public void requestStop() {
+        if (binder != null) {
+            try { binder.requestStop(); return; } catch (Throwable ignored) {}
+        }
         final Intent stop = new Intent(activity, MockedLocationService.class)
                 .setAction(MockedLocationService.ACTION_STOP);
         try {

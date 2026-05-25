@@ -36,7 +36,7 @@ public class HealthCheckWorker extends Worker {
 
     @NonNull private static final String TAG = HealthCheckWorker.class.getSimpleName();
     @NonNull public static final String UNIQUE_NAME = "health";
-    private static final long INTERVAL_SECONDS = 30L;
+    private static final long INTERVAL_SECONDS = 300L;
 
     public HealthCheckWorker(@NonNull Context ctx, @NonNull WorkerParameters p) {
         super(ctx, p);

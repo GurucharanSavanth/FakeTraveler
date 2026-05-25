@@ -19,7 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -29,6 +29,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.slider.Slider;
 
 import java.util.Locale;
 
@@ -82,12 +83,14 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
         wireDoubleField(view, R.id.et_DMockLon, "dLng", sharedPref);
         wireIntField(view, R.id.et_MockCount, "mockCount", 0, sharedPref, /*minClamp*/ 0);
         wireIntField(view, R.id.et_MockFrequency, "mockFrequency", 10, sharedPref, /*minClamp*/ 1);
+        wireTimingSliders(view, sharedPref);
         wireCheckBox(view, R.id.cb_MockSpeed, "mockSpeed", true);
         wireMapProvider(view, sharedPref);
         wireRestoreAfterBoot(view);                                                      // FIX-005
         wireOemHelper(view);                                                             // FIX-011
         wireOemCard(view);
         wireVersionFooter(view);
+        wireResetDefaults(view);
     }
 
     @Override
@@ -185,8 +188,39 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
         });
     }
 
+    private void wireTimingSliders(@NonNull View view, @NonNull SharedPreferences sp) {
+        wireSlider(view, R.id.slider_MockFrequency, R.id.mock_frequency_value,
+                R.id.et_MockFrequency, sp.getInt("mockFrequency", 10), 1, 60, false);
+        wireSlider(view, R.id.slider_MockCount, R.id.mock_count_value,
+                R.id.et_MockCount, sp.getInt("mockCount", 0), 0, 100, true);
+    }
+
+    private void wireSlider(@NonNull View view, int sliderId, int labelId, int editId,
+                            int current, int min, int max, boolean infiniteZero) {
+        final Slider slider = view.findViewById(sliderId);
+        final TextView label = view.findViewById(labelId);
+        final EditText edit = view.findViewById(editId);
+        if (slider == null || label == null || edit == null) return;
+        final int clamped = Math.max(min, Math.min(max, current));
+        slider.setValue(clamped);
+        label.setText(formatSliderValue(clamped, infiniteZero));
+        slider.addOnChangeListener((s, value, fromUser) -> {
+            final int rounded = Math.round(value);
+            label.setText(formatSliderValue(rounded, infiniteZero));
+            if (fromUser) edit.setText(String.format(Locale.ROOT, "%d", rounded));
+        });
+    }
+
+    @NonNull
+    private String formatSliderValue(int value, boolean infiniteZero) {
+        if (infiniteZero && value == 0) return getString(R.string.QuickSettings_Count_Infinite);
+        return infiniteZero
+                ? getString(R.string.QuickSettings_Count_Finite, value)
+                : getString(R.string.Settings_UpdateInterval_Value, value);
+    }
+
     private void wireCheckBox(@NonNull View view, int id, @NonNull String key, boolean dflt) {
-        final CheckBox cb = Inputs.requireView(view, id, "wireCheckBox:" + key);
+        final CompoundButton cb = Inputs.requireView(view, id, "wireCheckBox:" + key);
         final SharedPreferences sp = requireContext().getApplicationContext()
                 .getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE);
         cb.setChecked(sp.getBoolean(key, dflt));
@@ -216,10 +250,29 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
     }
 
     private void wireRestoreAfterBoot(@NonNull View view) {                              // FIX-005
-        final CheckBox cb = Inputs.requireView(view, R.id.cb_RestoreAfterBoot, "cb_RestoreAfterBoot");
+        final CompoundButton cb = Inputs.requireView(view, R.id.cb_RestoreAfterBoot, "cb_RestoreAfterBoot");
         cb.setChecked(SharedPrefsUtil.isRestoreAfterBoot(requireContext().getApplicationContext()));
         cb.setOnCheckedChangeListener((b, checked) ->
                 SharedPrefsUtil.setRestoreAfterBoot(requireContext().getApplicationContext(), checked));
+    }
+
+    private void wireResetDefaults(@NonNull View view) {
+        final MaterialButton btn = view.findViewById(R.id.settings_reset_defaults);
+        if (btn == null) return;
+        btn.setOnClickListener(v -> {
+            final Context ctx = requireContext().getApplicationContext();
+            final SharedPreferences.Editor e =
+                    ctx.getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE).edit();
+            putDouble(e, "dLat", 0);
+            putDouble(e, "dLng", 0);
+            e.putInt("mockCount", 0);
+            e.putInt("mockFrequency", 10);
+            e.putBoolean("mockSpeed", true);
+            e.putString("mapProvider",
+                    MapProviderUtil.getDefaultMapProvider(Locale.getDefault()));
+            e.apply();
+            dismiss();
+        });
     }
 
     private void wireOemHelper(@NonNull View view) {                                     // FIX-011
