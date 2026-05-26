@@ -104,6 +104,7 @@ Parsed by `GpxImporter` (`XmlPullParser`). Saved to prefs `routeData`.
 | V28 | WebView state persisted via `onSaveInstanceState`/`onRestoreInstanceState`. ! reload on every config change (rotate loses marker). | `MainActivity.onSaveInstanceState`, `onRestoreInstanceState` |
 | V29 | User-visible error paths use `Snackbar.LENGTH_LONG` (or AlertDialog). ! `LENGTH_SHORT` for errors. | `MainActivity.showError` |
 | V30 | Geo intent parse failure → user-visible Snackbar, NOT silent log only. | `MainActivity.applyIntentOrDefault` |
+| V31 | AGP 9 build uses one Kotlin toolchain path: no standalone `org.jetbrains.kotlin.android`, no `kotlinOptions`; Room schema path only via `room { schemaDirectory(...) }`; Room compiler uses exactly one processor path, KSP for this build; Protobuf Gradle plugin >=0.10.0. | Gradle build files |
 
 `?` = uncertain or new; user confirm.
 
@@ -150,6 +151,7 @@ Parsed by `GpxImporter` (`XmlPullParser`). Saved to prefs `routeData`.
 | B8 | 2026-05-20 | Process death recovery used bind-only — onStartCommand never fired → resumeFromPrefsIfActive never ran → service bound but not mocking | FIX-028 + V27 |
 | B9 | 2026-05-20 | WebView state lost on rotate (no onSaveInstanceState) → marker reset, user lost position | FIX-030 + V28 |
 | B10 | 2026-05-20 | Geo intent parse failure logged but no user feedback → user thought VIEW intent ignored | FIX-029 + V30 |
+| B11 | 2026-05-26 | W1-N1 AGP 9 build mixed standalone Kotlin plugin, Protobuf 0.9.4, Room schemaLocation option, and dual Room processors, causing config and D8 duplicate-class failures | Gradle convergence + V31 |
 
 ---
 

@@ -3,7 +3,7 @@
 agp = "9.2.1"
 kotlin = "2.1.0"
 ksp = "2.1.0-1.0.29"
-protobuf-plugin = "0.9.4"
+protobuf-plugin = "0.10.0"
 detekt = "1.23.7"
 
 # ── AndroidX core ──

@@ -2,7 +2,6 @@ import com.google.protobuf.gradle.id
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.protobuf)
@@ -21,15 +20,6 @@ android {
         versionCode = 240
         versionName = "2.4.0"
 
-        // Legacy Room annotation processor args (for existing Java @Entity classes).
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments += mapOf(
-                    "room.schemaLocation" to "$projectDir/schemas",
-                    "room.incremental" to "true",
-                )
-            }
-        }
     }
 
     buildTypes {
@@ -46,10 +36,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
         isCoreLibraryDesugaringEnabled = true
-    }
-
-    kotlinOptions {
-        jvmTarget = "21"
     }
 
     buildFeatures {
@@ -108,10 +94,9 @@ dependencies {
     implementation(libs.work.runtime)
     implementation(libs.work.runtime.ktx)
 
-    // ── Room (annotation processor for legacy Java, KSP for new Kotlin) ──
+    // ── Room (KSP compiler for Java + Kotlin sources) ──
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
-    annotationProcessor(libs.room.compiler)
     ksp(libs.room.compiler)
 
     // ── DataStore ──
