@@ -265,4 +265,5 @@
 
     <!-- ===== Aether v2 ===== -->
     <string name="aether_accessibility_desc">Detects which app is in the foreground to automatically apply location profiles.</string>
+    <string name="aether_accessibility_description">Detects which app is in the foreground to predict your next app. Used only when Usage Stats permission is not granted. No content is read or captured.</string>
 </resources>
