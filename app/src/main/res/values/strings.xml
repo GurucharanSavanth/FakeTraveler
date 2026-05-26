@@ -262,4 +262,7 @@
     <string name="Bookmark_Error_NameRequired">Name is required</string>
     <string name="Bookmark_Error_LatRange">Latitude must be between -90 and 90</string>
     <string name="Bookmark_Error_LngRange">Longitude must be between -180 and 180</string>
+
+    <!-- ===== Aether v2 ===== -->
+    <string name="aether_accessibility_desc">Detects which app is in the foreground to automatically apply location profiles.</string>
 </resources>
