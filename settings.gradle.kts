@@ -27,4 +27,4 @@ plugins {
 rootProject.name = "FakeTraveler"
 
 include(":app")
-// include(":benchmark")  // Module does not exist yet — uncomment after W1-N3.
+include(":benchmark")

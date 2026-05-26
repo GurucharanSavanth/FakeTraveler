@@ -1,0 +1,2 @@
+# Baseline profile placeholder for cl.coders.faketraveler
+# Generated profiles will be added by the BaselineProfileGenerator benchmark.
