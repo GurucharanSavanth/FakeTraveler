@@ -29,9 +29,14 @@ class ElevationApi(
      */
     suspend fun lookup(lat: Double, lon: Double): Result<Double> =
         try {
-            val response: ElevationResponse = client.get(OPEN_ELEVATION_URL) {
+            val httpResponse = client.get(OPEN_ELEVATION_URL) {
                 parameter("locations", "$lat,$lon")
-            }.body()
+            }
+            if (!httpResponse.status.isSuccess()) {
+                val body = httpResponse.bodyAsText().take(MAX_ERROR_BODY_LENGTH)
+                error("elevation lookup failed: HTTP ${httpResponse.status} — $body")
+            }
+            val response: ElevationResponse = httpResponse.body()
 
             val results = response.results
             check(results.isNotEmpty()) {
@@ -46,5 +51,6 @@ class ElevationApi(
 
     private companion object {
         const val OPEN_ELEVATION_URL = "https://api.open-elevation.com/api/v1/lookup"
+        const val MAX_ERROR_BODY_LENGTH = 512
     }
 }
