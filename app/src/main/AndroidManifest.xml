@@ -29,6 +29,11 @@
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
 
+    <!-- AetherMind: Activity Recognition for movement mode conflict resolution.
+         Required on API 29+ for ActivityRecognitionClient. -->
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+
     <!-- FIX-021 (drill-sergeant V19): signature-protected broadcast for in-app STOP control.
          Pre-33 registerReceiver gates on this permission; only our own PendingIntent (same signature)
          can dispatch ACTION_STOP_MOCK. On API 33+ Context.RECEIVER_NOT_EXPORTED is used instead. -->
