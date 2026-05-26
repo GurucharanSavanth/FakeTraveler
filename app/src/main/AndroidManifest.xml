@@ -24,7 +24,7 @@
         android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
         tools:ignore="BatteryLife" />
 
-    <!-- Aether observatory: foreground-app detection -->
+    <!-- AETHER W2-N6: Observatory engine requires UsageStats access for foreground-app polling. -->
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
@@ -139,16 +139,20 @@
             </intent-filter>
         </service>
 
+        <!-- AETHER W2-N6: Accessibility fallback for foreground-app detection.
+             Activated only when UsageStats permission is denied.
+             TYPE_WINDOW_STATE_CHANGED only — no node traversal, no content capture. -->
         <service
             android:name=".aether.observatory.AetherAccessibilityService"
-            android:exported="true"
+            android:enabled="true"
+            android:exported="false"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
             <meta-data
                 android:name="android.accessibilityservice"
-                android:resource="@xml/aether_accessibility_service" />
+                android:resource="@xml/aether_accessibility_config" />
         </service>
 
         <receiver

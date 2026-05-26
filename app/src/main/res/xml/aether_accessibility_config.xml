@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Accessibility service configuration for AetherAccessibilityService.
+
+    TYPE_WINDOW_STATE_CHANGED only — no node traversal, no content capture.
+    Google Play compliant: minimal intent-filter, no excessive permissions.
+-->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeWindowStateChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags=""
+    android:canRetrieveWindowContent="false"
+    android:description="@string/aether_accessibility_description"
+    android:notificationTimeout="400"
+    android:settingsActivity="cl.coders.faketraveler.MainActivity" />
