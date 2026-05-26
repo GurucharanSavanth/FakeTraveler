@@ -125,20 +125,25 @@
 
         <!-- ══ Aether v2 components ══ -->
 
+        <!-- Aether Engine v2: Compose entry point (Node 15) -->
         <activity
             android:name=".aether.ui.AetherActivity"
             android:exported="false"
-            android:enableOnBackInvokedCallback="true" />
+            android:enableOnBackInvokedCallback="true"
+            android:theme="@style/Theme.Material3.DayNight.NoActionBar" />
 
         <service
             android:name=".aether.shroud.AetherService"
             android:foregroundServiceType="dataSync"
             android:exported="false" />
 
+        <!-- Aether Engine v2: Quick Settings tile (Node 14) -->
         <service
             android:name=".aether.surface.AetherTileService"
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
-            android:exported="true">
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
@@ -168,6 +173,18 @@
                 <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
+        </receiver>
+
+        <!-- Aether Engine v2: Glance home screen widget (Node 14) -->
+        <receiver
+            android:name=".aether.surface.AetherWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/aether_widget_info" />
         </receiver>
 
     </application>
