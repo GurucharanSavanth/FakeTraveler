@@ -81,9 +81,12 @@ public class DetectionTestBottomSheet extends BottomSheetDialogFragment {
         final LayoutInflater inflater = LayoutInflater.from(requireContext());
         for (DetectionEngine.CheckResult c : report.checks) {
             final View row = inflater.inflate(R.layout.item_detection_check, host, false);
-            ((TextView) row.findViewById(R.id.check_label)).setText(c.label);
-            ((TextView) row.findViewById(R.id.check_detail)).setText(c.detail);
-            ((TextView) row.findViewById(R.id.check_status)).setText(c.passed ? "✅" : "❌");
+            final TextView label = Inputs.requireView(row, R.id.check_label, "check_label");
+            final TextView detail = Inputs.requireView(row, R.id.check_detail, "check_detail");
+            final TextView status = Inputs.requireView(row, R.id.check_status, "check_status");
+            label.setText(c.label);
+            detail.setText(c.detail);
+            status.setText(c.passed ? "✅" : "❌");
             host.addView(row);
         }
     }
