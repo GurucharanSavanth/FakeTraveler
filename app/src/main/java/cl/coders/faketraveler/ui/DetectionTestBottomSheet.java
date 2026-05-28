@@ -1,6 +1,9 @@
 package cl.coders.faketraveler.ui;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +12,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
@@ -23,6 +29,9 @@ import cl.coders.faketraveler.util.Inputs;
  * "Run" button. Placeholder layout — T15 will rebuild the surface.
  */
 public class DetectionTestBottomSheet extends BottomSheetDialogFragment {
+
+    private static final Executor BG = Executors.newSingleThreadExecutor();
+    private static final Handler MAIN = new Handler(Looper.getMainLooper());
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -40,7 +49,17 @@ public class DetectionTestBottomSheet extends BottomSheetDialogFragment {
     }
 
     private void runTest(@NonNull View view) {
-        final DetectionEngine.Report report = DetectionEngine.run(requireContext());
+        final Context appCtx = requireContext().getApplicationContext();
+        BG.execute(() -> {
+            final DetectionEngine.Report report = DetectionEngine.run(appCtx);
+            MAIN.post(() -> {
+                if (!isAdded()) return;
+                bindReport(view, report);
+            });
+        });
+    }
+
+    private void bindReport(@NonNull View view, @NonNull DetectionEngine.Report report) {
         final TextView risk = Inputs.requireView(view, R.id.risk_badge, "risk_badge");
         final TextView reco = Inputs.requireView(view, R.id.risk_recommendation, "risk_recommendation");
         switch (report.risk) {

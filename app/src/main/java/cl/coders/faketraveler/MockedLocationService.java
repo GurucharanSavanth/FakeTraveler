@@ -61,7 +61,7 @@ public class MockedLocationService extends Service {
     @NonNull private final Set<TimerTask> tasks = Collections.synchronizedSet(new HashSet<>());
 
     @Nullable private StopReceiver stopReceiver;
-    private boolean foregroundStarted = false;
+    private volatile boolean foregroundStarted = false;
 
     private long lastNotificationRefresh = 0;
     private static final long NOTIFICATION_THROTTLE_MS = 5_000L;

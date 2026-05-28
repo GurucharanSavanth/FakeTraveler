@@ -499,6 +499,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
             case MOCK_ERROR -> {
                 endTime = 0;
                 saveSettings();
+                changeButtonToApply();
+                HealthCheckWorker.cancel(this);
                 PermissionChecker.showDevSettingsDialog(this);                            // FIX-008
             }
         }

@@ -117,8 +117,10 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
      *  battery-optimisation settings screen. */
     private void wireOemCard(@NonNull View view) {
         final MaterialButton fix = view.findViewById(R.id.oem_card_fix_button);
-        if (fix != null) fix.setOnClickListener(v ->
-                OemBatteryOptHelper.showDialog((AppCompatActivity) requireActivity()));
+        if (fix != null) fix.setOnClickListener(v -> {
+            if (requireActivity() instanceof AppCompatActivity)
+                OemBatteryOptHelper.showDialog((AppCompatActivity) requireActivity());
+        });
     }
 
     private void refreshOemCard(@NonNull View view) {
@@ -153,7 +155,8 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
                     putDouble(e, key, 0);
                 } else {
                     try {
-                        putDouble(e, key, Double.parseDouble(et.getText().toString()));
+                        final double parsed = Double.parseDouble(et.getText().toString());
+                        if (Double.isFinite(parsed)) putDouble(e, key, parsed);
                     } catch (Throwable t) {
                         Log.e(TAG, "Could not parse " + key + "!", t);
                     }
@@ -196,9 +199,6 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
                 R.id.et_MockCount, sp.getInt("mockCount", 0), 0, 100, true);
     }
 
-    /** Guard flag to prevent recursive slider↔EditText updates. */
-    private boolean sliderEditSyncing;
-
     private void wireSlider(@NonNull View view, int sliderId, int labelId, int editId,
                             int current, int min, int max, boolean infiniteZero) {
         final Slider slider = view.findViewById(sliderId);
@@ -208,15 +208,18 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
         final int clamped = Math.max(min, Math.min(max, current));
         slider.setValue(clamped);
         label.setText(formatSliderValue(clamped, infiniteZero));
+        // Per-slider guard prevents the slider→EditText setText from re-triggering the
+        // slider listener for this specific pair; using boolean[] for lambda capture.
+        final boolean[] syncing = {false};
         slider.addOnChangeListener((s, value, fromUser) -> {
-            if (sliderEditSyncing) return;
-            sliderEditSyncing = true;
+            if (syncing[0]) return;
+            syncing[0] = true;
             try {
                 final int rounded = Math.round(value);
                 label.setText(formatSliderValue(rounded, infiniteZero));
                 if (fromUser) edit.setText(String.format(Locale.ROOT, "%d", rounded));
             } finally {
-                sliderEditSyncing = false;
+                syncing[0] = false;
             }
         });
         edit.addTextChangedListener(new TextWatcher() {
@@ -224,8 +227,8 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
             @Override public void onTextChanged(CharSequence s, int a, int b, int c) {}
             @Override
             public void afterTextChanged(Editable s) {
-                if (sliderEditSyncing) return;
-                sliderEditSyncing = true;
+                if (syncing[0]) return;
+                syncing[0] = true;
                 try {
                     if (s.toString().isBlank()) return;
                     int value;
@@ -238,7 +241,7 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
                     slider.setValue(clampedValue);
                     label.setText(formatSliderValue(clampedValue, infiniteZero));
                 } finally {
-                    sliderEditSyncing = false;
+                    syncing[0] = false;
                 }
             }
         });
@@ -312,8 +315,10 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
 
     private void wireOemHelper(@NonNull View view) {                                     // FIX-011
         final MaterialButton btn = Inputs.requireView(view, R.id.btn_OemHelper, "btn_OemHelper");
-        btn.setOnClickListener(v ->
-                OemBatteryOptHelper.showDialog((AppCompatActivity) requireActivity()));
+        btn.setOnClickListener(v -> {
+            if (requireActivity() instanceof AppCompatActivity)
+                OemBatteryOptHelper.showDialog((AppCompatActivity) requireActivity());
+        });
     }
 
     private static Spanned fromHtml(@NonNull String html) {

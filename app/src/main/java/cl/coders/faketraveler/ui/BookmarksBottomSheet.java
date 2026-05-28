@@ -118,6 +118,7 @@ public class BookmarksBottomSheet extends BottomSheetDialogFragment implements B
     }
 
     @Override public void onLongPress(@NonNull BookmarkEntity fav) {
+        if (!isAdded()) return;
         final EditText input = new EditText(requireContext());
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         input.setText(fav.name);

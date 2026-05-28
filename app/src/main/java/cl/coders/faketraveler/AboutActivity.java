@@ -62,8 +62,9 @@ public class AboutActivity extends AppCompatActivity {
     }
 
     private void bindHowTo() {
-        ((TextView) findViewById(R.id.about_step_3)).setText(getString(
-                R.string.About_HowTo_Step3, getString(R.string.ActivityMain_Apply)));
+        final TextView v = findViewById(R.id.about_step_3);
+        if (v == null) return;
+        v.setText(getString(R.string.About_HowTo_Step3, getString(R.string.ActivityMain_Apply)));
     }
 
     private void bindPermissionRows() {
