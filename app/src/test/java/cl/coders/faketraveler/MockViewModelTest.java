@@ -6,7 +6,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.SavedStateHandle;
 
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MockViewModelTest {
 
@@ -27,7 +27,8 @@ public class MockViewModelTest {
         assertEquals(56.78, vm2.lng(), 1e-9);
     }
 
-    @Test public void mock_state_publishes_to_live_data() {
+    @org.junit.jupiter.api.Test
+    public void mock_state_publishes_to_live_data() {
         MockViewModel vm = new MockViewModel(new SavedStateHandle());
         vm.updateMockState(MockState.MOCKED);
         assertEquals(MockState.MOCKED, vm.mockState().getValue());

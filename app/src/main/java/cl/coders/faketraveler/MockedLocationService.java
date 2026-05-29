@@ -54,6 +54,10 @@ public class MockedLocationService extends Service {
 
     @NonNull protected final MutableLiveData<MockState> mockState = new MutableLiveData<>(MockState.NOT_MOCKED);
     @NonNull protected final MutableLiveData<Location> mockedLocation = new MutableLiveData<>();
+    /** Unified event bus (P6–P8): feature modules observe this instead of raw mockedLocation. */
+    @NonNull protected final MutableLiveData<MockEvent> mockEvents = new MutableLiveData<>();
+    /** Service-assigned run id; stamped on every {@link MockEvent} of the current run. */
+    private volatile long currentRunId = 0L;
     /** FIX-027 (Phase 3.6): CopyOnWriteArrayList — Timer thread iterates via publishLocation()
      *  while main thread mutates via stopMockNow()/attachAllProviders(). */
     @NonNull private final List<MockedLocationProvider> providers = new CopyOnWriteArrayList<>();
@@ -144,6 +148,7 @@ public class MockedLocationService extends Service {
             // user hasn't granted it, the system kills any background mock anyway — exit
             // cleanly instead of running as a ghost service with no notification.
             mockState.postValue(MockState.MOCK_ERROR);
+            emit(MockEvent.Type.ERROR, null);
             stopSelf();
         }
     }
@@ -216,18 +221,55 @@ public class MockedLocationService extends Service {
             // Reset progress counters. maxTime==0 means infinite — render indeterminate.
             totalTicks.set(maxTime == 0 ? Integer.MAX_VALUE : maxTime);
             doneTicks.set(0);
+            currentRunId = System.currentTimeMillis();   // set before scheduling so the first TICK is stamped
             final TimerTask t = new MockedLocationTask(this,
                     longitude, latitude, longitudeDistance, latitudeDistance, maxTime, mockSpeed);
             timer.schedule(t, 0L, mockMilli);
             tasks.add(t);
             mockState.postValue(MockState.MOCKED);
+            emit(MockEvent.Type.START, null);
         } catch (SecurityException e) {
             Log.e(TAG, "Could not construct mock location providers", e);
+            // AUDIT-FGS1: a partial attachAllProviders() (e.g. GPS registered, then FUSED denied)
+            // leaves test providers registered AND the service running foreground indefinitely.
+            // promoteToForeground()'s failure path stopSelf()s on error; this path did not, so it
+            // produced a zombie FGS. Tear down any partial providers, then stopSelf to match.
+            // RATIONALE: provider.shutdown() is idempotent (removeTestProvider in try/catch); safe
+            //   even when no provider was attached. stopSelf releases the started-service ref.
+            // VERIFICATION: revoke the mock-location app mid-apply → no orphan provider, FGS exits.
+            for (MockedLocationProvider p : providers) p.shutdown();
+            providers.clear();
             mockState.postValue(MockState.MOCK_ERROR);
+            emit(MockEvent.Type.ERROR, null);
             try {
                 final NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                 if (nm != null) nm.notify(NotificationFactory.NOTIFICATION_ID + 1, NotificationFactory.buildError(this));
             } catch (Throwable ignored) {}
+            stopSelf();
+        }
+    }
+
+    /** Module 2: play a precomputed path instead of drift math. Mirrors {@link #startMockedService}
+     *  teardown on SecurityException so a denied provider cannot leave a zombie FGS. */
+    protected void startRoutePlayback(@NonNull List<Location> path, long mockMilli, boolean loop) {
+        try {
+            stopMockNow();
+            attachAllProviders();
+            totalTicks.set(loop ? Integer.MAX_VALUE : path.size());
+            doneTicks.set(0);
+            currentRunId = System.currentTimeMillis();
+            final TimerTask t = new RoutePlayerTask(this, path, loop);
+            timer.schedule(t, 0L, mockMilli);
+            tasks.add(t);
+            mockState.postValue(MockState.MOCKED);
+            emit(MockEvent.Type.START, null);
+        } catch (SecurityException e) {
+            Log.e(TAG, "Could not construct mock location providers for route", e);
+            for (MockedLocationProvider p : providers) p.shutdown();
+            providers.clear();
+            mockState.postValue(MockState.MOCK_ERROR);
+            emit(MockEvent.Type.ERROR, null);
+            stopSelf();
         }
     }
 
@@ -237,10 +279,17 @@ public class MockedLocationService extends Service {
         for (MockedLocationProvider p : providers) p.shutdown();
         providers.clear();
         mockState.postValue(MockState.NOT_MOCKED);
+        emit(MockEvent.Type.STOP, null);
+    }
+
+    /** Post a {@link MockEvent} on the unified bus. {@code loc} is null for START/STOP/ERROR. */
+    private void emit(@NonNull MockEvent.Type type, @Nullable Location loc) {
+        mockEvents.postValue(new MockEvent(type, loc, System.currentTimeMillis(), currentRunId));
     }
 
     void publishLocation(@NonNull Location value, double lat, double lng) {
         mockedLocation.postValue(value);
+        emit(MockEvent.Type.TICK, value);
         if (totalTicks.get() != Integer.MAX_VALUE) doneTicks.incrementAndGet();
         final long now = System.currentTimeMillis();
         if (now - lastNotificationRefresh >= NOTIFICATION_THROTTLE_MS) {
@@ -252,6 +301,7 @@ public class MockedLocationService extends Service {
 
     void notifyMockCompleted() {
         mockState.postValue(MockState.NOT_MOCKED);
+        emit(MockEvent.Type.STOP, null);
         stopSelf();
     }
 
@@ -288,11 +338,13 @@ public class MockedLocationService extends Service {
         @NonNull private final MockedLocationService service;
         @NonNull public final LiveData<MockState> mockState;
         @NonNull public final LiveData<Location> mockedLocation;
+        @NonNull public final LiveData<MockEvent> mockEvents;
 
         public MockedBinder(@NonNull MockedLocationService service) {
             this.service = service;
             this.mockState = service.mockState;
             this.mockedLocation = service.mockedLocation;
+            this.mockEvents = service.mockEvents;
         }
         public void continueMock() { service.mockState.postValue(MockState.SERVICE_BOUND); }
         public void startMock(double longitude, double latitude,
@@ -300,6 +352,9 @@ public class MockedLocationService extends Service {
                               long mockMilli, int maxTimes, float mockSpeed) {
             service.startMockedService(longitude, latitude, longitudeDistance, latitudeDistance,
                     mockMilli, maxTimes, mockSpeed);
+        }
+        public void startRoute(@NonNull List<Location> path, long mockMilli, boolean loop) {
+            service.startRoutePlayback(path, mockMilli, loop);
         }
         public void requestStop() { service.stopMockNow(); service.stopSelf(); }
     }

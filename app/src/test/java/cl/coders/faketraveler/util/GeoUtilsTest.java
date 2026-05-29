@@ -3,7 +3,7 @@ package cl.coders.faketraveler.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class GeoUtilsTest {
 
@@ -35,7 +35,8 @@ public class GeoUtilsTest {
         assertEquals(20015.087, km, 0.5);
     }
 
-    @Test public void haversine_near_pole_does_not_blow_up() {
+    @org.junit.jupiter.api.Test
+    public void haversine_near_pole_does_not_blow_up() {
         // Two points 0.001° apart near the pole stay tiny — no NaN/Inf from cos(lat)→0.
         double km = GeoUtils.haversineKm(89.999, 0.0, 89.999, 90.0);
         assertTrue("expected finite km near pole, was " + km,
@@ -50,7 +51,8 @@ public class GeoUtilsTest {
         assertEquals(0.0, GeoUtils.haversineKm(0, 0, 0, Double.NaN), KM_EPS);
     }
 
-    @Test public void haversine_returns_zero_for_infinite_input() {
+    @org.junit.jupiter.api.Test
+    public void haversine_returns_zero_for_infinite_input() {
         assertEquals(0.0, GeoUtils.haversineKm(Double.POSITIVE_INFINITY, 0, 0, 0), KM_EPS);
         assertEquals(0.0, GeoUtils.haversineKm(0, Double.NEGATIVE_INFINITY, 0, 0), KM_EPS);
     }

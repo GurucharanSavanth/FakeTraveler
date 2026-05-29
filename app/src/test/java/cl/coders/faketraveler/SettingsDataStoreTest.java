@@ -6,10 +6,10 @@ import static org.junit.Assert.assertNull;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.test.core.app.ApplicationProvider;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -24,12 +24,14 @@ public class SettingsDataStoreTest {
 
     private SettingsDataStore ds;
 
-    @Before public void setUp() {
+    @BeforeEach
+    public void setUp() {
         ds = SettingsDataStore.get(ApplicationProvider.getApplicationContext());
         ds.clearForTesting();
     }
 
-    @After public void tearDown() {
+    @AfterEach
+    public void tearDown() {
         ds.clearForTesting();
     }
 
@@ -38,7 +40,8 @@ public class SettingsDataStoreTest {
         assertNull(ds.getStringBlocking("routeData"));
     }
 
-    @Test public void write_then_read_roundtrip() {
+    @org.junit.jupiter.api.Test
+    public void write_then_read_roundtrip() {
         ds.setDoubleBlocking("lat", 12.34);
         ds.setStringBlocking("routeData", "{\"pts\":[]}");
         ds.setBoolBlocking("flag", true);

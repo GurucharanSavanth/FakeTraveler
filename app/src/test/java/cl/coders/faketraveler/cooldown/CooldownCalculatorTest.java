@@ -2,13 +2,14 @@ package cl.coders.faketraveler.cooldown;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 
 public class CooldownCalculatorTest {
 
-    @Test public void zero_when_under_1km() {
+    @org.junit.jupiter.api.Test
+    public void zero_when_under_1km() {
         Duration d = CooldownCalculator.compute(0.0, 0.0, 0.001, 0.0);   // ~111 m
         assertEquals(Duration.ZERO, d);
     }
@@ -18,7 +19,8 @@ public class CooldownCalculatorTest {
         assertEquals(Duration.ofSeconds(30), d);
     }
 
-    @Test public void one_minute_when_2_to_5km() {
+    @org.junit.jupiter.api.Test
+    public void one_minute_when_2_to_5km() {
         Duration d = CooldownCalculator.compute(0.0, 0.0, 0.03, 0.0);    // ~3.3 km
         assertEquals(Duration.ofMinutes(1), d);
     }
@@ -28,7 +30,8 @@ public class CooldownCalculatorTest {
         assertEquals(Duration.ofMinutes(10), d);
     }
 
-    @Test public void sixty_minutes_when_above_1000km() {
+    @org.junit.jupiter.api.Test
+    public void sixty_minutes_when_above_1000km() {
         Duration d = CooldownCalculator.compute(0.0, 0.0, 20.0, 0.0);    // ~2 222 km
         assertEquals(Duration.ofMinutes(60), d);
     }

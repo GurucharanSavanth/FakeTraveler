@@ -2,7 +2,7 @@ package cl.coders.faketraveler;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -12,7 +12,8 @@ import org.robolectric.util.ReflectionHelpers;
 @Config(sdk = 33)
 public class OemBatteryOptHelperTest {
 
-    @Test public void detect_xiaomi() {
+    @org.junit.jupiter.api.Test
+    public void detect_xiaomi() {
         ReflectionHelpers.setStaticField(android.os.Build.class, "MANUFACTURER", "Xiaomi");
         assertEquals(OemBatteryOptHelper.Vendor.XIAOMI, OemBatteryOptHelper.detect());
     }
@@ -47,7 +48,8 @@ public class OemBatteryOptHelperTest {
         assertEquals(OemBatteryOptHelper.Vendor.REALME, OemBatteryOptHelper.detect());
     }
 
-    @Test public void detect_oppo() {
+    @org.junit.jupiter.api.Test
+    public void detect_oppo() {
         ReflectionHelpers.setStaticField(android.os.Build.class, "MANUFACTURER", "OPPO");
         assertEquals(OemBatteryOptHelper.Vendor.OPPO, OemBatteryOptHelper.detect());
     }

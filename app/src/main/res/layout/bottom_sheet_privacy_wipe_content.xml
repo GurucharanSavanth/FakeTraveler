@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_sheet"
+    android:orientation="vertical"
+    android:padding="@dimen/spacing_lg">
+
+    <include layout="@layout/view_drag_handle" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_lg"
+        android:text="@string/PrivacyWipe_Title"
+        android:textAppearance="?attr/textAppearanceHeadlineSmall"
+        android:textColor="?attr/colorOnSurface" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_md"
+        android:text="@string/PrivacyWipe_SelectCategories"
+        android:textAppearance="?attr/textAppearanceTitleSmall"
+        android:textColor="?attr/colorOnSurfaceVariant" />
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/wipe_cb_sessions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="@string/PrivacyWipe_Cat_Sessions" />
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/wipe_cb_geofence"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="@string/PrivacyWipe_Cat_GeoFence" />
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/wipe_cb_permissions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="@string/PrivacyWipe_Cat_Permissions" />
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/wipe_cb_exif"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="@string/PrivacyWipe_Cat_Exif" />
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/wipe_cb_appdata"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/PrivacyWipe_Cat_AppData" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_md"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/wipe_now_btn"
+            android:layout_width="@dimen/size_zero"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/spacing_sm"
+            android:layout_weight="1"
+            android:text="@string/PrivacyWipe_Now"
+            app:icon="@drawable/ic_privacy_wipe" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/wipe_emergency_btn"
+            style="@style/Widget.FakeTraveler.Button.Outlined"
+            android:layout_width="@dimen/size_zero"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/PrivacyWipe_Emergency"
+            app:icon="@drawable/ic_delete"
+            app:iconTint="?attr/colorError" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_md"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="@dimen/size_zero"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/PrivacyWipe_Schedule"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:textColor="?attr/colorOnSurface" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/wipe_schedule_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/PrivacyWipe_Schedule" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_md"
+        android:text="@string/PrivacyWipe_History"
+        android:textAppearance="?attr/textAppearanceTitleSmall"
+        android:textColor="?attr/colorOnSurfaceVariant" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/wipe_log_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_sm"
+        android:clipToPadding="false"
+        android:nestedScrollingEnabled="false"
+        android:paddingBottom="@dimen/spacing_md" />
+</LinearLayout>

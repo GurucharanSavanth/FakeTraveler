@@ -49,7 +49,8 @@ import java.util.Locale;
 import cl.coders.faketraveler.util.Inputs;
 
 public class MainActivity extends AppCompatActivity implements ServiceConnector.Listener,
-        cl.coders.faketraveler.ui.BookmarksBottomSheet.Host {
+        cl.coders.faketraveler.ui.BookmarksBottomSheet.Host,
+        cl.coders.faketraveler.ui.SessionHistoryBottomSheet.Host {
 
     @NonNull private static final String TAG = MainActivity.class.getSimpleName();
     @NonNull public static final String sharedPrefKey = "cl.coders.faketraveler.sharedprefs";
@@ -66,6 +67,20 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
     private int currentVersion;
     @Nullable private ServiceConnector serviceConnector;
     @Nullable private LocationInputHandler inputHandler;
+    @Nullable private MockSessionRecorder sessionRecorder;
+    @Nullable private GeoFenceMonitor geofenceMonitor;
+    @Nullable private java.util.List<android.location.Location> pendingPath;
+
+    /** Launches Route Lab; on RESULT_OK plays the chosen route (P6–P8 Module 2). */
+    @NonNull
+    private final ActivityResultLauncher<Intent> routeLabLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    final long routeId = result.getData()
+                            .getLongExtra(RouteLabActivity.EXTRA_PLAY_ROUTE_ID, -1L);
+                    if (routeId > 0) playRouteById(routeId);
+                }
+            });
 
     /** API 34+ FGS type=location requires ACCESS_COARSE_LOCATION at runtime, otherwise
      *  startForeground throws SecurityException and the mock service crashes. */
@@ -151,6 +166,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
         inputHandler = new LocationInputHandler(editTextLat, editTextLng,
                 (lat, lng) -> setLatLng(lat, lng, CHANGE_FROM_EDITTEXT));                // FIX-015 (CoordConsumer)
         serviceConnector = new ServiceConnector(this, this);                             // FIX-015
+        sessionRecorder = new MockSessionRecorder(this);
+        geofenceMonitor = new GeoFenceMonitor(this);
 
         buttonApplyStop.setOnClickListener(view -> applyLocation());
         buttonSettings.setOnClickListener(view -> showSettingsSheet());
@@ -256,9 +273,28 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
 
     @Override
     public void onDestroy() {                                                            // FIX-015
+        if (sessionRecorder != null) sessionRecorder.stop();
+        if (geofenceMonitor != null) geofenceMonitor.stop();
         if (serviceConnector != null) serviceConnector.unbind();
         serviceConnector = null;
         inputHandler = null;
+        // AUDIT-WV1: WebView outlives the Activity through its JS bridge — WebAppInterface holds
+        // a strong MainActivity ref (added via addJavascriptInterface), so every recreate leaks
+        // the whole Activity. Detach from the view tree, then destroy().
+        // RATIONALE: removeView-before-destroy is the AOSP-documented teardown order; both calls
+        //   are wrapped because a partially-inflated layout must not block super.onDestroy().
+        // VERIFICATION: rotate 10x under LeakCanary — destroyed MainActivity instances == 0.
+        if (webView != null) {
+            try {
+                if (webView.getParent() instanceof android.view.ViewGroup) {
+                    ((android.view.ViewGroup) webView.getParent()).removeView(webView);
+                }
+                webView.destroy();
+            } catch (Throwable t) {
+                Log.w(TAG, "WebView destroy failed", t);
+            }
+            webView = null;
+        }
         super.onDestroy();
     }
 
@@ -398,6 +434,17 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
             endTime = Inputs.saturatingAdd(System.currentTimeMillis(), span);
         }
         saveSettings();
+        // AUDIT-CD1: persist the applied fix so the *next* Apply can compute the anti-detection
+        // cooldown. Before this, SharedPrefsUtil.saveLastMockedLocation() had zero callers, so
+        // readLastMockedLatLng() always returned null and the whole CooldownCalculator /
+        // CooldownOverlayDialog gate (V39) was dead code that never fired.
+        // RATIONALE: written here, after the cooldown gate, so the next applyLocation() reads it
+        //   as "last"; writing from the service Timer thread would race the UI read.
+        // VERIFICATION: apply A, then apply a distant B → CooldownOverlayDialog now appears.
+        final Location appliedLoc = new Location("manual");
+        appliedLoc.setLatitude(lat);
+        appliedLoc.setLongitude(lng);
+        SharedPrefsUtil.saveLastMockedLocation(context, appliedLoc);
         MockLogger.log("mock_start", "lat=" + lat + " lng=" + lng + " freq=" + mockFrequency + "s");
         HealthCheckWorker.scheduleNext(this);
     }
@@ -435,7 +482,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
                 strRes, Snackbar.LENGTH_LONG).show();
     }
     private static boolean isBlank(@NonNull EditText et) {
-        return et.getText().toString().isBlank();
+        return et.getText().toString().trim().isEmpty();
     }
     protected void setMapMarker(double lat, double lng) {
         if (webView == null || webView.getUrl() == null) return;
@@ -497,6 +544,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
             case SERVICE_BOUND -> { if (endTime > System.currentTimeMillis()) changeButtonToStop(); }
             case MOCKED -> { changeButtonToStop(); showSnackbar(R.string.MainActivity_MockApplied); }
             case MOCK_ERROR -> {
+                // AUDIT-FGS2: tell the bound service to stop. It is started+bound, so without an
+                // explicit stop it stays foreground (stale "mocking" notification) until the
+                // Activity is destroyed. Pairs with AUDIT-FGS1 in the service's catch block.
+                if (serviceConnector != null) serviceConnector.requestStop();
                 endTime = 0;
                 saveSettings();
                 changeButtonToApply();
@@ -581,6 +632,102 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
         showSaveBookmarkDialog();
     }
 
+    // --- P6–P8 module surfaces ---
+
+    @Override
+    public void onBinderConnected(@NonNull MockedLocationService.MockedBinder binder) {
+        if (sessionRecorder != null) sessionRecorder.start(binder.mockEvents, this);
+        if (geofenceMonitor != null) geofenceMonitor.start(binder.mockEvents, this);
+        flushPendingPath();
+    }
+
+    @Override
+    public void onReplaySession(long sessionId) {
+        if (!PermissionChecker.isMockLocationEnabled(context)) {
+            PermissionChecker.showDevSettingsDialog(this);
+            return;
+        }
+        final Context appCtx = getApplicationContext();
+        new Thread(() -> {
+            final java.util.List<cl.coders.faketraveler.db.RoutePointEntity> pts =
+                    cl.coders.faketraveler.db.AppDatabase.get(appCtx)
+                            .mockSessionDao().getPointsForSession(sessionId);
+            final java.util.List<android.location.Location> path = new java.util.ArrayList<>();
+            for (cl.coders.faketraveler.db.RoutePointEntity p : pts) {
+                final android.location.Location loc =
+                        new android.location.Location(android.location.LocationManager.GPS_PROVIDER);
+                loc.setLatitude(p.lat);
+                loc.setLongitude(p.lng);
+                if (p.altitude != 0) loc.setAltitude(p.altitude);
+                loc.setAccuracy(p.accuracy > 0 ? p.accuracy : 0.1f);
+                path.add(loc);
+            }
+            runOnUiThread(() -> startPath(path));
+        }, "ReplayLoad").start();
+    }
+
+    private void openRouteLab() {
+        try {
+            routeLabLauncher.launch(new Intent(this, RouteLabActivity.class));
+        } catch (Throwable t) {
+            Log.w(TAG, "route lab launch failed", t);
+        }
+    }
+
+    private void playRouteById(long routeId) {
+        if (!PermissionChecker.isMockLocationEnabled(context)) {
+            PermissionChecker.showDevSettingsDialog(this);
+            return;
+        }
+        final Context appCtx = getApplicationContext();
+        final long freqMs = Math.max(1, mockFrequency) * 1000L;
+        final boolean simAlt = context.getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE)
+                .getBoolean("simulateAltitude", false);
+        new Thread(() -> {
+            final java.util.List<cl.coders.faketraveler.db.RouteWaypointEntity> wps =
+                    cl.coders.faketraveler.db.AppDatabase.get(appCtx)
+                            .routeDao().getWaypointsForRoute(routeId);
+            final java.util.List<android.location.Location> path =
+                    RouteEngine.buildPath(wps, freqMs, simAlt);
+            runOnUiThread(() -> startPath(path));
+        }, "RoutePlayLoad").start();
+    }
+
+    /** Begin route/replay playback, bringing up + binding the service first if needed. */
+    private void startPath(@NonNull java.util.List<android.location.Location> path) {
+        if (path.size() < 2) {
+            showError(R.string.RouteEditor_Error_MinPoints);
+            return;
+        }
+        if (serviceConnector == null) return;
+        pendingPath = path;
+        if (serviceConnector.binder() != null) {
+            flushPendingPath();
+        } else {
+            final android.location.Location first = path.get(0);
+            serviceConnector.startAndBindForApply(new ServiceConnector.MockArgs(
+                    first.getLatitude(), first.getLongitude(), 0d, 0d,
+                    Math.max(1, mockFrequency) * 1000L, 0, 0f));
+            // onBinderConnected() flushes pendingPath once the service is bound.
+        }
+    }
+
+    private void flushPendingPath() {
+        if (serviceConnector == null || pendingPath == null) return;
+        final MockedLocationService.MockedBinder binder = serviceConnector.binder();
+        if (binder == null) return;
+        binder.startRoute(pendingPath, Math.max(1, mockFrequency) * 1000L, false);
+        pendingPath = null;
+        endTime = Long.MAX_VALUE;
+        saveSettings();
+        changeButtonToStop();
+        MockLogger.log("route_play", "playback started");
+    }
+
+    private void showModuleSheet(@NonNull androidx.fragment.app.DialogFragment sheet, @NonNull String tag) {
+        sheet.show(getSupportFragmentManager(), tag);
+    }
+
     private void wireDetectionButton() {
         Inputs.<android.view.View>requireView(this, R.id.detection_btn, "detection_btn")
                 .setOnClickListener(v -> showDetectionSheet());
@@ -660,6 +807,34 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
             }
             if (itemId == R.id.action_about || itemId == R.id.action_help) {
                 startActivity(new Intent(this, AboutActivity.class));
+                return true;
+            }
+            if (itemId == R.id.action_session_history) {
+                showModuleSheet(new cl.coders.faketraveler.ui.SessionHistoryBottomSheet(), "sessionHistory");
+                return true;
+            }
+            if (itemId == R.id.action_route_lab) {
+                openRouteLab();
+                return true;
+            }
+            if (itemId == R.id.action_geofence) {
+                showModuleSheet(new cl.coders.faketraveler.ui.GeoFenceLabBottomSheet(), "geofenceLab");
+                return true;
+            }
+            if (itemId == R.id.action_permission_drift) {
+                startActivity(new Intent(this, PermissionDriftActivity.class));
+                return true;
+            }
+            if (itemId == R.id.action_exif) {
+                showModuleSheet(new cl.coders.faketraveler.ui.ExifCleanerBottomSheet(), "exifCleaner");
+                return true;
+            }
+            if (itemId == R.id.action_privacy_wipe) {
+                showModuleSheet(new cl.coders.faketraveler.ui.PrivacyWipeBottomSheet(), "privacyWipe");
+                return true;
+            }
+            if (itemId == R.id.action_evidence) {
+                startActivity(new Intent(this, EvidenceExportActivity.class));
                 return true;
             }
             return false;

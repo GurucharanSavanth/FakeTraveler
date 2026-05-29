@@ -54,7 +54,9 @@ public class DetectionTestBottomSheet extends BottomSheetDialogFragment {
             final DetectionEngine.Report report = DetectionEngine.run(appCtx);
             MAIN.post(() -> {
                 if (!isAdded()) return;
-                bindReport(view, report);
+                final View v = getView();
+                if (v == null) return;
+                bindReport(v, report);
             });
         });
     }
@@ -78,7 +80,7 @@ public class DetectionTestBottomSheet extends BottomSheetDialogFragment {
         }
         final LinearLayout host = Inputs.requireView(view, R.id.breakdown_host, "breakdown_host");
         host.removeAllViews();
-        final LayoutInflater inflater = LayoutInflater.from(requireContext());
+        final LayoutInflater inflater = LayoutInflater.from(view.getContext());
         for (DetectionEngine.CheckResult c : report.checks) {
             final View row = inflater.inflate(R.layout.item_detection_check, host, false);
             final TextView label = Inputs.requireView(row, R.id.check_label, "check_label");

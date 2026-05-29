@@ -28,6 +28,8 @@ public final class ServiceConnector implements ServiceConnection {
     public interface Listener {
         void onMockedStateChange(@NonNull MockState s);
         void onMockedLocationChange(@NonNull Location loc);
+        /** Called once the service binder is connected, after the core observers attach (P6–P8). */
+        default void onBinderConnected(@NonNull MockedLocationService.MockedBinder binder) {}
     }
 
     /** Bundle of args to forward to {@link MockedLocationService#ACTION_START}. */
@@ -164,6 +166,7 @@ public final class ServiceConnector implements ServiceConnection {
         try {
             binder.mockState.observe(activity, listener::onMockedStateChange);
             binder.mockedLocation.observe(activity, listener::onMockedLocationChange);
+            listener.onBinderConnected(binder);
         } catch (Throwable t) {
             Log.e(TAG, "Observer attach failed", t);
         }

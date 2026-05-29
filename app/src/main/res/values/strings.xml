@@ -223,8 +223,8 @@
     <string name="About_LicensesView">View licenses</string>
     <string name="About_ReportIssue">Report an issue</string>
     <string name="About_SourceCode">Source code</string>
-    <string name="About_IssueUrl" translatable="false">https://github.com/GurucharanSavanth/FakeTraveler/issues</string>
-    <string name="About_SourceUrl" translatable="false">https://github.com/GurucharanSavanth/FakeTraveler</string>
+    <string name="About_IssueUrl" translatable="false">https://github.com/mcastillof/FakeTraveler/issues</string>
+    <string name="About_SourceUrl" translatable="false">https://github.com/mcastillof/FakeTraveler</string>
     <string name="About_LicenseBody">FakeTraveler is open source. Map rendering uses Leaflet and Leaflet-providers under BSD-compatible licenses.</string>
 
     <!-- Permission rationale activity -->
@@ -262,4 +262,161 @@
     <string name="Bookmark_Error_NameRequired">Name is required</string>
     <string name="Bookmark_Error_LatRange">Latitude must be between -90 and 90</string>
     <string name="Bookmark_Error_LngRange">Longitude must be between -180 and 180</string>
+
+    <!-- Module 1: Session History -->
+    <string name="SessionHistory_SheetTitle">Session history</string>
+    <string name="SessionHistory_ClearAll">Clear all</string>
+    <string name="SessionHistory_Empty_Title">No sessions yet</string>
+    <string name="SessionHistory_Empty_Body">Recorded mock sessions appear here.</string>
+    <string name="SessionHistory_Item_Summary">%1$s · %2$d points</string>
+    <string name="SessionHistory_Delete_Title">Delete session?</string>
+    <string name="SessionHistory_Delete_Message">Removes the session and its recorded points.</string>
+    <string name="SessionHistory_ClearAll_Title">Clear all sessions?</string>
+    <string name="SessionHistory_ClearAll_Message">Deletes every recorded session and its points.</string>
+    <string name="Cd_SessionHistory">Session history</string>
+    <string name="Cd_SessionReplay">Replay session</string>
+
+    <!-- Module 2: Route Lab -->
+    <string name="RouteLab_Title">Route Lab</string>
+    <string name="RouteLab_Empty_Title">No routes yet</string>
+    <string name="RouteLab_Empty_Body">Create a route to simulate movement.</string>
+    <string name="RouteLab_NewRoute">New route</string>
+    <string name="RouteLab_Play">Play route</string>
+    <string name="RouteLab_Delete_Title">Delete route?</string>
+    <string name="RouteLab_Delete_Message">Removes this route and its waypoints.</string>
+    <string name="RouteLab_Item_Summary">%1$d pts · %2$.0f m · %3$s</string>
+    <string name="RouteEditor_Title">Edit route</string>
+    <string name="RouteEditor_NameHint">Route name</string>
+    <string name="RouteEditor_AddWaypoint">Add waypoint</string>
+    <string name="RouteEditor_Save">Save route</string>
+    <string name="RouteEditor_Empty">No waypoints yet. Add at least two.</string>
+    <string name="RouteEditor_Waypoint_Detail">%1$.0f km/h · dwell %2$d ms</string>
+    <string name="RouteEditor_Error_Name">Name required</string>
+    <string name="RouteEditor_Error_MinPoints">Add at least 2 waypoints</string>
+    <string name="RouteEditor_Error_LatLng">Latitude -90..90, longitude -180..180</string>
+    <string name="RouteEditor_Dialog_Title">Add waypoint</string>
+    <string name="RouteEditor_Hint_Lat">Latitude</string>
+    <string name="RouteEditor_Hint_Lng">Longitude</string>
+    <string name="RouteEditor_Hint_Speed">Speed (km/h)</string>
+    <string name="RouteEditor_Hint_Dwell">Dwell (ms)</string>
+    <string name="Cd_RouteLab">Route Lab</string>
+    <string name="Cd_WaypointDrag">Drag to reorder</string>
+    <string name="Cd_WaypointDelete">Delete waypoint</string>
+
+    <!-- Module 3: GeoFence Lab -->
+    <string name="GeoFence_SheetTitle">GeoFence Lab</string>
+    <string name="GeoFence_Add">Add fence</string>
+    <string name="GeoFence_Events">Event log</string>
+    <string name="GeoFence_Active">Fence active</string>
+    <string name="GeoFence_Empty_Title">No geofences</string>
+    <string name="GeoFence_Empty_Body">Add a fence to monitor entry and exit.</string>
+    <string name="GeoFence_Delete_Title">Delete fence?</string>
+    <string name="GeoFence_Delete_Message">Removes this fence. Logged events are kept.</string>
+    <string name="GeoFence_Add_Title">Add fence</string>
+    <string name="GeoFence_Edit_Title">Edit fence</string>
+    <string name="GeoFence_Hint_Name">Name</string>
+    <string name="GeoFence_Hint_Lat">Center latitude</string>
+    <string name="GeoFence_Hint_Lng">Center longitude</string>
+    <string name="GeoFence_Hint_Radius">Radius (m)</string>
+    <string name="GeoFence_Error_Invalid">Check name and coordinates</string>
+    <string name="GeoFence_Type_Polygon">Polygon fence</string>
+    <string name="GeoFence_Events_Title">GeoFence events</string>
+    <string name="GeoFence_Event_Empty_Title">No events yet</string>
+    <string name="GeoFence_Event_Empty_Body">Transitions appear here while a mock runs.</string>
+    <string name="GeoFence_Event_Export">Export CSV</string>
+    <string name="GeoFence_Event_Entry">Entry</string>
+    <string name="GeoFence_Event_Exit">Exit</string>
+    <string name="GeoFence_Event_Dwell">Dwell</string>
+    <string name="Cd_GeoFence">GeoFence</string>
+    <string name="Cd_GeoFenceDelete">Delete fence</string>
+
+    <!-- Module 5: Permission Drift Monitor -->
+    <string name="PermissionDrift_Title">Permission Drift</string>
+    <string name="PermissionDrift_Empty_Title">No scan yet</string>
+    <string name="PermissionDrift_Empty_Body">Tap scan to audit app permissions.</string>
+    <string name="PermissionDrift_Scan">Scan now</string>
+    <string name="PermissionDrift_Filter">Only alerts</string>
+    <string name="PermissionDrift_StatusGranted">Granted</string>
+    <string name="PermissionDrift_StatusDenied">Denied</string>
+    <string name="PermissionDrift_Ack">Acknowledge all</string>
+    <string name="PermissionDrift_Acknowledged">Alerts acknowledged</string>
+    <string name="PermissionDrift_Channel">Permission drift alerts</string>
+    <string name="PermissionDrift_Notif_Title">Permission drift detected</string>
+    <string name="Cd_PermissionDrift">Permission drift</string>
+
+    <!-- Module 6: EXIF Cleaner -->
+    <string name="ExifCleaner_Title">EXIF Cleaner</string>
+    <string name="ExifCleaner_Stats">%d photos cleaned</string>
+    <string name="ExifCleaner_Clean">Scan &amp; clean now</string>
+    <string name="ExifCleaner_Auto">Auto-clean new photos</string>
+    <string name="ExifCleaner_Empty_Title">Nothing cleaned yet</string>
+    <string name="ExifCleaner_Empty_Body">Strip GPS tags from your photos to remove location traces.</string>
+    <string name="ExifCleaner_Started">Cleaning started in background</string>
+    <string name="ExifCleaner_Item_Coords">Was: %1$.5f, %2$.5f</string>
+    <string name="Cd_ExifCleaner">EXIF Cleaner</string>
+    <plurals name="PermissionDrift_Notif_Body">
+        <item quantity="one">%d new critical permission change</item>
+        <item quantity="other">%d new critical permission changes</item>
+    </plurals>
+
+    <!-- Module 7: Privacy Wipe -->
+    <string name="PrivacyWipe_Title">Privacy Wipe</string>
+    <string name="PrivacyWipe_SelectCategories">Select what to wipe</string>
+    <string name="PrivacyWipe_Cat_Sessions">Session history</string>
+    <string name="PrivacyWipe_Cat_GeoFence">GeoFence events</string>
+    <string name="PrivacyWipe_Cat_Permissions">Permission snapshots</string>
+    <string name="PrivacyWipe_Cat_Exif">EXIF clean log</string>
+    <string name="PrivacyWipe_Cat_AppData">App cache &amp; preferences</string>
+    <string name="PrivacyWipe_Now">Wipe now</string>
+    <string name="PrivacyWipe_Emergency">Emergency wipe</string>
+    <string name="PrivacyWipe_Schedule">Scheduled automatic wipe</string>
+    <string name="PrivacyWipe_History">History</string>
+    <string name="PrivacyWipe_Confirm_Title">Wipe selected data?</string>
+    <string name="PrivacyWipe_Confirm_Message">This permanently deletes the selected categories. It cannot be undone.</string>
+    <string name="PrivacyWipe_Countdown">Wipe (%d)</string>
+    <string name="PrivacyWipe_NothingSelected">Select at least one category</string>
+    <string name="PrivacyWipe_Done">Wipe complete</string>
+    <string name="PrivacyWipe_Type_Full">Full wipe</string>
+    <string name="PrivacyWipe_Type_Partial">Partial wipe</string>
+    <string name="PrivacyWipe_Status_Ok">Done</string>
+    <string name="PrivacyWipe_Status_Fail">Failed</string>
+    <string name="Cd_PrivacyWipe">Privacy wipe</string>
+
+    <!-- Module 8: Evidence Export -->
+    <string name="Evidence_Title">Evidence Export</string>
+    <string name="Evidence_SelectModules">Include data</string>
+    <string name="Evidence_Cat_Sessions">Sessions</string>
+    <string name="Evidence_Cat_Routes">Routes</string>
+    <string name="Evidence_Cat_GeoFences">GeoFence events</string>
+    <string name="Evidence_Cat_Permissions">Permissions</string>
+    <string name="Evidence_Cat_Exif">EXIF log</string>
+    <string name="Evidence_Cat_Wipes">Wipe history</string>
+    <string name="Evidence_Format">Format</string>
+    <string name="Evidence_Fmt_Json">JSON</string>
+    <string name="Evidence_Fmt_Csv">CSV</string>
+    <string name="Evidence_Fmt_Pdf">PDF</string>
+    <string name="Evidence_Generate">Generate report</string>
+    <string name="Evidence_History">Reports</string>
+    <string name="Evidence_Empty_Title">No reports yet</string>
+    <string name="Evidence_Empty_Body">Generated reports appear here.</string>
+    <string name="Evidence_Generated">Report generated</string>
+    <string name="Evidence_Failed">Export failed</string>
+    <string name="Evidence_Share">Share report</string>
+    <string name="Evidence_ShareFailed">Could not share file</string>
+    <string name="Evidence_Delete">Delete report</string>
+    <string name="Cd_EvidenceExport">Evidence export</string>
+
+    <!-- P6–P8: Settings feature-module toggles -->
+    <string name="Settings_Section_Modules">Feature modules</string>
+    <string name="Settings_Section_Simulation">Simulation</string>
+    <string name="Settings_Feat_SessionHistory">Record session history</string>
+    <string name="Settings_Feat_RouteLab">Route Lab</string>
+    <string name="Settings_Feat_GeoFence">GeoFence monitoring</string>
+    <string name="Settings_Feat_PermDrift">Permission drift monitor</string>
+    <string name="Settings_Feat_Exif">EXIF cleaner</string>
+    <string name="Settings_Feat_PrivacyWipe">Privacy wipe</string>
+    <string name="Settings_Feat_Evidence">Evidence export</string>
+    <string name="Settings_Sim_Altitude">Simulate altitude</string>
+    <string name="Settings_Sim_Accuracy">Simulate accuracy drift</string>
+    <string name="Settings_SessionLabel_Hint">Session label (optional)</string>
 </resources>

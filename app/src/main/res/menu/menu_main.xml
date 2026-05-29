@@ -27,4 +27,40 @@
         android:icon="@drawable/ic_help"
         android:title="@string/TopAppBar_Help"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_session_history"
+        android:icon="@drawable/ic_session_history"
+        android:title="@string/SessionHistory_SheetTitle"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_route_lab"
+        android:icon="@drawable/ic_route_lab"
+        android:title="@string/RouteLab_Title"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_geofence"
+        android:icon="@drawable/ic_geofence"
+        android:title="@string/GeoFence_SheetTitle"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_permission_drift"
+        android:icon="@drawable/ic_permission_drift"
+        android:title="@string/PermissionDrift_Title"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_exif"
+        android:icon="@drawable/ic_exif_cleaner"
+        android:title="@string/ExifCleaner_Title"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_privacy_wipe"
+        android:icon="@drawable/ic_privacy_wipe"
+        android:title="@string/PrivacyWipe_Title"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_evidence"
+        android:icon="@drawable/ic_evidence_export"
+        android:title="@string/Evidence_Title"
+        app:showAsAction="never" />
 </menu>

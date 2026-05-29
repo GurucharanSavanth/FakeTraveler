@@ -7,10 +7,10 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.room.Room;
 import androidx.test.core.app.ApplicationProvider;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -26,7 +26,8 @@ public class BookmarkDaoTest {
     private AppDatabase db;
     private BookmarkDao dao;
 
-    @Before public void setUp() {
+    @BeforeEach
+    public void setUp() {
         db = Room.inMemoryDatabaseBuilder(
                 ApplicationProvider.getApplicationContext(), AppDatabase.class)
                 .allowMainThreadQueries()
@@ -34,9 +35,11 @@ public class BookmarkDaoTest {
         dao = db.bookmarkDao();
     }
 
-    @After public void tearDown() { db.close(); }
+    @AfterEach
+    public void tearDown() { db.close(); }
 
-    @Test public void insert_then_get_returns_entry() {
+    @org.junit.jupiter.api.Test
+    public void insert_then_get_returns_entry() {
         BookmarkEntity e = new BookmarkEntity();
         e.name = "Home";
         e.lat = 12.34;
