@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Evidence reports written by EvidenceExporter to getExternalFilesDir(DOCUMENTS). -->
+    <external-files-path name="evidence_docs" path="Documents/" />
+    <external-files-path name="evidence_root" path="." />
+    <files-path name="internal" path="." />
+</paths>

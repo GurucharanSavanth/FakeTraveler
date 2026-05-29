@@ -68,6 +68,7 @@ output/
 
 # Gradle daemon JVM cache
 gradle/gradle-daemon-jvm.properties
+Advanced_Engins_used/
 
 # Stale "do not commit" marker
 .claude/
@@ -75,4 +76,5 @@ gradle/gradle-daemon-jvm.properties
 # Drill-sergeant + orchestration scratch docs
 docs/
 FakeTraveler_Caveman_Orchestration_Engine.md
-
+Prompt_Generated(1).xml
+ANDROID_P6P7P8_PATCH_PROMPT.md

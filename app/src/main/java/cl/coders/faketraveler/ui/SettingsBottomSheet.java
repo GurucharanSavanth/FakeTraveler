@@ -33,6 +33,7 @@ import com.google.android.material.slider.Slider;
 
 import java.util.Locale;
 
+import cl.coders.faketraveler.FeatureFlag;
 import cl.coders.faketraveler.MapProviderUtil;
 import cl.coders.faketraveler.OemBatteryOptHelper;
 import cl.coders.faketraveler.PackageInfoUtil;
@@ -87,6 +88,7 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
         wireCheckBox(view, R.id.cb_MockSpeed, "mockSpeed", true);
         wireMapProvider(view, sharedPref);
         wireRestoreAfterBoot(view);                                                      // FIX-005
+        wireFeatureModules(view);                                                        // P6–P8
         wireOemHelper(view);                                                             // FIX-011
         wireOemCard(view);
         wireVersionFooter(view);
@@ -151,7 +153,7 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
             public void afterTextChanged(Editable s) {
                 final SharedPreferences.Editor e = requireContext().getApplicationContext()
                         .getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE).edit();
-                if (et.getText().toString().isBlank()) {
+                if (et.getText().toString().trim().isEmpty()) {
                     putDouble(e, key, 0);
                 } else {
                     try {
@@ -169,7 +171,7 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
     private void wireIntField(@NonNull View view, int id, @NonNull String key, int dflt,
                               @NonNull SharedPreferences sp, int minClamp, int maxClamp) {
         final EditText et = Inputs.requireView(view, id, "wireIntField:" + key);
-        et.setText(String.format(Locale.ROOT, "%d", sp.getInt(key, dflt)));
+        et.setText(String.format(Locale.ROOT, "%d", Math.max(minClamp, Math.min(maxClamp, sp.getInt(key, dflt)))));
         et.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
             @Override public void onTextChanged(CharSequence s, int a, int b, int c) {}
@@ -178,7 +180,7 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
                 final SharedPreferences.Editor e = requireContext().getApplicationContext()
                         .getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE).edit();
                 int value = dflt;
-                if (!et.getText().toString().isBlank()) {
+                if (!et.getText().toString().trim().isEmpty()) {
                     try {
                         value = Integer.parseInt(et.getText().toString());
                     } catch (Throwable t) {
@@ -230,7 +232,7 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
                 if (syncing[0]) return;
                 syncing[0] = true;
                 try {
-                    if (s.toString().isBlank()) return;
+                    if (s.toString().trim().isEmpty()) return;
                     int value;
                     try {
                         value = Integer.parseInt(s.toString());
@@ -278,7 +280,7 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
                 final SharedPreferences.Editor e = requireContext().getApplicationContext()
                         .getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE).edit();
                 final String text = etMap.getText().toString();
-                e.putString("mapProvider", text.isBlank()
+                e.putString("mapProvider", text.trim().isEmpty()
                         ? MapProviderUtil.getDefaultMapProvider(Locale.getDefault())
                         : text);
                 e.apply();
@@ -291,6 +293,47 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
         cb.setChecked(SharedPrefsUtil.isRestoreAfterBoot(requireContext().getApplicationContext()));
         cb.setOnCheckedChangeListener((b, checked) ->
                 SharedPrefsUtil.setRestoreAfterBoot(requireContext().getApplicationContext(), checked));
+    }
+
+    /** P6–P8: one switch per {@link FeatureFlag} plus the Module 1 simulation prefs. Reuses
+     *  {@link #wireCheckBox} so each toggle reads/writes the same SharedPreferences key the
+     *  modules consult ({@code FeatureFlag.prefKey} / {@code simulateAltitude} / etc). */
+    private void wireFeatureModules(@NonNull View view) {
+        wireCheckBox(view, R.id.cb_feat_session_history,
+                FeatureFlag.SESSION_HISTORY.prefKey, FeatureFlag.SESSION_HISTORY.defaultValue);
+        wireCheckBox(view, R.id.cb_feat_route_lab,
+                FeatureFlag.ROUTE_LAB.prefKey, FeatureFlag.ROUTE_LAB.defaultValue);
+        wireCheckBox(view, R.id.cb_feat_geofence,
+                FeatureFlag.GEOFENCE_LAB.prefKey, FeatureFlag.GEOFENCE_LAB.defaultValue);
+        wireCheckBox(view, R.id.cb_feat_perm_drift,
+                FeatureFlag.PERMISSION_DRIFT.prefKey, FeatureFlag.PERMISSION_DRIFT.defaultValue);
+        wireCheckBox(view, R.id.cb_feat_exif,
+                FeatureFlag.EXIF_CLEANER.prefKey, FeatureFlag.EXIF_CLEANER.defaultValue);
+        wireCheckBox(view, R.id.cb_feat_privacy_wipe,
+                FeatureFlag.PRIVACY_WIPE.prefKey, FeatureFlag.PRIVACY_WIPE.defaultValue);
+        wireCheckBox(view, R.id.cb_feat_evidence,
+                FeatureFlag.EVIDENCE_EXPORT.prefKey, FeatureFlag.EVIDENCE_EXPORT.defaultValue);
+        wireCheckBox(view, R.id.cb_SimulateAltitude, "simulateAltitude", false);
+        wireCheckBox(view, R.id.cb_SimulateAccuracy, "simulateAccuracy", false);
+        wireStringField(view, R.id.et_SessionLabel, "sessionLabel");
+    }
+
+    private void wireStringField(@NonNull View view, int id, @NonNull String key) {
+        final EditText et = view.findViewById(id);
+        if (et == null) return;
+        final SharedPreferences sp = requireContext().getApplicationContext()
+                .getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE);
+        et.setText(sp.getString(key, ""));
+        et.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
+            @Override public void onTextChanged(CharSequence s, int a, int b, int c) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                requireContext().getApplicationContext()
+                        .getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE).edit()
+                        .putString(key, et.getText().toString()).apply();
+            }
+        });
     }
 
     private void wireResetDefaults(@NonNull View view) {
