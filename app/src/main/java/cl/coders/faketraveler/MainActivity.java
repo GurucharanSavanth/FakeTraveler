@@ -50,7 +50,9 @@ import cl.coders.faketraveler.util.Inputs;
 
 public class MainActivity extends AppCompatActivity implements ServiceConnector.Listener,
         cl.coders.faketraveler.ui.BookmarksBottomSheet.Host,
-        cl.coders.faketraveler.ui.SessionHistoryBottomSheet.Host {
+        cl.coders.faketraveler.ui.SessionHistoryBottomSheet.Host,
+        cl.coders.faketraveler.ui.GeoFenceLabBottomSheet.Host,
+        cl.coders.faketraveler.ui.ExifCleanerBottomSheet.Host {
 
     @NonNull private static final String TAG = MainActivity.class.getSimpleName();
     @NonNull public static final String sharedPrefKey = "cl.coders.faketraveler.sharedprefs";
@@ -92,6 +94,34 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
                 }
             });
 
+    /** P6–P8 Module 6: photo-read permission for the bulk EXIF scan. */
+    @NonNull
+    private final ActivityResultLauncher<String> mediaPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
+                if (granted) startExifBulkScan();
+                else showError(R.string.ExifCleaner_PermNeeded);
+            });
+
+    /** P6–P8 Module 6: Android Photo Picker — user selects images to strip GPS EXIF from. */
+    @NonNull
+    private final ActivityResultLauncher<androidx.activity.result.PickVisualMediaRequest> photoPickLauncher =
+            registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(), uris -> {
+                if (uris != null && !uris.isEmpty()) requestExifWriteConsent(uris);
+            });
+
+    /** P6–P8 Module 6: MediaStore URIs awaiting the system write-consent result. */
+    @Nullable private java.util.List<Uri> pendingExifUris;
+
+    /** P6–P8 Module 6: on write consent granted, strip GPS EXIF from the picked images. */
+    @NonNull
+    private final ActivityResultLauncher<androidx.activity.result.IntentSenderRequest> exifWriteConsentLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(), result -> {
+                final java.util.List<Uri> uris = pendingExifUris;
+                pendingExifUris = null;
+                if (uris == null) return;
+                if (result.getResultCode() == RESULT_OK) runExifClean(uris);
+            });
+
     // Persisted config
     private int version;
     private double lat, lng, zoom, dLat, dLng;
@@ -128,7 +158,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_layout), (v, insets) -> {
             final Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars()
                     | WindowInsetsCompat.Type.displayCutout());
-            v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            final Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+            // Lift bottom-pinned controls above the soft keyboard so the coordinate
+            // inputs stay visible while typing (paired with windowSoftInputMode=adjustResize).
+            v.setPadding(bars.left, bars.top, bars.right, Math.max(bars.bottom, ime.bottom));
             return WindowInsetsCompat.CONSUMED;
         });
         // Predictive back: warn if the user is about to walk away from an active mock.
@@ -672,6 +705,77 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
         } catch (Throwable t) {
             Log.w(TAG, "route lab launch failed", t);
         }
+    }
+
+    @Override
+    public void onGeofencesChanged() {
+        if (geofenceMonitor != null) geofenceMonitor.reloadFences();
+    }
+
+    // --- Module 6: EXIF cleaner host (photo permission, Photo Picker, write consent) ---
+
+    @Override
+    public void onExifScanAll() {
+        final String perm = android.os.Build.VERSION.SDK_INT >= 33
+                ? Manifest.permission.READ_MEDIA_IMAGES
+                : Manifest.permission.READ_EXTERNAL_STORAGE;
+        if (ContextCompat.checkSelfPermission(this, perm) == PackageManager.PERMISSION_GRANTED) {
+            startExifBulkScan();
+        } else {
+            mediaPermissionLauncher.launch(perm);
+        }
+    }
+
+    private void startExifBulkScan() {
+        ExifCleanWorker.enqueue(getApplicationContext());
+        showSnackbar(R.string.ExifCleaner_Started);
+    }
+
+    @Override
+    public void onExifPickPhotos() {
+        try {
+            photoPickLauncher.launch(new androidx.activity.result.PickVisualMediaRequest.Builder()
+                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                    .build());
+        } catch (Throwable t) {
+            Log.w(TAG, "photo picker launch failed", t);
+            showError(R.string.ExifCleaner_PermNeeded);
+        }
+    }
+
+    /** Map Photo-Picker URIs to writable MediaStore image URIs, then request write consent. */
+    private void requestExifWriteConsent(@NonNull java.util.List<Uri> picked) {
+        final java.util.List<Uri> media = new java.util.ArrayList<>(picked.size());
+        for (Uri u : picked) {
+            try {
+                media.add(android.content.ContentUris.withAppendedId(
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        android.content.ContentUris.parseId(u)));
+            } catch (Throwable ignored) {
+                media.add(u);
+            }
+        }
+        if (android.os.Build.VERSION.SDK_INT >= 30) {
+            try {
+                final android.app.PendingIntent pi = android.provider.MediaStore
+                        .createWriteRequest(getContentResolver(), media);
+                pendingExifUris = media;
+                exifWriteConsentLauncher.launch(new androidx.activity.result.IntentSenderRequest
+                        .Builder(pi.getIntentSender()).build());
+                return;
+            } catch (Throwable t) {
+                Log.w(TAG, "createWriteRequest failed", t);
+            }
+        }
+        runExifClean(media);
+    }
+
+    private void runExifClean(@NonNull java.util.List<Uri> uris) {
+        final Context appCtx = getApplicationContext();
+        new Thread(() -> {
+            final ExifCleaner.CleanResult r = new ExifCleaner(appCtx).cleanUris(uris);
+            runOnUiThread(() -> showSnackbar(getString(R.string.ExifCleaner_Result, r.cleaned, r.scanned)));
+        }, "ExifPickClean").start();
     }
 
     private void playRouteById(long routeId) {

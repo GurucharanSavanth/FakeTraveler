@@ -223,8 +223,8 @@
     <string name="About_LicensesView">View licenses</string>
     <string name="About_ReportIssue">Report an issue</string>
     <string name="About_SourceCode">Source code</string>
-    <string name="About_IssueUrl" translatable="false">https://github.com/mcastillof/FakeTraveler/issues</string>
-    <string name="About_SourceUrl" translatable="false">https://github.com/mcastillof/FakeTraveler</string>
+    <string name="About_IssueUrl" translatable="false">https://github.com/GurucharanSavanth/FakeTraveler/issues</string>
+    <string name="About_SourceUrl" translatable="false">https://github.com/GurucharanSavanth/FakeTraveler</string>
     <string name="About_LicenseBody">FakeTraveler is open source. Map rendering uses Leaflet and Leaflet-providers under BSD-compatible licenses.</string>
 
     <!-- Permission rationale activity -->
@@ -352,6 +352,9 @@
     <string name="ExifCleaner_Empty_Title">Nothing cleaned yet</string>
     <string name="ExifCleaner_Empty_Body">Strip GPS tags from your photos to remove location traces.</string>
     <string name="ExifCleaner_Started">Cleaning started in background</string>
+    <string name="ExifCleaner_SelectPhotos">Select photos to clean</string>
+    <string name="ExifCleaner_PermNeeded">Photo access is needed to scan and clean</string>
+    <string name="ExifCleaner_Result">Cleaned %1$d of %2$d selected photo(s)</string>
     <string name="ExifCleaner_Item_Coords">Was: %1$.5f, %2$.5f</string>
     <string name="Cd_ExifCleaner">EXIF Cleaner</string>
     <plurals name="PermissionDrift_Notif_Body">

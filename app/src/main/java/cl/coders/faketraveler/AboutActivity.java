@@ -50,6 +50,8 @@ public class AboutActivity extends AppCompatActivity {
                         .show());
         findViewById(R.id.about_issue_button).setOnClickListener(v ->
                 openUrl(getString(R.string.About_IssueUrl)));
+        findViewById(R.id.about_source_button).setOnClickListener(v ->
+                openUrl(getString(R.string.About_SourceUrl)));
     }
 
     private void bindVersion() {

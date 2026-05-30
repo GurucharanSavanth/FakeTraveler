@@ -32,7 +32,25 @@ import cl.coders.faketraveler.db.GeoFenceEntity;
 public class GeoFenceLabBottomSheet extends BottomSheetDialogFragment
         implements GeoFenceAdapter.Listener {
 
+    /** Implemented by MainActivity to reload the running GeoFenceMonitor after fence edits. */
+    public interface Host {
+        void onGeofencesChanged();
+    }
+
+    @Nullable private Host host;
     @Nullable private GeoFenceAdapter adapter;
+
+    @Override
+    public void onAttach(@NonNull android.content.Context context) {
+        super.onAttach(context);
+        if (context instanceof Host) host = (Host) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        host = null;
+    }
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -67,7 +85,7 @@ public class GeoFenceLabBottomSheet extends BottomSheetDialogFragment
     public void onToggleActive(@NonNull GeoFenceEntity fence, boolean active) {
         fence.active = active;
         final android.content.Context appCtx = requireContext().getApplicationContext();
-        runDb(() -> AppDatabase.get(appCtx).geoFenceDao().update(fence));
+        runDbNotify(() -> AppDatabase.get(appCtx).geoFenceDao().update(fence));
     }
 
     @Override
@@ -81,7 +99,7 @@ public class GeoFenceLabBottomSheet extends BottomSheetDialogFragment
                 .setTitle(R.string.GeoFence_Delete_Title)
                 .setMessage(R.string.GeoFence_Delete_Message)
                 .setPositiveButton(android.R.string.ok,
-                        (d, w) -> runDb(() -> AppDatabase.get(appCtx).geoFenceDao().delete(fence)))
+                        (d, w) -> runDbNotify(() -> AppDatabase.get(appCtx).geoFenceDao().delete(fence)))
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
     }
@@ -128,7 +146,7 @@ public class GeoFenceLabBottomSheet extends BottomSheetDialogFragment
                         f.monitorExit = true;
                         f.active = true;
                     }
-                    runDb(() -> {
+                    runDbNotify(() -> {
                         if (existing == null) AppDatabase.get(appCtx).geoFenceDao().insert(f);
                         else AppDatabase.get(appCtx).geoFenceDao().update(f);
                     });
@@ -160,6 +178,15 @@ public class GeoFenceLabBottomSheet extends BottomSheetDialogFragment
 
     private void toast(int res) {
         if (isAdded()) Toast.makeText(requireContext(), res, Toast.LENGTH_SHORT).show();
+    }
+
+    /** Run a fence mutation off the main thread, then tell the host to reload the monitor. */
+    private void runDbNotify(@NonNull Runnable dbOp) {
+        final Host h = host;
+        runDb(() -> {
+            dbOp.run();
+            if (h != null) h.onGeofencesChanged();
+        });
     }
 
     private static void runDb(@NonNull Runnable r) {

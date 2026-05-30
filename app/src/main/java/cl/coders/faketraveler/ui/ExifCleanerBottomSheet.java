@@ -31,7 +31,26 @@ public class ExifCleanerBottomSheet extends BottomSheetDialogFragment {
 
     public static final String PREF_AUTO_CLEAN = "exifAutoClean";
 
+    /** Implemented by MainActivity, which owns the photo-permission + Photo Picker launchers. */
+    public interface Host {
+        void onExifScanAll();
+        void onExifPickPhotos();
+    }
+
+    @Nullable private Host host;
     @Nullable private ExifCleanedAdapter adapter;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof Host) host = (Host) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        host = null;
+    }
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -62,9 +81,10 @@ public class ExifCleanerBottomSheet extends BottomSheetDialogFragment {
         });
 
         view.findViewById(R.id.exif_clean_btn).setOnClickListener(v -> {
-            ExifCleanWorker.enqueue(appCtx);
-            if (isAdded()) Toast.makeText(requireContext(),
-                    R.string.ExifCleaner_Started, Toast.LENGTH_SHORT).show();
+            if (host != null) host.onExifScanAll();
+        });
+        view.findViewById(R.id.exif_pick_btn).setOnClickListener(v -> {
+            if (host != null) host.onExifPickPhotos();
         });
 
         AppDatabase.get(requireContext()).exifCleanedFileDao().getAllCleanedFiles().observe(

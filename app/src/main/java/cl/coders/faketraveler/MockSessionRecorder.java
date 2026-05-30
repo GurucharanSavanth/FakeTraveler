@@ -161,7 +161,15 @@ public final class MockSessionRecorder {
             final long sid = sessionRowId;
             if (sid <= 0) return; // session insert failed; drop rather than orphan
             for (RoutePointEntity p : snapshot) p.sessionId = sid;
-            dao.insertPoints(snapshot);
+            try {
+                dao.insertPoints(snapshot);
+            } catch (android.database.sqlite.SQLiteException ex) {
+                // The parent session row may have vanished mid-recording (e.g. Privacy Wipe
+                // cleared session history). Abandon this session instead of crashing FT-ModuleIO;
+                // a later START opens a fresh one.
+                sessionRowId = -1L;
+                android.util.Log.w("MockSessionRecorder", "session row gone; dropping points", ex);
+            }
         });
     }
 

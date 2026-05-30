@@ -13,7 +13,7 @@ public enum FeatureFlag {
     ROUTE_LAB("enable_route_lab", true),
     GEOFENCE_LAB("enable_geofence", true),
     PERMISSION_DRIFT("enable_perm_drift", true),
-    EXIF_CLEANER("enable_exif_cleaner", false),
+    EXIF_CLEANER("enable_exif_cleaner", true),
     PRIVACY_WIPE("enable_privacy_wipe", true),
     EVIDENCE_EXPORT("enable_evidence_export", true);
 

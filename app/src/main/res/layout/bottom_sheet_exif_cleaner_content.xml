@@ -56,6 +56,14 @@
         android:text="@string/ExifCleaner_Clean"
         app:icon="@drawable/ic_exif_cleaner" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/exif_pick_btn"
+        style="@style/Widget.FakeTraveler.Button.Outlined"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_sm"
+        android:text="@string/ExifCleaner_SelectPhotos" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/exif_list"
         android:layout_width="match_parent"

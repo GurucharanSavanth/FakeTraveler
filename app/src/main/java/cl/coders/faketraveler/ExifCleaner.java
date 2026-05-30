@@ -75,6 +75,22 @@ public final class ExifCleaner {
         return res;
     }
 
+    /**
+     * Strip GPS EXIF from a user-selected set of images (Photo Picker → write-consent flow).
+     * The caller must have obtained write access for these URIs (e.g. via
+     * {@link MediaStore#createWriteRequest}); any still lacking it are counted as needsConsent.
+     */
+    @WorkerThread
+    @NonNull
+    public CleanResult cleanUris(@NonNull java.util.List<Uri> uris) {
+        final CleanResult res = new CleanResult();
+        for (Uri uri : uris) {
+            res.scanned++;
+            cleanOne(uri, res);
+        }
+        return res;
+    }
+
     private void cleanOne(@NonNull Uri uri, @NonNull CleanResult res) {
         final float[] out = new float[2];
         boolean hasGps = false;
