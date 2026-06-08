@@ -121,6 +121,19 @@
             android:exported="false"
             android:foregroundServiceType="location" />
 
+        <!-- Panic Quick Settings tile (API 24+): one-tap stop + clear. The system holds
+             BIND_QUICK_SETTINGS_TILE; older platforms ignore this declaration. -->
+        <service
+            android:name=".PanicTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_location_off"
+            android:label="@string/Panic_TileLabel"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
         <!-- FIX-005 -->
         <receiver
             android:name=".BootCompletedReceiver"

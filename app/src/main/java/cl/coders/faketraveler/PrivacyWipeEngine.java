@@ -133,8 +133,10 @@ public final class PrivacyWipeEngine {
         return ok;
     }
 
-    private void clearCache() {
-        deleteRecursive(appCtx.getCacheDir());
+    private void clearCache() throws Exception {
+        if (!deleteRecursive(appCtx.getCacheDir())) {
+            throw new java.io.IOException("one or more cache files could not be deleted");
+        }
     }
 
     private void clearNonEssentialPrefs() {
@@ -147,16 +149,21 @@ public final class PrivacyWipeEngine {
         e.apply();
     }
 
-    private static void deleteRecursive(File f) {
-        if (f == null) return;
+    /** @return {@code true} only if every targeted node was actually deleted. */
+    private static boolean deleteRecursive(File f) {
+        if (f == null) return true;
+        boolean ok = true;
         final File[] children = f.listFiles();
-        if (children != null) for (File c : children) deleteRecursive(c);
+        if (children != null) for (File c : children) ok &= deleteRecursive(c);
         // Never delete the cache dir itself, only its contents.
         if (!f.isDirectory() || (f.getParentFile() != null
                 && !"cache".equals(f.getName()))) {
-            //noinspection ResultOfMethodCallIgnored
-            f.delete();
+            if (!f.delete()) {
+                Log.w(TAG, "Failed to delete " + f.getAbsolutePath());
+                ok = false;
+            }
         }
+        return ok;
     }
 
     private static int firstType(@NonNull Options o) {

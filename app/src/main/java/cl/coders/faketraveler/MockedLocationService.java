@@ -226,6 +226,7 @@ public class MockedLocationService extends Service {
                     longitude, latitude, longitudeDistance, latitudeDistance, maxTime, mockSpeed);
             timer.schedule(t, 0L, mockMilli);
             tasks.add(t);
+            scheduleRadioWatch();
             mockState.postValue(MockState.MOCKED);
             emit(MockEvent.Type.START, null);
         } catch (SecurityException e) {
@@ -261,6 +262,7 @@ public class MockedLocationService extends Service {
             final TimerTask t = new RoutePlayerTask(this, path, loop);
             timer.schedule(t, 0L, mockMilli);
             tasks.add(t);
+            scheduleRadioWatch();
             mockState.postValue(MockState.MOCKED);
             emit(MockEvent.Type.START, null);
         } catch (SecurityException e) {
@@ -278,8 +280,49 @@ public class MockedLocationService extends Service {
         tasks.clear();
         for (MockedLocationProvider p : providers) p.shutdown();
         providers.clear();
+        try {
+            final NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if (nm != null) nm.cancel(RadioConsistencyManager.NOTIFICATION_ID);
+        } catch (Throwable ignored) {
+            // notification manager unavailable; nothing to clear
+        }
         mockState.postValue(MockState.NOT_MOCKED);
         emit(MockEvent.Type.STOP, null);
+    }
+
+    /** Poll radio / location-mode consistency every 5s while mocking and guide the user via a
+     *  notification. Read-only — no system setting is changed. In Strict mode the watcher stops
+     *  this app's own mock when an overriding state is detected. */
+    private void scheduleRadioWatch() {
+        final RadioWatchTask rt = new RadioWatchTask(this, new RadioConsistencyManager(this));
+        timer.schedule(rt, 5_000L, 5_000L);
+        tasks.add(rt);
+    }
+
+    /** V25 discipline: {@link #cancel()} sets the volatile flag; {@link #run()} bails when set. */
+    static final class RadioWatchTask extends TimerTask {
+        @NonNull private final MockedLocationService svc;
+        @NonNull private final RadioConsistencyManager mgr;
+        private volatile boolean cancelled = false;
+
+        RadioWatchTask(@NonNull MockedLocationService svc, @NonNull RadioConsistencyManager mgr) {
+            this.svc = svc;
+            this.mgr = mgr;
+        }
+
+        @Override public boolean cancel() {
+            cancelled = true;
+            return super.cancel();
+        }
+
+        @Override public void run() {
+            if (cancelled) return;
+            final boolean inconsistent = mgr.checkAndNotify();
+            if (inconsistent && !cancelled && SharedPrefsUtil.isStrictRadioMode(svc)) {
+                svc.stopMockNow();
+                svc.stopSelf();
+            }
+        }
     }
 
     /** Post a {@link MockEvent} on the unified bus. {@code loc} is null for START/STOP/ERROR. */
@@ -296,7 +339,7 @@ public class MockedLocationService extends Service {
             lastNotificationRefresh = now;
             refreshNotification(value);
         }
-        for (MockedLocationProvider prov : providers) prov.pushLocation(lat, lng);
+        for (MockedLocationProvider prov : providers) prov.pushLocation(value);
     }
 
     void notifyMockCompleted() {

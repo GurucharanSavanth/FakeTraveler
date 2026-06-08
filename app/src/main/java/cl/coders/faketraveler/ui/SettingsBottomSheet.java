@@ -88,6 +88,7 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
         wireCheckBox(view, R.id.cb_MockSpeed, "mockSpeed", true);
         wireMapProvider(view, sharedPref);
         wireRestoreAfterBoot(view);                                                      // FIX-005
+        wireCheckBox(view, R.id.cb_StrictRadioMode, SharedPrefsUtil.KEY_STRICT_RADIO_MODE, false);
         wireFeatureModules(view);                                                        // P6–P8
         wireOemHelper(view);                                                             // FIX-011
         wireOemCard(view);

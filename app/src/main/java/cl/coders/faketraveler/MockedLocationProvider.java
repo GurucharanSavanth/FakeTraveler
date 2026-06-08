@@ -35,7 +35,11 @@ public class MockedLocationProvider {
     public MockedLocationProvider(@NonNull String name, @NonNull Context ctx) {
         this.providerName = name;
         this.ctx = ctx;
-        this.lm = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
+        final LocationManager mgr = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
+        if (mgr == null) {
+            throw new SecurityException("LocationManager unavailable for " + name);
+        }
+        this.lm = mgr;
         startup();
     }
 
@@ -93,25 +97,28 @@ public class MockedLocationProvider {
     }
 
     /**
-     * Push a single mocked location to the underlying test provider.
+     * Push a single mocked location to the underlying test provider. Forwards the speed, bearing,
+     * altitude and accuracy actually computed by the caller (drift / route tasks) instead of fixed
+     * constants, so speed-aware consumers (Fused, navigation apps) see correct velocity and
+     * {@code hasSpeed()}/{@code hasBearing()} reflect real intent. A fresh {@link Location} carrying
+     * this provider's name is required — {@code setTestProviderLocation} rejects a mismatched name.
      *
-     * @param lat latitude  in decimal degrees
-     * @param lon longitude in decimal degrees
+     * @param src caller-built location (named for any provider); its fields are copied verbatim
      */
-    public void pushLocation(double lat, double lon) {
+    public void pushLocation(@NonNull Location src) {
         final Location m = new Location(providerName);
-        m.setLatitude(lat);
-        m.setLongitude(lon);
-        m.setAltitude(3F);
+        m.setLatitude(src.getLatitude());
+        m.setLongitude(src.getLongitude());
+        m.setAltitude(src.hasAltitude() ? src.getAltitude() : 3F);
         m.setTime(System.currentTimeMillis());
         m.setElapsedRealtimeNanos(SystemClock.elapsedRealtimeNanos());
-        m.setSpeed(0.01F);
-        m.setBearing(1F);
-        m.setAccuracy(3F);
+        if (src.hasSpeed()) m.setSpeed(src.getSpeed());
+        if (src.hasBearing()) m.setBearing(src.getBearing());
+        m.setAccuracy(src.hasAccuracy() ? src.getAccuracy() : 3F);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            m.setBearingAccuracyDegrees(0.1F);
-            m.setVerticalAccuracyMeters(0.1F);
-            m.setSpeedAccuracyMetersPerSecond(0.01F);
+            if (src.hasSpeedAccuracy()) m.setSpeedAccuracyMetersPerSecond(src.getSpeedAccuracyMetersPerSecond());
+            if (src.hasBearingAccuracy()) m.setBearingAccuracyDegrees(src.getBearingAccuracyDegrees());
+            if (src.hasVerticalAccuracy()) m.setVerticalAccuracyMeters(src.getVerticalAccuracyMeters());
         }
         try {
             lm.setTestProviderLocation(providerName, m);

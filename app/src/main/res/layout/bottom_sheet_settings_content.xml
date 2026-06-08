@@ -258,6 +258,15 @@
             android:text="@string/More_RestoreAfterBoot"
             android:textAppearance="?attr/textAppearanceBodyLarge" />
 
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/cb_StrictRadioMode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:minHeight="@dimen/touch_target_min"
+            android:text="@string/Settings_StrictRadioMode"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_OemHelper"
             style="@style/Widget.FakeTraveler.Button.Outlined"

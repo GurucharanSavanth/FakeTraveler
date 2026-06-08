@@ -47,7 +47,11 @@ public final class MockSessionRecorder {
     @Nullable private LiveData<MockEvent> source;
 
     // Main-thread state for the in-flight session.
-    private volatile long sessionRowId = -1L;   // written + read only on the io thread
+    // sessionRowId is written and read exclusively on the repo's single-threaded io executor
+    // (the insert in beginSession, the resets in flush/endSession, and the reads in flush/endSession
+    // are all queued via repo.io). The main thread never touches it, so the volatile read in the
+    // io tasks observes a consistent, FIFO-ordered value with no cross-thread race.
+    private volatile long sessionRowId = -1L;
     private long sessionStartTime;
     private int sequence;
     private boolean haveStart;
@@ -102,7 +106,6 @@ public final class MockSessionRecorder {
         haveStart = false;
         buffer.clear();
         lastFlush = e.timestamp;
-        sessionRowId = -1L;
         active = true;
 
         final SharedPreferences p =
@@ -112,6 +115,7 @@ public final class MockSessionRecorder {
                 ? "Session " + sessionStartTime : label.trim();
         final long startTime = sessionStartTime;
         repo.io(() -> {
+            sessionRowId = -1L; // reset on the io thread so writes stay on one thread (FIFO)
             MockSessionEntity s = new MockSessionEntity();
             s.startTime = startTime;
             s.sessionLabel = resolved;
@@ -184,6 +188,7 @@ public final class MockSessionRecorder {
         final int count = sequence;
         repo.io(() -> {
             final long sid = sessionRowId;
+            sessionRowId = -1L; // close the session on the io thread, after the read above
             if (sid <= 0) return;
             MockSessionEntity s = dao.getSession(sid);
             if (s == null) return;
@@ -197,6 +202,5 @@ public final class MockSessionRecorder {
             dao.update(s);
         });
         active = false;
-        sessionRowId = -1L;
     }
 }

@@ -96,7 +96,8 @@ public class PermissionDriftWorker extends Worker {
                 .setAutoCancel(true);
         try {
             nm.notify(NOTIFICATION_ID, b.build());
-        } catch (Throwable ignored) {
+        } catch (Throwable t) {
+            Log.w(TAG, "failed to post permission-drift notification", t);
         }
     }
 }

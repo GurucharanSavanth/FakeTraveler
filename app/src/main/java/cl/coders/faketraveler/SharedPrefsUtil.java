@@ -30,6 +30,9 @@ public final class SharedPrefsUtil {
     public static final String KEY_SCHEMA_VERSION = "prefsSchemaVersion";
     public static final String KEY_RESTORE_AFTER_BOOT = "restoreAfterBoot";
     public static final String KEY_LAST_MOCKED_LOCATION = "lastMockedLocation";
+    /** When true, the service stops its own mock if {@link RadioConsistencyManager} flags an
+     *  inconsistent radio/location state. Default off. */
+    public static final String KEY_STRICT_RADIO_MODE = "strictRadioMode";
 
     private SharedPrefsUtil() { throw new UnsupportedOperationException(); }
 
@@ -97,6 +100,35 @@ public final class SharedPrefsUtil {
                 .putBoolean(KEY_RESTORE_AFTER_BOOT, restore)
                 .apply();
         SettingsDataStore.get(ctx).setBoolBlocking(KEY_RESTORE_AFTER_BOOT, restore);
+    }
+
+    /** Synchronous read for the mock Timer thread (avoids DataStore's async/Flow surface). */
+    public static boolean isStrictRadioMode(@NonNull Context ctx) {
+        return ctx.getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE)
+                .getBoolean(KEY_STRICT_RADIO_MODE, false);
+    }
+
+    /** True while a mock is scheduled to still be running (endTime in the future, incl. the
+     *  {@code Long.MAX_VALUE} infinite-mock sentinel — V24). */
+    public static boolean isMockActive(@NonNull Context ctx) {
+        return ctx.getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE)
+                .getLong("endTime", 0L) > System.currentTimeMillis();
+    }
+
+    /** Panic action: clear persisted mock coordinates + expiry so nothing resumes on reboot or
+     *  process restart. Does not stop a live service — callers broadcast ACTION_STOP for that. */
+    public static void clearMockState(@NonNull Context ctx) {
+        try {
+            ctx.getSharedPreferences(sharedPrefKey, Context.MODE_PRIVATE).edit()
+                    .putLong("endTime", 0L)
+                    .remove("lat").remove("lng")
+                    .remove("dLat").remove("dLng")
+                    .putString(KEY_LAST_MOCKED_LOCATION, "")
+                    .apply();
+            SettingsDataStore.get(ctx).setStringBlocking(KEY_LAST_MOCKED_LOCATION, "");
+        } catch (Throwable t) {
+            Log.w(TAG, "clearMockState failed", t);
+        }
     }
 
     public static boolean isRestoreAfterBoot(@NonNull Context ctx) {

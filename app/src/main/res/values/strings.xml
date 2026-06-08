@@ -422,4 +422,18 @@
     <string name="Settings_Sim_Altitude">Simulate altitude</string>
     <string name="Settings_Sim_Accuracy">Simulate accuracy drift</string>
     <string name="Settings_SessionLabel_Hint">Session label (optional)</string>
+
+    <!-- Panic Quick Settings tile -->
+    <string name="Panic_TileLabel">Stop FakeTraveler</string>
+
+    <!-- Radio / location-mode consistency guard (read-only, guidance only) -->
+    <string name="RadioGuard_ChannelName">Location consistency</string>
+    <string name="RadioGuard_ChannelDesc">Warns when Wi-Fi scanning or High-accuracy mode may override the mocked location.</string>
+    <string name="RadioGuard_Title">Mocked location may be overridden</string>
+    <string name="RadioGuard_Body_Wifi">Wi-Fi scanning is on — it can override your mocked position.</string>
+    <string name="RadioGuard_Body_LocMode">Location mode is not “Device only” — Wi-Fi/network positioning can override the mock.</string>
+    <string name="RadioGuard_Action">Open location settings</string>
+
+    <!-- Strict mode toggle -->
+    <string name="Settings_StrictRadioMode">Strict mode: stop mocking on inconsistent radio state</string>
 </resources>
