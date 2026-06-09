@@ -211,7 +211,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
 
         wireBookmarkButtons();
         wireDetectionButton();
-        wirePrivacyGuardButton();
         wireQuickSettingsChips();
 
         detectAppVersion();
@@ -296,7 +295,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
         super.onResume();
         context = getApplicationContext();
         loadSharedPrefs();
-        if (findViewById(R.id.privacy_guard_btn) != null) wirePrivacyGuardButton();
     }
 
     @Override
@@ -844,14 +842,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
                 .show(getSupportFragmentManager(), "detection");
     }
 
-    private void wirePrivacyGuardButton() {
-        final android.view.View btn =
-                Inputs.requireView(this, R.id.privacy_guard_btn, "privacy_guard_btn");
-        btn.setVisibility(FeatureFlag.PRIVACY_GUARD.isEnabled(context)
-                ? android.view.View.VISIBLE : android.view.View.GONE);
-        btn.setOnClickListener(v -> showPrivacyGuardSheet());
-    }
-
     private void showPrivacyGuardSheet() {
         new cl.coders.faketraveler.ui.PrivacyGuardBottomSheet()
                 .show(getSupportFragmentManager(), "privacy_guard");
@@ -914,6 +904,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
     private void showOverflowMenu(@NonNull View anchor) {
         final PopupMenu menu = new PopupMenu(this, anchor);
         menu.inflate(R.menu.menu_main);
+        final android.view.MenuItem pgItem = menu.getMenu().findItem(R.id.action_privacy_guard);
+        if (pgItem != null) pgItem.setVisible(FeatureFlag.PRIVACY_GUARD.isEnabled(context));
         menu.setOnMenuItemClickListener(item -> {
             final int itemId = item.getItemId();
             if (itemId == R.id.action_bookmarks) {
@@ -950,6 +942,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
             }
             if (itemId == R.id.action_privacy_wipe) {
                 showModuleSheet(new cl.coders.faketraveler.ui.PrivacyWipeBottomSheet(), "privacyWipe");
+                return true;
+            }
+            if (itemId == R.id.action_privacy_guard) {
+                showPrivacyGuardSheet();
                 return true;
             }
             if (itemId == R.id.action_evidence) {

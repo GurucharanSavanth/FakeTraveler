@@ -63,4 +63,9 @@
         android:icon="@drawable/ic_evidence_export"
         android:title="@string/Evidence_Title"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_privacy_guard"
+        android:icon="@drawable/ic_info"
+        android:title="@string/PrivacyGuard_Open"
+        app:showAsAction="never" />
 </menu>
