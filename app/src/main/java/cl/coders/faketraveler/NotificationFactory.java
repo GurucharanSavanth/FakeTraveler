@@ -26,6 +26,10 @@ public final class NotificationFactory {
     public static final String HEALTH_CHANNEL_ID = "faketraveler.health";
     public static final int HEALTH_NOTIFICATION_ID = 4242;
 
+    /** Low-importance advisory channel for privacy-exposure alerts. */
+    public static final String PRIVACY_CHANNEL_ID = "faketraveler.privacy";
+    public static final int PRIVACY_NOTIFICATION_ID = 5150;
+
     private NotificationFactory() {
         throw new UnsupportedOperationException();
     }
@@ -205,6 +209,46 @@ public final class NotificationFactory {
                 .setContentIntent(contentIntent)
                 .setAutoCancel(true)
                 .setCategory(NotificationCompat.CATEGORY_ERROR)
+                .build();
+    }
+
+    /** Idempotent — creates the low-importance privacy channel on API 26+ if absent. */
+    public static void ensurePrivacyChannel(@NonNull Context ctx) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
+        final NotificationManager nm = ctx.getSystemService(NotificationManager.class);
+        if (nm == null) return;
+        if (nm.getNotificationChannel(PRIVACY_CHANNEL_ID) != null) return;
+        final NotificationChannel ch = new NotificationChannel(
+                PRIVACY_CHANNEL_ID,
+                ctx.getString(R.string.PrivacyGuard_ChannelName),
+                NotificationManager.IMPORTANCE_LOW);
+        ch.setDescription(ctx.getString(R.string.PrivacyGuard_ChannelDesc));
+        try { nm.createNotificationChannel(ch); } catch (Throwable ignored) {}
+    }
+
+    /** Advisory notification posted after apply when exposure is HIGH. Tap -> accessibility
+     *  settings (HIGH risk only ever comes from a third-party accessibility service). */
+    @NonNull
+    public static Notification buildPrivacyExposure(@NonNull Context ctx) {
+        ensurePrivacyChannel(ctx);
+        final int piFlags = PendingIntent.FLAG_UPDATE_CURRENT
+                | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0);
+        final PendingIntent contentIntent = PendingIntent.getActivity(
+                ctx, 4,
+                new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                piFlags);
+        return new NotificationCompat.Builder(ctx, PRIVACY_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_mock_notification)
+                .setContentTitle(ctx.getString(R.string.PrivacyGuard_NotifTitle))
+                .setContentText(ctx.getString(R.string.PrivacyGuard_NotifBody))
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText(ctx.getString(R.string.PrivacyGuard_NotifBody)))
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setVisibility(NotificationCompat.VISIBILITY_SECRET)
+                .setContentIntent(contentIntent)
+                .setCategory(NotificationCompat.CATEGORY_STATUS)
                 .build();
     }
 

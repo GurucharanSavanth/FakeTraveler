@@ -454,6 +454,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
         serviceConnector.startAndBindForApply(new ServiceConnector.MockArgs(
                 lat, lng, dLat / 1_000_000d, dLng / 1_000_000d,
                 mockFrequency * 1000L, mockCount, speed[0]));
+        PrivacyGuardNotifier.maybeNotify(context);
         // FIX-024 (Phase 3.2): mockCount==0 means infinite — sentinel endTime so UI
         // recognises "still running" instead of computing a past timestamp.
         // Saturate arithmetic so pathological mockCount/mockFrequency values (corrupt
