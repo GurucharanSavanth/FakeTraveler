@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -92,6 +93,9 @@ public final class ExifCleaner {
     }
 
     private void cleanOne(@NonNull Uri uri, @NonNull CleanResult res) {
+        // ExifInterface(FileDescriptor) is API 24+; no raw-path fallback in this FD-only design, so
+        // GPS stripping is unavailable on API 21-23 (the photo is left untouched, never crashes).
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return;
         final float[] out = new float[2];
         boolean hasGps = false;
         try (ParcelFileDescriptor pfd = resolver.openFileDescriptor(uri, "r")) {

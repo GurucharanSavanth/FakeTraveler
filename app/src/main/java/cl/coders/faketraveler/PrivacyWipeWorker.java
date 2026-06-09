@@ -2,6 +2,7 @@ package cl.coders.faketraveler;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -63,10 +64,14 @@ public class PrivacyWipeWorker extends Worker {
             return;
         }
         final int days = Math.max(1, sp.getInt(PREF_INTERVAL_DAYS, 7));
-        final Constraints constraints = new Constraints.Builder()
-                .setRequiresBatteryNotLow(true)
-                .setRequiresDeviceIdle(true)
-                .build();
+        final Constraints.Builder cb = new Constraints.Builder()
+                .setRequiresBatteryNotLow(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // setRequiresDeviceIdle is @RequiresApi(23); on API 21-22 the wipe runs without the
+            // idle constraint (battery-not-low still applies).
+            cb.setRequiresDeviceIdle(true);
+        }
+        final Constraints constraints = cb.build();
         final OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(PrivacyWipeWorker.class)
                 .setInitialDelay(days, TimeUnit.DAYS)
                 .setConstraints(constraints)

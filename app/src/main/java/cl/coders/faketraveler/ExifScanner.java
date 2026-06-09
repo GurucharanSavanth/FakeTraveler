@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 
@@ -51,6 +52,9 @@ public final class ExifScanner {
     }
 
     boolean hasGps(@NonNull Uri uri) {
+        // ExifInterface(FileDescriptor) is API 24+; this FD-only design has no raw-path fallback
+        // (scoped-storage safe), so on API 21-23 the audit reports no GPS instead of crashing.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return false;
         try (ParcelFileDescriptor pfd = resolver.openFileDescriptor(uri, "r")) {
             if (pfd == null) return false;
             final ExifInterface exif = new ExifInterface(pfd.getFileDescriptor());

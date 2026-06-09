@@ -66,9 +66,14 @@ final class RadioConsistencyManager {
         return mask != 0;
     }
 
+    @SuppressWarnings("deprecation") // isScanAlwaysAvailable @Deprecated API 33; still the only
+    // read of the user's "Wi-Fi scanning" toggle — no replacement read API exists.
     private boolean wifiScanAlwaysOn() {
         try {
-            final WifiManager wm = (WifiManager) appCtx.getSystemService(Context.WIFI_SERVICE);
+            // WIFI_SERVICE must resolve via the application context to avoid a pre-N leak; appCtx is
+            // already application context but lint requires the explicit call (WifiManagerPotentialLeak).
+            final WifiManager wm = (WifiManager) appCtx.getApplicationContext()
+                    .getSystemService(Context.WIFI_SERVICE);
             return wm != null && wm.isScanAlwaysAvailable();
         } catch (Throwable t) {
             return false;
