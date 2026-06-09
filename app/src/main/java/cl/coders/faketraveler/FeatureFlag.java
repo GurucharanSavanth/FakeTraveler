@@ -15,7 +15,8 @@ public enum FeatureFlag {
     PERMISSION_DRIFT("enable_perm_drift", true),
     EXIF_CLEANER("enable_exif_cleaner", true),
     PRIVACY_WIPE("enable_privacy_wipe", true),
-    EVIDENCE_EXPORT("enable_evidence_export", true);
+    EVIDENCE_EXPORT("enable_evidence_export", true),
+    PRIVACY_GUARD("enable_privacy_guard", false);
 
     public final String prefKey;
     public final boolean defaultValue;
