@@ -211,6 +211,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
 
         wireBookmarkButtons();
         wireDetectionButton();
+        wirePrivacyGuardButton();
         wireQuickSettingsChips();
 
         detectAppVersion();
@@ -295,6 +296,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
         super.onResume();
         context = getApplicationContext();
         loadSharedPrefs();
+        if (findViewById(R.id.privacy_guard_btn) != null) wirePrivacyGuardButton();
     }
 
     @Override
@@ -840,6 +842,19 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
     private void showDetectionSheet() {
         new cl.coders.faketraveler.ui.DetectionTestBottomSheet()
                 .show(getSupportFragmentManager(), "detection");
+    }
+
+    private void wirePrivacyGuardButton() {
+        final android.view.View btn =
+                Inputs.requireView(this, R.id.privacy_guard_btn, "privacy_guard_btn");
+        btn.setVisibility(FeatureFlag.PRIVACY_GUARD.isEnabled(context)
+                ? android.view.View.VISIBLE : android.view.View.GONE);
+        btn.setOnClickListener(v -> showPrivacyGuardSheet());
+    }
+
+    private void showPrivacyGuardSheet() {
+        new cl.coders.faketraveler.ui.PrivacyGuardBottomSheet()
+                .show(getSupportFragmentManager(), "privacy_guard");
     }
 
     private void showSettingsSheet() {

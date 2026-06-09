@@ -314,6 +314,8 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
                 FeatureFlag.PRIVACY_WIPE.prefKey, FeatureFlag.PRIVACY_WIPE.defaultValue);
         wireCheckBox(view, R.id.cb_feat_evidence,
                 FeatureFlag.EVIDENCE_EXPORT.prefKey, FeatureFlag.EVIDENCE_EXPORT.defaultValue);
+        wireCheckBox(view, R.id.cb_feat_privacy_guard,
+                FeatureFlag.PRIVACY_GUARD.prefKey, FeatureFlag.PRIVACY_GUARD.defaultValue);
         wireCheckBox(view, R.id.cb_SimulateAltitude, "simulateAltitude", false);
         wireCheckBox(view, R.id.cb_SimulateAccuracy, "simulateAccuracy", false);
         wireStringField(view, R.id.et_SessionLabel, "sessionLabel");

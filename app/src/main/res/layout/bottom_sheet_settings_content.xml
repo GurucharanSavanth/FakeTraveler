@@ -391,6 +391,14 @@
             android:text="@string/Settings_Feat_Evidence"
             android:textAppearance="?attr/textAppearanceBodyLarge" />
 
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/cb_feat_privacy_guard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/touch_target_min"
+            android:text="@string/Settings_FeatPrivacyGuard"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
+
         <!-- ═══ Simulation Section (Module 1) ═══ -->
 
         <TextView

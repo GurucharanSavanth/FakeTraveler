@@ -320,4 +320,11 @@
         android:layout_height="@dimen/hidden_compat_size"
         android:visibility="gone"
         android:text="@string/MainActivity_DetectionTest" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/privacy_guard_btn"
+        android:layout_width="@dimen/hidden_compat_size"
+        android:layout_height="@dimen/hidden_compat_size"
+        android:visibility="gone"
+        android:text="@string/PrivacyGuard_Open" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
