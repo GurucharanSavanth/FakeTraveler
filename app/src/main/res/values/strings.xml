@@ -436,4 +436,20 @@
 
     <!-- Strict mode toggle -->
     <string name="Settings_StrictRadioMode">Strict mode: stop mocking on inconsistent radio state</string>
+
+    <!-- Privacy Guard -->
+    <string name="PrivacyGuard_Open">Privacy guard</string>
+    <string name="PrivacyGuard_Run">Re-scan</string>
+    <string name="PrivacyGuard_Fix">Fix</string>
+    <string name="PrivacyGuard_Low">Low exposure</string>
+    <string name="PrivacyGuard_Medium">Medium exposure</string>
+    <string name="PrivacyGuard_High">High exposure</string>
+    <string name="PrivacyGuard_LowReco">Your device isn\'t exposing extra surveillance surface right now.</string>
+    <string name="PrivacyGuard_MediumReco">An app can draw over your screen. Review the apps below.</string>
+    <string name="PrivacyGuard_HighReco">An app can read your screen and tap for you. Review it below.</string>
+    <string name="PrivacyGuard_NotifTitle">Privacy risk while mocking</string>
+    <string name="PrivacyGuard_NotifBody">An accessibility service can read your screen. Tap to review.</string>
+    <string name="PrivacyGuard_ChannelName">Privacy guard</string>
+    <string name="PrivacyGuard_ChannelDesc">Advisory alerts about device privacy exposure</string>
+    <string name="Settings_FeatPrivacyGuard">Privacy guard (exposure advisor)</string>
 </resources>
