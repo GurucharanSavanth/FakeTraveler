@@ -104,6 +104,9 @@ Parsed by `GpxImporter` (`XmlPullParser`). Saved to prefs `routeData`.
 | V28 | WebView state persisted via `onSaveInstanceState`/`onRestoreInstanceState`. ! reload on every config change (rotate loses marker). | `MainActivity.onSaveInstanceState`, `onRestoreInstanceState` |
 | V29 | User-visible error paths use `Snackbar.LENGTH_LONG` (or AlertDialog). ! `LENGTH_SHORT` for errors. | `MainActivity.showError` |
 | V30 | Geo intent parse failure → user-visible Snackbar, NOT silent log only. | `MainActivity.applyIntentOrDefault` |
+| V31 | `detection/PrivacyExposureScanner` READ-ONLY: only `getEnabledAccessibilityServiceList`, `Settings.Global.getInt`, `AppOpsManager.checkOpNoThrow`, `getInstalledPackages`/`getApplicationInfo`. ! any `Settings.*.put*`, `addTestProvider`, or setting/provider mutation. Inverse of `DetectionEngine` (advisory exposure scan). | `PrivacyExposureScanner` |
+| V32 | Privacy-guard alerts ADVISORY-ONLY: `PrivacyGuardNotifier.maybeNotify` (from `MainActivity.proceedWithApply` after `startAndBindForApply`) only reads `PrivacyExposureScanner.run` + may post 1 HIGH notification. ! start/stop/suspend/alter mock lifecycle from a finding (rejected v3.0.0 "Restrictive auto-stop" forbidden — see memory project_v3_evasion_declined). Gated `FeatureFlag.PRIVACY_GUARD` default off. | `PrivacyGuardNotifier.maybeNotify`, `MainActivity.proceedWithApply` |
+| V33 | ∀ new feature bottom-sheet → user-reachable via `menu_main` `action_*` item + `showModuleSheet`, on-device verified. ! wire to placeholder `detection_btn` (`@dimen/hidden_compat_size`=0dp + visibility=gone → unreachable; compiles green but dead). | `MainActivity.showOverflowMenu`, `res/menu/menu_main.xml` |
 
 `?` = uncertain or new; user confirm.
 
@@ -135,6 +138,7 @@ Parsed by `GpxImporter` (`XmlPullParser`). Saved to prefs `routeData`.
 | T8 | . | assembleRelease (signing config required) | C5 |
 | T9 | . | translate 5 new English strings to da/de/es/pt-rBR/ru/zh | I.manifest |
 | T10 | . | resolve `app_name` translatable=false ↔ da/de/zh translated mismatch | (lint warn) |
+| T23 | x | impl privacy-guard: read-only `PrivacyExposureScanner` + advisory `PrivacyGuardNotifier` + flag-gated `action_privacy_guard` overflow entry + sheet (commits b841bab..b29565e) | V31,V32,V33 |
 
 ## §B — Bugs
 
@@ -150,6 +154,7 @@ Parsed by `GpxImporter` (`XmlPullParser`). Saved to prefs `routeData`.
 | B8 | 2026-05-20 | Process death recovery used bind-only — onStartCommand never fired → resumeFromPrefsIfActive never ran → service bound but not mocking | FIX-028 + V27 |
 | B9 | 2026-05-20 | WebView state lost on rotate (no onSaveInstanceState) → marker reset, user lost position | FIX-030 + V28 |
 | B10 | 2026-05-20 | Geo intent parse failure logged but no user feedback → user thought VIEW intent ignored | FIX-029 + V30 |
+| B11 | 2026-06-10 | privacy-guard entry button copied placeholder `detection_btn` (0dp + visibility=gone) → menu-less entry unreachable even with flag on; "compiles ≠ reachable", caught only by on-device smoke. Moved entry to flag-gated `action_privacy_guard` overflow item | V33 |
 
 ---
 
