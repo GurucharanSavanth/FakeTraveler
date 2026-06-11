@@ -144,68 +144,6 @@
                 android:text="@string/Default_MockCount" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- ═══ Accuracy & Altitude Section ═══ -->
-
-        <TextView
-            style="?attr/textAppearanceLabelLarge"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/section_gap"
-            android:text="@string/Settings_Section_AccuracyAltitude"
-            android:textAllCaps="true"
-            android:textColor="?attr/colorPrimary" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_md"
-            android:orientation="horizontal">
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="@dimen/size_zero"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="@string/Settings_Accuracy_Label"
-                app:boxBackgroundMode="outline"
-                app:boxCornerRadiusBottomEnd="@dimen/corner_small"
-                app:boxCornerRadiusBottomStart="@dimen/corner_small"
-                app:boxCornerRadiusTopEnd="@dimen/corner_small"
-                app:boxCornerRadiusTopStart="@dimen/corner_small"
-                app:helperText="@string/Settings_Defaults_Helper">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_Accuracy"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/text_input_height"
-                    android:inputType="numberDecimal"
-                    android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <Space
-                android:layout_width="@dimen/spacing_sm"
-                android:layout_height="@dimen/size_zero" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="@dimen/size_zero"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="@string/Settings_Altitude_Label"
-                app:boxBackgroundMode="outline"
-                app:boxCornerRadiusBottomEnd="@dimen/corner_small"
-                app:boxCornerRadiusBottomStart="@dimen/corner_small"
-                app:boxCornerRadiusTopEnd="@dimen/corner_small"
-                app:boxCornerRadiusTopStart="@dimen/corner_small"
-                app:helperText="@string/Settings_Defaults_Helper">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_Altitude"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/text_input_height"
-                    android:inputType="numberSigned|numberDecimal"
-                    android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
-        </LinearLayout>
-
         <!-- ═══ Map Section ═══ -->
 
         <TextView
@@ -486,8 +424,7 @@
             <TextView android:id="@+id/textView"  android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ActivityMore_HowToTittle" />
             <TextView android:id="@+id/textView2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ActivityMore_HowToInstructions" />
             <TextView android:id="@+id/textView3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ActivityMore_IconLicense" />
-            <TextView android:id="@+id/et_DMockLatLon" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ActivityMore_DMockLatLon" />
-            <EditText android:id="@+id/et_DMockLat"  android:layout_width="wrap_content" android:layout_height="wrap_content" android:inputType="numberSigned|numberDecimal" android:text="@string/Default_DMockValue" />
+<EditText android:id="@+id/et_DMockLat"  android:layout_width="wrap_content" android:layout_height="wrap_content" android:inputType="numberSigned|numberDecimal" android:text="@string/Default_DMockValue" />
             <EditText android:id="@+id/et_DMockLon"  android:layout_width="wrap_content" android:layout_height="wrap_content" android:inputType="numberSigned|numberDecimal" android:text="@string/Default_DMockValue" />
             <CheckBox android:id="@+id/cb_MockSpeed" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ActivityMore_Speed" />
             <TextView android:id="@+id/textView4" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ActivityMore_HowManyTimes" />
