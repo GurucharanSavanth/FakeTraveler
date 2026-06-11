@@ -107,6 +107,10 @@ Parsed by `GpxImporter` (`XmlPullParser`). Saved to prefs `routeData`.
 | V31 | `detection/PrivacyExposureScanner` READ-ONLY: only `getEnabledAccessibilityServiceList`, `Settings.Global.getInt`, `AppOpsManager.checkOpNoThrow`, `getInstalledPackages`/`getApplicationInfo`. ! any `Settings.*.put*`, `addTestProvider`, or setting/provider mutation. Inverse of `DetectionEngine` (advisory exposure scan). | `PrivacyExposureScanner` |
 | V32 | Privacy-guard alerts ADVISORY-ONLY: `PrivacyGuardNotifier.maybeNotify` (from `MainActivity.proceedWithApply` after `startAndBindForApply`) only reads `PrivacyExposureScanner.run` + may post 1 HIGH notification. ! start/stop/suspend/alter mock lifecycle from a finding (rejected v3.0.0 "Restrictive auto-stop" forbidden — see memory project_v3_evasion_declined). Gated `FeatureFlag.PRIVACY_GUARD` default off. | `PrivacyGuardNotifier.maybeNotify`, `MainActivity.proceedWithApply` |
 | V33 | ∀ new feature bottom-sheet → user-reachable via `menu_main` `action_*` item + `showModuleSheet`, on-device verified. ! wire to placeholder `detection_btn` (`@dimen/hidden_compat_size`=0dp + visibility=gone → unreachable; compiles green but dead). | `MainActivity.showOverflowMenu`, `res/menu/menu_main.xml` |
+| V34 | RecyclerView drag-reorder → caller guards `getBindingAdapterPosition()==NO_POSITION` AND adapter bounds-checks `from`/`to` vs `items.size()` before `Collections.swap`. ! pass raw adapter position (detached VH → -1 → IndexOutOfBounds). | `RouteEditorBottomSheet.onMove`, `WaypointAdapter.onMove` |
+| V35 | WebView tile interceptor → fully buffer response body (capped `MAX_TILE_BYTES`) then `disconnect()` on EVERY exit path (success/non-2xx/IOException/Throwable). ! hand live `getInputStream()` to `WebResourceResponse` (conn leaks until GC → socket-pool exhaustion under tile load). | `WebViewSetup.shouldInterceptRequest`, `readBounded` |
+| V36 | Per-tick mock drift accumulation → clamp result to WGS84 via `Inputs.clampLat`/`clampLng`. ! add raw delta unbounded (out-of-range coord → silent `setTestProviderLocation` reject on later ticks). | `MockedLocationTask.run` |
+| V37 | Settings double deltas (`dLat`/`dLng`) → clamp to [-180,180] BEFORE `putDouble`, matching `wireIntField`. ! persist only `isFinite`-checked value (unbounded drift). | `SettingsBottomSheet.wireDoubleField` |
 
 `?` = uncertain or new; user confirm.
 
@@ -139,6 +143,7 @@ Parsed by `GpxImporter` (`XmlPullParser`). Saved to prefs `routeData`.
 | T9 | . | translate 5 new English strings to da/de/es/pt-rBR/ru/zh | I.manifest |
 | T10 | . | resolve `app_name` translatable=false ↔ da/de/zh translated mismatch | (lint warn) |
 | T23 | x | impl privacy-guard: read-only `PrivacyExposureScanner` + advisory `PrivacyGuardNotifier` + flag-gated `action_privacy_guard` overflow entry + sheet (commits b841bab..b29565e) | V31,V32,V33 |
+| T24 | x | audit-fix batch: 10 verified defects fixed (drag-OOB ×2, conn-leak, drift-clamp, delta-clamp, 4 silent-catch); 4 FP/benign rejected; compileDebugJavaWithJavac green (commit 4199c6a) | V34..V37, B12..B20 |
 
 ## §B — Bugs
 
@@ -155,6 +160,17 @@ Parsed by `GpxImporter` (`XmlPullParser`). Saved to prefs `routeData`.
 | B9 | 2026-05-20 | WebView state lost on rotate (no onSaveInstanceState) → marker reset, user lost position | FIX-030 + V28 |
 | B10 | 2026-05-20 | Geo intent parse failure logged but no user feedback → user thought VIEW intent ignored | FIX-029 + V30 |
 | B11 | 2026-06-10 | privacy-guard entry button copied placeholder `detection_btn` (0dp + visibility=gone) → menu-less entry unreachable even with flag on; "compiles ≠ reachable", caught only by on-device smoke. Moved entry to flag-gated `action_privacy_guard` overflow item | V33 |
+| B12 | 2026-06-11 | RecyclerView drag-reorder passed `getBindingAdapterPosition()` (=-1 when VH detaches mid-drag) straight into `Collections.swap` → IndexOutOfBoundsException | V34 + NO_POSITION guard (`RouteEditorBottomSheet.onMove`) |
+| B13 | 2026-06-11 | `WaypointAdapter.onMove` swapped without bounds-check → IndexOutOfBounds on stale/-1 index | V34 + bounds-check before swap |
+| B14 | 2026-06-11 | `WebViewSetup` handed live `HttpURLConnection.getInputStream()` to `WebResourceResponse`; `finally` skipped disconnect on handOff + non-2xx early-return → connection leak → socket-pool exhaustion under sustained tile load | V35 + buffer body + disconnect every path |
+| B15 | 2026-06-11 | `MockedLocationTask` accumulated per-tick drift unclamped → out-of-WGS84 coords silently rejected by `setTestProviderLocation` on later ticks | V36 + `Inputs.clampLat/clampLng` |
+| B16 | 2026-06-11 | `SettingsBottomSheet.wireDoubleField` stored dLat/dLng with only `isFinite` check (no magnitude bound) unlike `wireIntField` → unbounded drift via SharedPreferences | V37 + clamp [-180,180] |
+| B17 | 2026-06-11 | `AboutActivity` empty `catch(Throwable ignored)` on version-bind + openUrl → silent failure, no diagnostic | Log.w + TAG (mirrors `MainActivity.detectAppVersion`) |
+| B18 | 2026-06-11 | `ExifScanner.audit` empty catch → MediaStore query failure returns partial/empty scan with no signal (false "0 GPS photos" privacy report) | Log.w |
+| B19 | 2026-06-11 | `ExifCleaner.cleanOne` empty catch on GPS-detect read → GPS tags may exist but appear absent → photo left uncleaned | Log.w |
+| B20 | 2026-06-11 | `SharedPrefsUtil.saveLastMockedLocation` empty `catch(JSONException)` → NaN coord drops persist silently → breaks restore-after-reboot for that session | Log.w |
+
+Rejected (adversarial/manual verify — not bugs): `setRestoreAfterBoot` dual-write (reader `isRestoreAfterBoot` handles legacy fallback; cited "V42" is fabricated), `MockSessionRecorder` point-insert (SQLiteException already caught + logged), `WebViewSetup.disconnect` empty catch (best-effort cleanup), `PermissionChecker.openDevSettings` empty catch (intentional primary→fallback Intent chain).
 
 ---
 
