@@ -525,6 +525,17 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
         webView.loadUrl("javascript:setOnMap("
                 + Inputs.jsNumber(safeLat) + "," + Inputs.jsNumber(safeLng) + ");");
     }
+
+    /** Variant that also forces the map zoom — used by LOAD/bookmark restore so a saved
+     *  bookmark applies its stored zoom, not just its coordinates (V33-adjacent UX fix). */
+    protected void setMapMarker(double lat, double lng, double mapZoom) {
+        if (webView == null || webView.getUrl() == null) return;
+        final double safeLat = Inputs.clampLat(lat);
+        final double safeLng = Inputs.clampLng(lng);
+        webView.loadUrl("javascript:setOnMap("
+                + Inputs.jsNumber(safeLat) + "," + Inputs.jsNumber(safeLng)
+                + "," + Inputs.jsNumber(mapZoom) + ");");
+    }
     void changeButtonToApply() {
         buttonApplyStop.setText(context.getResources().getString(R.string.ActivityMain_Apply));
         buttonApplyStop.setIconResource(R.drawable.ic_location_on);
@@ -554,7 +565,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnector.
     void setLatLng(double mLat, double mLng, @NonNull SourceChange srcChange) {
         lat = LocationInputHandler.clampLat(mLat);
         lng = LocationInputHandler.clampLng(mLng);
-        if (srcChange == CHANGE_FROM_EDITTEXT || srcChange == LOAD) setMapMarker(lat, lng);
+        if (srcChange == LOAD) setMapMarker(lat, lng, zoom);            // restore saved zoom too
+        else if (srcChange == CHANGE_FROM_EDITTEXT) setMapMarker(lat, lng); // keep current zoom
         if ((srcChange == CHANGE_FROM_MAP || srcChange == LOAD) && inputHandler != null) {
             inputHandler.setProgrammatic(lat, lng);
         }

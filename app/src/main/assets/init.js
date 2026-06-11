@@ -80,9 +80,9 @@ function onMapClick(e) {
 function onZoomEnd(e) {
   Android.setZoom(map.getZoom());
 }
-function setOnMap(aLat, aLng) {
+function setOnMap(aLat, aLng, aZoom) {
   if (typeof mapMarker != 'undefined') map.removeLayer(mapMarker);
-  zoom = map.getZoom();
+  zoom = (typeof aZoom !== 'undefined' && aZoom !== null) ? aZoom : map.getZoom();
   map.setView(new L.LatLng(aLat, aLng), zoom);
   mapMarker = L.marker([aLat, aLng], {
     icon: icon
