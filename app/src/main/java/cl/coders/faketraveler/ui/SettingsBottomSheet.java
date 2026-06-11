@@ -158,7 +158,10 @@ public class SettingsBottomSheet extends BottomSheetDialogFragment {
                     putDouble(e, key, 0);
                 } else {
                     try {
-                        final double parsed = Double.parseDouble(et.getText().toString());
+                        double parsed = Double.parseDouble(et.getText().toString());
+                        // Clamp lat/lng deltas to the valid geographic span so a stray
+                        // microdegree value can't drift the mock beyond coordinate bounds.
+                        parsed = Math.max(-180d, Math.min(180d, parsed));
                         if (Double.isFinite(parsed)) putDouble(e, key, parsed);
                     } catch (Throwable t) {
                         Log.e(TAG, "Could not parse " + key + "!", t);

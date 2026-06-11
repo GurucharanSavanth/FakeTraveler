@@ -91,7 +91,8 @@ public final class SharedPrefsUtil {
                     .putString(KEY_LAST_MOCKED_LOCATION, json)
                     .apply();
             SettingsDataStore.get(ctx).setStringBlocking(KEY_LAST_MOCKED_LOCATION, json);
-        } catch (JSONException ignored) {
+        } catch (JSONException e) {
+            Log.w(TAG, "lastMockedLocation serialize failed; not persisted", e);
         }
     }
 

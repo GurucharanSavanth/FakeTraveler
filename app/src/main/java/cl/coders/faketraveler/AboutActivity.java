@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -20,6 +21,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 /** Presentation-only About / help surface for the trimmed global mock workflow. */
 public class AboutActivity extends AppCompatActivity {
+
+    private static final String TAG = "AboutActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +62,8 @@ public class AboutActivity extends AppCompatActivity {
             final PackageInfo pi = getPackageManager().getPackageInfo(getPackageName(), 0);
             ((TextView) findViewById(R.id.about_version)).setText(getString(
                     R.string.About_Version, pi.versionName, PackageInfoUtil.versionCode(pi)));
-        } catch (Throwable ignored) {
+        } catch (Throwable t) {
+            Log.w(TAG, "getPackageInfo failed", t);
         }
     }
 
@@ -89,7 +93,8 @@ public class AboutActivity extends AppCompatActivity {
     private void openUrl(@NonNull String url) {
         try {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-        } catch (Throwable ignored) {
+        } catch (Throwable t) {
+            Log.w(TAG, "openUrl failed: no handler for " + url, t);
         }
     }
 }

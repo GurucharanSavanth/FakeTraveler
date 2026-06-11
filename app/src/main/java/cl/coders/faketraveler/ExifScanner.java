@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
@@ -19,6 +20,8 @@ import androidx.annotation.WorkerThread;
  * so it never needs a raw file path. Mutating strips live in {@link ExifCleaner}.
  */
 public final class ExifScanner {
+
+    private static final String TAG = "ExifScanner";
 
     public static final class ScanResult {
         public int scanned;
@@ -46,7 +49,8 @@ public final class ExifScanner {
                 final Uri uri = ContentUris.withAppendedId(collection, c.getLong(idCol));
                 if (hasGps(uri)) res.withGps++;
             }
-        } catch (Throwable ignored) {
+        } catch (Throwable t) {
+            Log.w(TAG, "EXIF audit query failed; returning partial scan", t);
         }
         return res;
     }

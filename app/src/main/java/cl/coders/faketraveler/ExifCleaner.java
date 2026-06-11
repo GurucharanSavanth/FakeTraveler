@@ -102,7 +102,8 @@ public final class ExifCleaner {
             if (pfd == null) return;
             // platform ExifInterface: boolean getLatLong(float[2] out), not the androidx double[] form
             hasGps = new ExifInterface(pfd.getFileDescriptor()).getLatLong(out);
-        } catch (Throwable ignored) {
+        } catch (Throwable t) {
+            Log.w(TAG, "GPS-tag detection read failed; treating as no-GPS", t);
         }
         if (!hasGps) return; // no GPS to strip
 

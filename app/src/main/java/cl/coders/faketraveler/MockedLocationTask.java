@@ -8,6 +8,8 @@ import androidx.annotation.NonNull;
 
 import java.util.TimerTask;
 
+import cl.coders.faketraveler.util.Inputs;
+
 /**
  * Periodic mock-location push. Extracted from {@link MockedLocationService} (FIX-015).
  * Mutates internal lat/lng each tick by the configured deltas; auto-cancels when the
@@ -72,7 +74,10 @@ final class MockedLocationTask extends TimerTask {
             service.notifyMockCompleted();
             return;
         }
-        latitude += latitudeMockedDistance;
-        longitude += longitudeMockedDistance;
+        // S2-Location-1: clamp accumulated drift to valid WGS84 ranges (lat ±90, lng ±180);
+        // out-of-bounds coords would yield invalid Location objects and silent
+        // setTestProviderLocation() rejection on the next tick.
+        latitude = Inputs.clampLat(latitude + latitudeMockedDistance);
+        longitude = Inputs.clampLng(longitude + longitudeMockedDistance);
     }
 }

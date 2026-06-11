@@ -68,7 +68,12 @@ public class RouteEditorBottomSheet extends BottomSheetDialogFragment
                                             @NonNull RecyclerView.ViewHolder a,
                                             @NonNull RecyclerView.ViewHolder b) {
                 if (adapter == null) return false;
-                adapter.onMove(a.getBindingAdapterPosition(), b.getBindingAdapterPosition());
+                final int fromPos = a.getBindingAdapterPosition();
+                final int toPos = b.getBindingAdapterPosition();
+                if (fromPos == RecyclerView.NO_POSITION || toPos == RecyclerView.NO_POSITION) {
+                    return false;
+                }
+                adapter.onMove(fromPos, toPos);
                 return true;
             }
             @Override public void onSwiped(@NonNull RecyclerView.ViewHolder vh, int dir) { }

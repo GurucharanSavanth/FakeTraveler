@@ -41,6 +41,7 @@ public class WaypointAdapter extends RecyclerView.Adapter<WaypointAdapter.VH> {
     public void refresh() { notifyDataSetChanged(); }
 
     public void onMove(int from, int to) {
+        if (from < 0 || from >= items.size() || to < 0 || to >= items.size()) return;
         Collections.swap(items, from, to);
         notifyItemMoved(from, to);
     }

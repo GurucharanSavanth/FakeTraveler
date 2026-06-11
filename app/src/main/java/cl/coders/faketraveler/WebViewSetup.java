@@ -13,7 +13,10 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Set;
@@ -78,6 +81,10 @@ public final class WebViewSetup {
 
         private static final int TIMEOUT_MS = 8_000;
 
+        // Cap on a single buffered tile so a misbehaving/oversized response cannot OOM the
+        // WebView process. Real OSM-style PNG/JPEG tiles are well under this.
+        private static final int MAX_TILE_BYTES = 4 * 1024 * 1024;
+
         @Override
         @Nullable
         public WebResourceResponse shouldInterceptRequest(@NonNull WebView view,
@@ -87,7 +94,6 @@ public final class WebViewSetup {
             final String host = u.getHost();
             if (host == null || !TILE_HOSTS.contains(host)) return null;
             HttpURLConnection conn = null;
-            boolean handOff = false;
             try {
                 final URL url = new URL(u.toString());
                 conn = (HttpURLConnection) url.openConnection();
@@ -103,10 +109,11 @@ public final class WebViewSetup {
                 String mime = conn.getContentType();
                 if (mime == null) mime = "image/png";
                 final String encoding = conn.getContentEncoding();
-                final WebResourceResponse resp =
-                        new WebResourceResponse(stripCharset(mime), encoding, conn.getInputStream());
-                handOff = true;
-                return resp;
+                // Buffer the body fully so the connection can be released in finally; handing
+                // the live stream to WebResourceResponse would leak the connection (no close).
+                final byte[] body = readBounded(conn.getInputStream());
+                return new WebResourceResponse(stripCharset(mime), encoding,
+                        new ByteArrayInputStream(body));
             } catch (IOException e) {
                 Log.w(TAG, "Tile interceptor falling back for " + u, e);
                 return null;
@@ -114,9 +121,27 @@ public final class WebViewSetup {
                 Log.e(TAG, "Tile interceptor unexpected error for " + u, t);
                 return null;
             } finally {
-                if (!handOff && conn != null) {
+                if (conn != null) {
                     try { conn.disconnect(); } catch (Throwable ignored) {}
                 }
+            }
+        }
+
+        @NonNull
+        private static byte[] readBounded(@NonNull InputStream in) throws IOException {
+            try (InputStream src = in) {
+                final ByteArrayOutputStream buf = new ByteArrayOutputStream();
+                final byte[] chunk = new byte[8192];
+                int total = 0;
+                int n;
+                while ((n = src.read(chunk)) > 0) {
+                    total += n;
+                    if (total > MAX_TILE_BYTES) {
+                        throw new IOException("Tile exceeds " + MAX_TILE_BYTES + " bytes");
+                    }
+                    buf.write(chunk, 0, n);
+                }
+                return buf.toByteArray();
             }
         }
 
